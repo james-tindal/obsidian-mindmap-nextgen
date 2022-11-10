@@ -11,4 +11,5 @@ export class MindMapSettings {
   color2: string = "#2ab7ca";
   color3: string = "#fe4a49";
   defaultColor: string = "#2ab7ca";
+  initialExpandLevel: number = 1;
 }

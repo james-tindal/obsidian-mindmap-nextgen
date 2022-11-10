@@ -15,6 +15,7 @@ import { createSVG, getComputedCss, removeExistingSVG } from "./markmap-svg";
 import { copyImageToClipboard } from "./copy-image";
 import { MindMapSettings } from "./settings";
 import { IMarkmapOptions } from "markmap-view/types/types";
+import { Selection as d3Selection } from "d3";
 import { D3ZoomEvent, ZoomTransform, zoomIdentity } from "d3-zoom";
 
 export default class MindmapView extends ItemView {
@@ -63,7 +64,31 @@ export default class MindmapView extends ItemView {
           .setIcon("image-file")
           .setTitle("Copy screenshot")
           .onClick(() => copyImageToClipboard(this.svg))
+      )
+      .addSeparator()
+      .addItem((item) =>
+        item
+          .setIcon("folder")
+          .setTitle("Collapse All")
+          .onClick(() => {
+            try {
+              this.markmapSVG.g
+                .selectAll("g")
+                .nodes()
+                .forEach((node: any) => {
+                  if (
+                    node.querySelector("circle")?.getAttribute("fill") ==
+                    "rgb(255, 255, 255)"
+                  ) {
+                    node.dispatchEvent(new CustomEvent("click"));
+                  }
+                });
+            } catch (err) {
+              console.log(err);
+            }
+          })
       );
+
     menu.showAtPosition({ x: 0, y: 0 });
   }
 
@@ -84,6 +109,7 @@ export default class MindmapView extends ItemView {
   async onOpen() {
     this.obsMarkmap = new ObsidianMarkmap(this.vault);
     this.registerActiveLeafUpdate();
+    this.workspace.onLayoutReady(() => this.update());
     this.listeners = [
       this.workspace.on("layout-change", () => this.update()),
       this.workspace.on("resize", () => this.update()),
@@ -209,7 +235,6 @@ export default class MindmapView extends ItemView {
   }
 
   applyColor({ d: depth }: INode) {
-    console.log("uaauu", this);
     const colors = [
       this.settings.color1,
       this.settings.color2,
