@@ -75,7 +75,7 @@ export default class MindmapView extends ItemView {
               this.markmapSVG.g
                 .selectAll("g")
                 .nodes()
-                .forEach((node: any) => {
+                .forEach((node: HTMLElement) => {
                   if (
                     node.querySelector("circle")?.getAttribute("fill") ==
                     "rgb(255, 255, 255)"
