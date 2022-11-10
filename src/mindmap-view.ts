@@ -1,206 +1,291 @@
-import { EventRef, ItemView, Menu, Vault, Workspace, WorkspaceLeaf } from 'obsidian';
-import { transform } from 'markmap-lib';
-import { Markmap } from 'markmap-view';
-import { INode } from 'markmap-common';
-import { FRONT_MATTER_REGEX, MD_VIEW_TYPE, MM_VIEW_TYPE } from './constants';
-import ObsidianMarkmap from './obsidian-markmap-plugin';
-import { createSVG, getComputedCss, removeExistingSVG } from './markmap-svg';
-import { copyImageToClipboard } from './copy-image';
-import { MindMapSettings } from './settings';
-import { IMarkmapOptions } from 'markmap-view/types/types';
+import {
+  EventRef,
+  ItemView,
+  Menu,
+  Vault,
+  Workspace,
+  WorkspaceLeaf,
+} from "obsidian";
+import { transform } from "markmap-lib";
+import { Markmap } from "markmap-view";
+import { INode } from "markmap-common";
+import { FRONT_MATTER_REGEX, MD_VIEW_TYPE, MM_VIEW_TYPE } from "./constants";
+import ObsidianMarkmap from "./obsidian-markmap-plugin";
+import { createSVG, getComputedCss, removeExistingSVG } from "./markmap-svg";
+import { copyImageToClipboard } from "./copy-image";
+import { MindMapSettings } from "./settings";
+import { IMarkmapOptions } from "markmap-view/types/types";
+import { D3ZoomEvent, ZoomTransform, zoomIdentity } from "d3-zoom";
+import { EventEmitter } from "@billjs/event-emitter";
 
 export default class MindmapView extends ItemView {
-    filePath: string;
-    fileName: string;
-    linkedLeaf: WorkspaceLeaf;
-    displayText: string;
-    currentMd: string;
-    vault: Vault;
-    workspace: Workspace;
-    listeners: EventRef[];
-    emptyDiv: HTMLDivElement;
-    svg: SVGElement;
-    obsMarkmap: ObsidianMarkmap;
-    isLeafPinned: boolean;
-    pinAction: HTMLElement;
-    settings: MindMapSettings;
+  filePath: string;
+  fileName: string;
+  linkedLeaf: WorkspaceLeaf;
+  displayText: string;
+  currentMd: string;
+  vault: Vault;
+  workspace: Workspace;
+  listeners: EventRef[];
+  emptyDiv: HTMLDivElement;
+  svg: SVGElement;
+  obsMarkmap: ObsidianMarkmap;
+  isLeafPinned: boolean;
+  pinAction: HTMLElement;
+  settings: MindMapSettings;
+  currentTransform: ZoomTransform;
+  markmapSVG: Markmap;
+  configChange: EventEmitter;
 
-    getViewType(): string {
-        return MM_VIEW_TYPE;
-    }
+  // workaround for zooming
 
-    getDisplayText(): string {
-        return this.displayText ?? 'Mind Map';
-    }
+  getViewType(): string {
+    return MM_VIEW_TYPE;
+  }
 
-    getIcon() {
-        return "dot-network";
-    }
+  getDisplayText(): string {
+    return this.displayText ?? "Mind Map";
+  }
 
-    onMoreOptionsMenu(menu: Menu) {    
-        menu
-        .addItem((item) => 
-            item
-            .setIcon('pin')
-            .setTitle('Pin')
-            .onClick(() => this.pinCurrentLeaf())
-        )
-        .addSeparator()
-        .addItem((item) => 
-            item
-            .setIcon('image-file')
-            .setTitle('Copy screenshot')
-            .onClick(() => copyImageToClipboard(this.svg))  
-        );
-        menu.showAtPosition({x: 0, y: 0});
-    }
+  getIcon() {
+    return "dot-network";
+  }
 
-    constructor(settings: MindMapSettings, leaf: WorkspaceLeaf, initialFileInfo: {path:string, basename:string}){
-        super(leaf);
-        this.settings = settings;
-        this.filePath = initialFileInfo.path;
-        this.fileName = initialFileInfo.basename; 
-        this.vault = this.app.vault;
-        this.workspace = this.app.workspace;
-    }
+  onMoreOptionsMenu(menu: Menu) {
+    menu
+      .addItem((item) =>
+        item
+          .setIcon("pin")
+          .setTitle("Pin")
+          .onClick(() => this.pinCurrentLeaf())
+      )
+      .addSeparator()
+      .addItem((item) =>
+        item
+          .setIcon("image-file")
+          .setTitle("Copy screenshot")
+          .onClick(() => copyImageToClipboard(this.svg))
+      );
+    menu.showAtPosition({ x: 0, y: 0 });
+  }
 
-    async onOpen() {
-        this.obsMarkmap = new ObsidianMarkmap(this.vault);
-        this.registerActiveLeafUpdate();
-        this.listeners = [
-            this.workspace.on('layout-ready', () => this.update()),
-            this.workspace.on('resize', () => this.update()),
-            this.workspace.on('css-change', () => this.update()),
-            this.leaf.on('group-change', (group) => this.updateLinkedLeaf(group, this))
-        ];
-    }
+  constructor(
+    settings: MindMapSettings,
+    leaf: WorkspaceLeaf,
+    initialFileInfo: { path: string; basename: string }
+  ) {
+    super(leaf);
+    console.log("settings", settings);
+    this.settings = settings;
+    this.filePath = initialFileInfo.path;
+    this.fileName = initialFileInfo.basename;
+    this.vault = this.app.vault;
+    this.workspace = this.app.workspace;
 
-    async onClose() {
-        this.listeners.forEach(listener => this.workspace.offref(listener));
-    }
+    this.configChange = new EventEmitter();
+    this.configChange.on("configChange", () => {
+      this.update();
+    });
+  }
 
-    registerActiveLeafUpdate() {
-        this.registerInterval(
-            window.setInterval(() => this.checkAndUpdate(), 1000)
-        );
-    }
-    
-    async checkAndUpdate() {
-        try {
-            if(await this.checkActiveLeaf()) {
-                this.update();
-            }
-        } catch (error) {
-            console.error(error)
-        }
-    }
+  async onOpen() {
+    this.obsMarkmap = new ObsidianMarkmap(this.vault);
+    this.registerActiveLeafUpdate();
+    this.listeners = [
+      this.workspace.on("layout-change", () => this.update()),
+      this.workspace.on("resize", () => this.update()),
+      this.workspace.on("css-change", () => this.update()),
+      this.leaf.on("group-change", (group) =>
+        this.updateLinkedLeaf(group, this)
+      ),
+    ];
+  }
 
-    updateLinkedLeaf(group: string, mmView: MindmapView) {
-        if(group === null) {
-            mmView.linkedLeaf = undefined;
-            return;
-        }
-        const mdLinkedLeaf = mmView.workspace.getGroupLeaves(group).filter(l => l.view.getViewType() === MM_VIEW_TYPE)[0];
-        mmView.linkedLeaf = mdLinkedLeaf;
-        this.checkAndUpdate();
-    }
+  async onClose() {
+    this.listeners.forEach((listener) => this.workspace.offref(listener));
+  }
 
-    pinCurrentLeaf() {
-        this.isLeafPinned = true;
-        this.pinAction = this.addAction('filled-pin', 'Pin', () => this.unPin(), 20);
-        this.pinAction.addClass('is-active');
-    }
+  registerActiveLeafUpdate() {
+    this.registerInterval(
+      window.setInterval(() => this.checkAndUpdate(), 1000)
+    );
+  }
 
-    unPin() {
-        this.isLeafPinned = false;
-        this.pinAction.parentNode.removeChild(this.pinAction);
+  async checkAndUpdate() {
+    try {
+      if (await this.checkActiveLeaf()) {
+        this.update();
+      }
+    } catch (error) {
+      console.error(error);
     }
+  }
 
-    async update(){
-        if(this.filePath) {
-            await this.readMarkDown();
-            if(this.currentMd.length === 0 || this.getLeafTarget().view.getViewType() != MD_VIEW_TYPE){
-                this.displayEmpty(true);
-                removeExistingSVG();
-            } else {
-                const { root, features } = await this.transformMarkdown();
-                this.displayEmpty(false);
-                this.svg = createSVG(this.containerEl, this.settings.lineHeight);
-                this.renderMarkmap(root, this.svg);
-            }
-        }
-        this.displayText = this.fileName != undefined ? `Mind Map of ${this.fileName}` : 'Mind Map'; 
-        this.load();
+  updateLinkedLeaf(group: string, mmView: MindmapView) {
+    if (group === null) {
+      mmView.linkedLeaf = undefined;
+      return;
     }
+    const mdLinkedLeaf = mmView.workspace
+      .getGroupLeaves(group)
+      .filter((l) => l.view.getViewType() === MM_VIEW_TYPE)[0];
+    mmView.linkedLeaf = mdLinkedLeaf;
+    this.checkAndUpdate();
+  }
 
-    async checkActiveLeaf() {
-        if(this.app.workspace.activeLeaf.view.getViewType() === MM_VIEW_TYPE){
-            return false;
-        }
-        const pathHasChanged = this.readFilePath();
-        const markDownHasChanged = await this.readMarkDown();
-        const updateRequired = pathHasChanged || markDownHasChanged;
-        return updateRequired;
-    }
+  pinCurrentLeaf() {
+    this.isLeafPinned = true;
+    this.pinAction = this.addAction(
+      "filled-pin",
+      "Pin",
+      () => this.unPin(),
+      20
+    );
+    this.pinAction.addClass("is-active");
+  }
 
-    readFilePath() {
-        const fileInfo = (this.getLeafTarget().view as any).file;
-        const pathHasChanged = this.filePath != fileInfo.path;
-        this.filePath = fileInfo.path;
-        this.fileName = fileInfo.basename;
-        return pathHasChanged;
-    }
-    
-    getLeafTarget() {
-        if(!this.isLeafPinned){
-            this.linkedLeaf = this.app.workspace.activeLeaf;
-        }
-        return this.linkedLeaf != undefined ? this.linkedLeaf : this.app.workspace.activeLeaf;
-    }
+  unPin() {
+    this.isLeafPinned = false;
+    this.pinAction.parentNode.removeChild(this.pinAction);
+  }
 
-    async readMarkDown() {
-        let md = await this.app.vault.adapter.read(this.filePath);
-        if(md.startsWith('---')) {
-            md = md.replace(FRONT_MATTER_REGEX, '');
-        }
-        const markDownHasChanged = this.currentMd != md;
-        this.currentMd = md;
-        return markDownHasChanged;
+  async update() {
+    if (this.filePath) {
+      await this.readMarkDown();
+      if (
+        this.currentMd.length === 0 ||
+        this.getLeafTarget().view.getViewType() != MD_VIEW_TYPE
+      ) {
+        this.displayEmpty(true);
+        removeExistingSVG();
+      } else {
+        const { root, features } = await this.transformMarkdown();
+        this.displayEmpty(false);
+
+        this.svg = createSVG(this.containerEl, this.settings.lineHeight);
+
+        this.renderMarkmap(root, this.svg);
+      }
     }
-    
-    async transformMarkdown() {
-        const { root, features } = transform(this.currentMd);
-        this.obsMarkmap.updateInternalLinks(root);
-        return { root, features };
+    this.displayText =
+      this.fileName != undefined ? `Mind Map of ${this.fileName}` : "Mind Map";
+    this.load();
+  }
+
+  async checkActiveLeaf() {
+    if (this.app.workspace.activeLeaf.view.getViewType() === MM_VIEW_TYPE) {
+      return false;
     }
-    
-    async renderMarkmap(root: INode, svg: SVGElement) {
-        const { font } = getComputedCss(this.containerEl);
-        const options: IMarkmapOptions = {
-            autoFit: false,
-            duration: 10,
-            nodeFont: font,
-            nodeMinHeight: this.settings.nodeMinHeight ?? 16,
-            spacingVertical: this.settings.spacingVertical ?? 5,
-            spacingHorizontal: this.settings.spacingHorizontal ?? 80,
-            paddingX: this.settings.paddingX ?? 8
-          };
-          try {
-            const markmapSVG = Markmap.create(svg, options, root);
-          } catch (error) {
-              console.error(error);
+    const pathHasChanged = this.readFilePath();
+    const markDownHasChanged = await this.readMarkDown();
+    const updateRequired = pathHasChanged || markDownHasChanged;
+    return updateRequired;
+  }
+
+  readFilePath() {
+    const fileInfo = (this.getLeafTarget().view as any).file;
+    const pathHasChanged = this.filePath != fileInfo.path;
+    this.filePath = fileInfo.path;
+    this.fileName = fileInfo.basename;
+    return pathHasChanged;
+  }
+
+  getLeafTarget() {
+    if (!this.isLeafPinned) {
+      this.linkedLeaf = this.app.workspace.activeLeaf;
+    }
+    return this.linkedLeaf != undefined
+      ? this.linkedLeaf
+      : this.app.workspace.activeLeaf;
+  }
+
+  async readMarkDown() {
+    let md = await this.app.vault.adapter.read(this.filePath);
+    if (md.startsWith("---")) {
+      md = md.replace(FRONT_MATTER_REGEX, "");
+    }
+    const markDownHasChanged = this.currentMd != md;
+    this.currentMd = md;
+    return markDownHasChanged;
+  }
+
+  async transformMarkdown() {
+    const { root, features } = transform(this.currentMd);
+    this.obsMarkmap.updateInternalLinks(root);
+    return { root, features };
+  }
+
+  applyColor({ d: depth }: INode) {
+    console.log("uaauu", this);
+    const colors = [
+      this.settings.color1,
+      this.settings.color2,
+      this.settings.color3,
+    ];
+
+    const selectedColor = colors[depth % colors.length];
+
+    return selectedColor ? selectedColor : this.settings.defaultColor;
+  }
+
+  async renderMarkmap(root: INode, svg: SVGElement) {
+    const { font } = getComputedCss(this.containerEl);
+    const options: IMarkmapOptions = {
+      autoFit: false,
+      color: this.applyColor.bind(this),
+      duration: 10,
+      nodeFont: font,
+      nodeMinHeight: this.settings.nodeMinHeight ?? 16,
+      spacingVertical: this.settings.spacingVertical ?? 5,
+      spacingHorizontal: this.settings.spacingHorizontal ?? 80,
+      paddingX: this.settings.paddingX ?? 8,
+    };
+    try {
+      let hasAppliedZoom = false;
+      const previousTransform = this.currentTransform;
+
+      this.markmapSVG = Markmap.create(svg, options, root);
+
+      this.markmapSVG.zoom.on(
+        "start.keeper",
+        (evt: D3ZoomEvent<SVGElement, any>) => {
+          if (previousTransform && hasAppliedZoom) {
+            const { x, y, k } = previousTransform;
+            evt.transform.translate(x, y).scale(k);
           }
-    }
+        }
+      );
 
-    displayEmpty(display: boolean) {
-        if(this.emptyDiv === undefined) {
-            const div = document.createElement('div')
-            div.className = 'pane-empty';
-            div.innerText = 'No content found';
-            removeExistingSVG();
-            this.containerEl.children[1].appendChild(div);
-            this.emptyDiv = div;
-        } 
-        this.emptyDiv.toggle(display);
+      this.markmapSVG.zoom.on(
+        "end.keeper",
+        (evt: D3ZoomEvent<SVGElement, any>) => {
+          if (previousTransform && !hasAppliedZoom) {
+            hasAppliedZoom = true;
+            const { x, y, k } = previousTransform;
+
+            this.markmapSVG.zoom.transform(
+              this.markmapSVG.svg,
+              zoomIdentity.translate(x, y).scale(k)
+            );
+          } else {
+            this.currentTransform = evt.transform;
+          }
+        }
+      );
+    } catch (error) {
+      console.error(error);
     }
+  }
+
+  displayEmpty(display: boolean) {
+    if (this.emptyDiv === undefined) {
+      const div = document.createElement("div");
+      div.className = "pane-empty";
+      div.innerText = "No content found";
+      removeExistingSVG();
+      this.containerEl.children[1].appendChild(div);
+      this.emptyDiv = div;
+    }
+    this.emptyDiv.toggle(display);
+  }
 }

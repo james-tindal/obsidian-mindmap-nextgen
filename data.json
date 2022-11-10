@@ -1,0 +1,11 @@
+{
+  "splitDirection": "horizontal",
+  "nodeMinHeight": 16,
+  "lineHeight": "1em",
+  "spacingVertical": 5,
+  "spacingHorizontal": 80,
+  "paddingX": 8,
+  "color1": "#ffffff",
+  "color2": "#05e650",
+  "color3": "#912ab7"
+}
