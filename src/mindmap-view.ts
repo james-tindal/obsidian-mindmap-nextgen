@@ -16,7 +16,6 @@ import { copyImageToClipboard } from "./copy-image";
 import { MindMapSettings } from "./settings";
 import { IMarkmapOptions } from "markmap-view/types/types";
 import { D3ZoomEvent, ZoomTransform, zoomIdentity } from "d3-zoom";
-import { EventEmitter } from "@billjs/event-emitter";
 
 export default class MindmapView extends ItemView {
   filePath: string;
@@ -35,7 +34,6 @@ export default class MindmapView extends ItemView {
   settings: MindMapSettings;
   currentTransform: ZoomTransform;
   markmapSVG: Markmap;
-  configChange: EventEmitter;
 
   // workaround for zooming
 
@@ -81,11 +79,6 @@ export default class MindmapView extends ItemView {
     this.fileName = initialFileInfo.basename;
     this.vault = this.app.vault;
     this.workspace = this.app.workspace;
-
-    this.configChange = new EventEmitter();
-    this.configChange.on("configChange", () => {
-      this.update();
-    });
   }
 
   async onOpen() {
