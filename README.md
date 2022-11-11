@@ -56,7 +56,3 @@ As of version [0.9.7 of Obsidian](https://forum.obsidian.md/t/obsidian-release-v
 Pull requests are both welcome and appreciated. 😀
 
 If you would like to contribute to the development of this plugin, please follow the guidelines provided in [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Donating
-
-This plugin is provided free of charge. If you would like to donate something to me, you can via [PayPal](https://paypal.me/lynchjames2020). Thank you!

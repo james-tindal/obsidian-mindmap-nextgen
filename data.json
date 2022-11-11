@@ -7,5 +7,7 @@
   "paddingX": 8,
   "color1": "#ffffff",
   "color2": "#05e650",
-  "color3": "#912ab7"
+  "color3": "#912ab7",
+  "defaultColor": "#ae3232",
+  "initialExpandLevel": 1
 }

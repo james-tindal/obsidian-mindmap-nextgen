@@ -25,6 +25,7 @@ export default class MindMap extends Plugin {
         color1: "#fed766",
         color2: "#2ab7ca",
         color3: "#fe4a49",
+        defaultColor: "#000000",
         initialExpandLevel: 1,
       },
       await this.loadData()

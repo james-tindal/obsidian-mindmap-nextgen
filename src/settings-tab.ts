@@ -151,7 +151,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Default Color")
-      .setDesc("Default color for the mind map")
+      .setDesc("Color for level 4 and beyond")
       .addColorPicker((colPicker) =>
         colPicker
           .setValue(this.plugin.settings.defaultColor?.toString())
