@@ -241,8 +241,6 @@ export default class MindmapView extends ItemView {
       this.settings.color3,
     ];
 
-    console.log(depth, colors.length, colors[depth - 1]);
-
     return depth - 1 < colors.length
       ? colors[depth - 1]
       : this.settings.defaultColor;
