@@ -241,9 +241,11 @@ export default class MindmapView extends ItemView {
       this.settings.color3,
     ];
 
-    const selectedColor = colors[depth % colors.length];
+    console.log(depth, colors.length, colors[depth - 1]);
 
-    return selectedColor ? selectedColor : this.settings.defaultColor;
+    return depth - 1 < colors.length
+      ? colors[depth - 1]
+      : this.settings.defaultColor;
   }
 
   async renderMarkmap(root: INode, svg: SVGElement) {
