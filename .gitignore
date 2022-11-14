@@ -8,6 +8,7 @@ main.js
 *.js.map
 *.zip
 dist/
+data.json
 coverage/
 .nyc_output/
 test-vault/
