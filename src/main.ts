@@ -22,11 +22,19 @@ export default class MindMap extends Plugin {
         spacingVertical: 5,
         spacingHorizontal: 80,
         paddingX: 8,
-        color1: "#fed766",
-        color2: "#2ab7ca",
-        color3: "#fe4a49",
-        defaultColor: "#000000",
         initialExpandLevel: 1,
+
+        color1: "#fed766",
+        color1Thickness: 50,
+
+        color2: "#2ab7ca",
+        color2Thickness: 50,
+
+        color3: "#fe4a49",
+        color3Thickness: 50,
+
+        defaultColor: "#000000",
+        defaultColorThickness: 50,
       },
       await this.loadData()
     );
