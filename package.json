@@ -35,8 +35,8 @@
   },
   "dependencies": {
     "@types/d3": "^7.4.0",
-    "markmap-lib": "^0.10.2",
+    "markmap-lib": "^0.14.3",
     "markmap-toolbar": "^0.14.3",
-    "markmap-view": "^0.1.2"
+    "markmap-view": "^0.14.3"
   }
 }

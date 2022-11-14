@@ -155,7 +155,7 @@
   resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.20.3.tgz#5358cf62e380cf69efcb87a7bb922ff88bfac6e2"
   integrity sha512-OP/s5a94frIPXwjzEcv5S/tpQfc6XhxYUnmWpgdqMWGgYCuErA3SzozaRAMQgSZWKeTJxht9aWAkUY+0UzvOFg==
 
-"@babel/runtime@^7.12.1", "@babel/runtime@^7.12.5", "@babel/runtime@^7.16.3", "@babel/runtime@^7.18.9":
+"@babel/runtime@^7.12.5", "@babel/runtime@^7.16.3", "@babel/runtime@^7.18.9":
   version "7.20.1"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.20.1.tgz#1148bb33ab252b165a06698fde7576092a78b4a9"
   integrity sha512-mrzLkl6U9YLF8qpqI7TB82PESyEGjm/0Ly91jG575eVxMMlb8fYfOXFZIJ8XfLrJZQbm7dlKry2bJmXBUEkdFg==
@@ -1148,10 +1148,15 @@ combined-stream@^1.0.8:
   dependencies:
     delayed-stream "~1.0.0"
 
-commander@2, commander@^2.19.0:
+commander@2:
   version "2.20.3"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.3.tgz#fd485e84c03eb4881c20722ba48035e8531aeb33"
   integrity sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==
+
+commander@^8.0.0:
+  version "8.3.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-8.3.0.tgz#4837ea1b2da67b9c616a67afbb0fafee567bca66"
+  integrity sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==
 
 commondir@^1.0.1:
   version "1.0.1"
@@ -2083,6 +2088,13 @@ js-yaml@^3.13.1:
     argparse "^1.0.7"
     esprima "^4.0.0"
 
+js-yaml@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-4.1.0.tgz#c1fb65f8f5017901cdd2c951864ba18458a10602"
+  integrity sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==
+  dependencies:
+    argparse "^2.0.1"
+
 jsdom-global@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/jsdom-global/-/jsdom-global-3.0.2.tgz#6bd299c13b0c4626b2da2c0393cd4385d606acb9"
@@ -2138,12 +2150,12 @@ jsonfile@^4.0.0:
   optionalDependencies:
     graceful-fs "^4.1.6"
 
-katex@^0.12.0:
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/katex/-/katex-0.12.0.tgz#2fb1c665dbd2b043edcf8a1f5c555f46beaa0cb9"
-  integrity sha512-y+8btoc/CK70XqcHqjxiGWBOeIL8upbS0peTPXTvgrh21n1RiWWcIpSWM+4uXq+IAgNh9YYQWdc7LVDPDAEEAg==
+katex@^0.16.0:
+  version "0.16.3"
+  resolved "https://registry.yarnpkg.com/katex/-/katex-0.16.3.tgz#29640560b8fa0403e45f3aa20da5fdbb6d2b83a8"
+  integrity sha512-3EykQddareoRmbtNiNEDgl3IGjryyrp2eg/25fHDEnlHymIDi33bptkMv6K4EOC2LZCybLW/ZkEo6Le+EM9pmA==
   dependencies:
-    commander "^2.19.0"
+    commander "^8.0.0"
 
 levn@~0.3.0:
   version "0.3.0"
@@ -2210,24 +2222,17 @@ make-error@^1.1.1:
   resolved "https://registry.yarnpkg.com/make-error/-/make-error-1.3.6.tgz#2eb2e37ea9b67c4891f684a1394799af484cf7a2"
   integrity sha512-s8UhlNe7vPKomQhC1qFelMokr/Sc3AgNbso3n74mVPA5LTZwkB9NlXf4XPamLxJE8h0gh73rM94xvwRT2CVInw==
 
-markmap-common@^0.1.0:
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/markmap-common/-/markmap-common-0.1.6.tgz#11050562c23ae84b160e01e663478f29f1dd9ae6"
-  integrity sha512-fx4YUo6gZFFr08mi8qX8i6RH9xm5yieLKHr9hAdaTMP+CkPmgzB65F/+t39aFH5HcyEgs5vtTrRZ40lkhalETA==
+markmap-lib@^0.14.3:
+  version "0.14.3"
+  resolved "https://registry.yarnpkg.com/markmap-lib/-/markmap-lib-0.14.3.tgz#8ad43102af570014ccd84f8e234200f8af6a00f6"
+  integrity sha512-nvHpeBp3nlQvCgNETHwASYLqo4GGjl3JF04+Aq3i0+8ni0mKDqongrEslU1cI0SuELOjGphTXiLt6ugcObhE/A==
   dependencies:
-    "@babel/runtime" "^7.12.1"
-
-markmap-lib@^0.10.2:
-  version "0.10.2"
-  resolved "https://registry.yarnpkg.com/markmap-lib/-/markmap-lib-0.10.2.tgz#68c855021f5e43068fd2a47f398bb4daa52044a3"
-  integrity sha512-IKtYn3gZMB0wgG3D4N56HlwpQTI+adK03JpzEwe+05h7RlJhuIq466W8hTGRs7JE8r0gL8Q/8J5xoulkabKPFQ==
-  dependencies:
-    "@babel/runtime" "^7.12.5"
-    katex "^0.12.0"
-    markmap-common "^0.1.0"
-    prismjs "^1.21.0"
-    remarkable "^2.0.0"
-    remarkable-katex "^1.1.6"
+    "@babel/runtime" "^7.18.9"
+    js-yaml "^4.1.0"
+    katex "^0.16.0"
+    prismjs "^1.28.0"
+    remarkable "^2.0.1"
+    remarkable-katex "^1.2.1"
 
 markmap-toolbar@^0.14.3:
   version "0.14.3"
@@ -2237,16 +2242,15 @@ markmap-toolbar@^0.14.3:
     "@babel/runtime" "^7.16.3"
     "@gera2ld/jsx-dom" "^2.1.1"
 
-markmap-view@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/markmap-view/-/markmap-view-0.1.2.tgz#818ebed4f5f03f20b7e214a2b1663285397bec13"
-  integrity sha512-d0iD+fa47BuzrfQsVf4GZ/u5SCLH/kYltQbw76h/sDHMgVA2FNI+dPKhKmTJe8z5rudCGd2yEDJ3dx0QLntibw==
+markmap-view@^0.14.3:
+  version "0.14.3"
+  resolved "https://registry.yarnpkg.com/markmap-view/-/markmap-view-0.14.3.tgz#660e46b757305ed67a998def9e1431023a184a1d"
+  integrity sha512-8w96PQv5O4+XAKhdHWnZvl16PvOn1UdvBRWdhkwYjH2DXuWp1cmXqF4ushgEp4Ec/GxhZlTcQN4+0hyFxgIK+w==
   dependencies:
     "@babel/runtime" "^7.12.5"
     "@types/d3" "^6.0.0"
     d3 "^6.2.0"
     d3-flextree "^2.1.1"
-    markmap-common "^0.1.0"
 
 merge2@^1.2.3, merge2@^1.3.0:
   version "1.4.1"
@@ -2527,7 +2531,7 @@ prelude-ls@~1.1.2:
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.1.2.tgz#21932a549f5e52ffd9a827f570e04be62a97da54"
   integrity sha512-ESF23V4SKG6lVSGZgYNpbsiaAkdab6ZgOxe52p7+Kid3W3u3bxR4Vfd/o21dmN7jSt0IwgZ4v5MUd26FEtXE9w==
 
-prismjs@^1.21.0:
+prismjs@^1.28.0:
   version "1.29.0"
   resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.29.0.tgz#f113555a8fa9b57c35e637bba27509dcf802dd12"
   integrity sha512-Kx/1w86q/epKcmte75LNrEoT+lX8pBpavuAbvJWRXar7Hz8jrtF+e3vY751p0R8H9HdArwaCTNDDzHg/ScJK1Q==
@@ -2585,12 +2589,12 @@ release-zalgo@^1.0.0:
   dependencies:
     es6-error "^4.0.1"
 
-remarkable-katex@^1.1.6:
+remarkable-katex@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/remarkable-katex/-/remarkable-katex-1.2.1.tgz#ffb664372b5f3199b2973a2e0a64e8a8f0ee7f20"
   integrity sha512-Y1VquJBZnaVsfsVcKW2hmjT+pDL7mp8l5WAVlvuvViltrdok2m1AIKmJv8SsH+mBY84PoMw67t3kTWw1dIm8+g==
 
-remarkable@^2.0.0:
+remarkable@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/remarkable/-/remarkable-2.0.1.tgz#280ae6627384dfb13d98ee3995627ca550a12f31"
   integrity sha512-YJyMcOH5lrR+kZdmB0aJJ4+93bEojRZ1HGDn9Eagu6ibg7aVZhc3OWbbShRid+Q5eAfsEqWxpe+g5W5nYNfNiA==
