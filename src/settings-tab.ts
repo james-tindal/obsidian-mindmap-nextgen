@@ -1,4 +1,10 @@
-import { App, PluginSettingTab, Setting, SplitDirection } from "obsidian";
+import {
+  App,
+  PluginSettingTab,
+  Setting,
+  SliderComponent,
+  SplitDirection,
+} from "obsidian";
 import MindMap from "./main";
 import { MindMapSettings } from "./settings";
 
@@ -111,8 +117,6 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
-    // add 3 colors settings and default color setting
-
     new Setting(containerEl)
       .setName("Color 1")
       .setDesc("Color for the first level of the mind map")
@@ -121,6 +125,19 @@ export class MindMapSettingsTab extends PluginSettingTab {
           .setValue(this.plugin.settings.color1?.toString())
           .onChange((value: string) => {
             this.plugin.settings.color1 = value;
+            save();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Color 1 thickness")
+      .setDesc("Color 1 thickess in points (px)")
+      .addSlider((slider) =>
+        slider
+          .setLimits(1, 10, 0.5)
+          .setValue(this.plugin.settings.color1Thickness)
+          .onChange((value) => {
+            this.plugin.settings.color1Thickness = value;
             save();
           })
       );
@@ -138,6 +155,19 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
+      .setName("Color 2 thickness")
+      .setDesc("Color 2 thickess in points (px)")
+      .addSlider((slider) =>
+        slider
+          .setLimits(1, 10, 0.5)
+          .setValue(this.plugin.settings.color2Thickness)
+          .onChange((value) => {
+            this.plugin.settings.color2Thickness = value;
+            save();
+          })
+      );
+
+    new Setting(containerEl)
       .setName("Color 3")
       .setDesc("Color for the third level of the mind map")
       .addColorPicker((colPicker) =>
@@ -150,13 +180,39 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
+      .setName("Color 2 thickness")
+      .setDesc("Color 2 thickess in points (px)")
+      .addSlider((slider) =>
+        slider
+          .setLimits(1, 10, 0.5)
+          .setValue(this.plugin.settings.color2Thickness)
+          .onChange((value) => {
+            this.plugin.settings.color2Thickness = value;
+            save();
+          })
+      );
+
+    new Setting(containerEl)
       .setName("Default Color")
-      .setDesc("Color for level 4 and beyond")
+      .setDesc("Color for fourth level and beyond")
       .addColorPicker((colPicker) =>
         colPicker
           .setValue(this.plugin.settings.defaultColor?.toString())
           .onChange((value: string) => {
             this.plugin.settings.defaultColor = value;
+            save();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Default color thickness")
+      .setDesc("Default color thickess in points (px)")
+      .addSlider((slider) =>
+        slider
+          .setLimits(1, 10, 0.5)
+          .setValue(this.plugin.settings.defaultColorThickness)
+          .onChange((value) => {
+            this.plugin.settings.defaultColorThickness = value;
             save();
           })
       );
