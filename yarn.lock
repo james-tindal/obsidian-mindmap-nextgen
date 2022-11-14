@@ -2393,9 +2393,10 @@ nyc@^15.1.0:
     test-exclude "^6.0.0"
     yargs "^15.0.2"
 
-"obsidian@https://github.com/obsidianmd/obsidian-api/tarball/master":
+obsidian@^0.16.3:
   version "0.16.3"
-  resolved "https://github.com/obsidianmd/obsidian-api/tarball/master#42480ad9a62d78a85ce2e68a6a7bccd1f0fa56bc"
+  resolved "https://registry.yarnpkg.com/obsidian/-/obsidian-0.16.3.tgz#137b7e91f949517a1bc817b1d7ef9b8aefb219bc"
+  integrity sha512-hal9qk1A0GMhHSeLr2/+o3OpLmImiP+Y+sx2ewP13ds76KXsziG96n+IPFT0mSkup1zSwhEu+DeRhmbcyCCXWw==
   dependencies:
     "@types/codemirror" "0.0.108"
     moment "2.29.4"
