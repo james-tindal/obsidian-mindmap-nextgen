@@ -15,7 +15,6 @@ import { createSVG, getComputedCss, removeExistingSVG } from "./markmap-svg";
 import { copyImageToClipboard } from "./copy-image";
 import { MindMapSettings } from "./settings";
 import { IMarkmapOptions } from "markmap-view/types/types";
-import { Selection as d3Selection } from "d3";
 import { D3ZoomEvent, ZoomTransform, zoomIdentity } from "d3-zoom";
 
 export default class MindmapView extends ItemView {
