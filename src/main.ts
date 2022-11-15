@@ -25,16 +25,16 @@ export default class MindMap extends Plugin {
         initialExpandLevel: 1,
 
         color1: "#fed766",
-        color1Thickness: 50,
+        color1Thickness: 10,
 
         color2: "#2ab7ca",
-        color2Thickness: 50,
+        color2Thickness: 6,
 
         color3: "#fe4a49",
-        color3Thickness: 50,
+        color3Thickness: 4,
 
         defaultColor: "#000000",
-        defaultColorThickness: 50,
+        defaultColorThickness: 2,
       },
       await this.loadData()
     );

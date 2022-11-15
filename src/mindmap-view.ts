@@ -6,15 +6,14 @@ import {
   Workspace,
   WorkspaceLeaf,
 } from "obsidian";
-import { transform } from "markmap-lib";
+import { Transformer, builtInPlugins } from "markmap-lib";
 import { Markmap } from "markmap-view";
-import { INode } from "markmap-common";
+import { INode, IMarkmapOptions } from "markmap-common";
 import { FRONT_MATTER_REGEX, MD_VIEW_TYPE, MM_VIEW_TYPE } from "./constants";
 import ObsidianMarkmap from "./obsidian-markmap-plugin";
 import { createSVG, getComputedCss, removeExistingSVG } from "./markmap-svg";
 import { copyImageToClipboard } from "./copy-image";
 import { MindMapSettings } from "./settings";
-import { IMarkmapOptions } from "markmap-view/types/types";
 import { D3ZoomEvent, ZoomTransform, zoomIdentity } from "d3-zoom";
 
 export default class MindmapView extends ItemView {
@@ -34,6 +33,7 @@ export default class MindmapView extends ItemView {
   settings: MindMapSettings;
   currentTransform: ZoomTransform;
   markmapSVG: Markmap;
+  transformer: Transformer;
 
   groupEventListenerFn: () => unknown;
 
@@ -104,6 +104,7 @@ export default class MindmapView extends ItemView {
     this.fileName = initialFileInfo.basename;
     this.vault = this.app.vault;
     this.workspace = this.app.workspace;
+    this.transformer = new Transformer(builtInPlugins);
   }
 
   async onOpen() {
@@ -199,7 +200,7 @@ export default class MindmapView extends ItemView {
       this.fileName != undefined ? `Mind Map of ${this.fileName}` : "Mind Map";
     this.load();
 
-    setTimeout(() => this.applyWidths(root), 100);
+    // setTimeout(() => this.applyWidths(root), 100);
   }
 
   async checkActiveLeaf() {
@@ -240,22 +241,20 @@ export default class MindmapView extends ItemView {
   }
 
   async transformMarkdown() {
-    let { root, features } = transform(this.currentMd);
+    let { root, features } = this.transformer.transform(this.currentMd);
 
     this.obsMarkmap.updateInternalLinks(root);
     return { root, features };
   }
 
-  applyColor({ d: depth }: INode) {
+  applyColor({ depth }: INode) {
     const colors = [
       this.settings.color1,
       this.settings.color2,
       this.settings.color3,
     ];
 
-    return depth - 1 < colors.length
-      ? colors[depth - 1]
-      : this.settings.defaultColor;
+    return depth < colors.length ? colors[depth] : this.settings.defaultColor;
   }
 
   hexToRgb(hex: string) {
@@ -314,7 +313,9 @@ export default class MindmapView extends ItemView {
     // possible workarounds for the rect problem:
     // store the element position and compares on every ocurrence, if the new ocurrence comes before or after
     // (in coordinates), the levels of the already found ocurrences should be reorganized.
+  }
 
+  applyWidthsOld(root: INode) {
     const widths = ["20", "10", "5", "5"];
 
     const queue = [root];
@@ -322,16 +323,16 @@ export default class MindmapView extends ItemView {
     while (queue.length) {
       const node = queue.shift();
 
-      queue.push(...node.c);
+      queue.push(...node.children);
 
-      const text = node.p.el.innerHTML;
+      const text = node.state.el.innerHTML;
 
       if (text) {
         const nodesWithContent = Array.from(
           this.svg.querySelectorAll("*")
         ).filter((el) => el.innerHTML == text)[0];
 
-        const width = Math.min(4, node.d);
+        const width = Math.min(4, node.depth);
 
         nodesWithContent.parentElement.parentElement
           .querySelector("rect")
@@ -377,15 +378,17 @@ export default class MindmapView extends ItemView {
 
   async renderMarkmap(root: INode, svg: SVGElement) {
     const { font } = getComputedCss(this.containerEl);
-    const options: IMarkmapOptions = {
+    const options: Partial<IMarkmapOptions> = {
       autoFit: false,
       color: this.applyColor.bind(this),
       duration: 10,
-      nodeFont: font,
+      style: (id) => `${id} * {font: ${font}}`,
       nodeMinHeight: this.settings.nodeMinHeight ?? 16,
       spacingVertical: this.settings.spacingVertical ?? 5,
       spacingHorizontal: this.settings.spacingHorizontal ?? 80,
       paddingX: this.settings.paddingX ?? 8,
+      embedGlobalCSS: true,
+      fitRatio: 1,
     };
     try {
       let hasAppliedZoom = false;
