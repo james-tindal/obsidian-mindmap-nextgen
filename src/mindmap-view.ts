@@ -6,16 +6,14 @@ import {
   Workspace,
   WorkspaceLeaf,
 } from "obsidian";
-import { transform } from "markmap-lib";
-import { Markmap } from "markmap-view";
-import { INode } from "markmap-common";
+import { Transformer, builtInPlugins } from "markmap-lib";
+import { Markmap, loadCSS, loadJS } from "markmap-view";
+import { INode, IMarkmapOptions, JSItem, CSSItem } from "markmap-common";
 import { FRONT_MATTER_REGEX, MD_VIEW_TYPE, MM_VIEW_TYPE } from "./constants";
 import ObsidianMarkmap from "./obsidian-markmap-plugin";
 import { createSVG, getComputedCss, removeExistingSVG } from "./markmap-svg";
 import { copyImageToClipboard } from "./copy-image";
 import { MindMapSettings } from "./settings";
-import { IMarkmapOptions } from "markmap-view/types/types";
-import { Selection as d3Selection } from "d3";
 import { D3ZoomEvent, ZoomTransform, zoomIdentity } from "d3-zoom";
 
 export default class MindmapView extends ItemView {
@@ -35,6 +33,7 @@ export default class MindmapView extends ItemView {
   settings: MindMapSettings;
   currentTransform: ZoomTransform;
   markmapSVG: Markmap;
+  transformer: Transformer;
 
   groupEventListenerFn: () => unknown;
 
@@ -72,23 +71,7 @@ export default class MindmapView extends ItemView {
         item
           .setIcon("folder")
           .setTitle("Collapse All")
-          .onClick(() => {
-            try {
-              this.markmapSVG.g
-                .selectAll("g")
-                .nodes()
-                .forEach((node: HTMLElement) => {
-                  if (
-                    node.querySelector("circle")?.getAttribute("fill") ==
-                    "rgb(255, 255, 255)"
-                  ) {
-                    node.dispatchEvent(new CustomEvent("click"));
-                  }
-                });
-            } catch (err) {
-              console.log(err);
-            }
-          })
+          .onClick(() => this.collapseAll())
       );
 
     menu.showAtPosition({ x: 0, y: 0 });
@@ -105,6 +88,7 @@ export default class MindmapView extends ItemView {
     this.fileName = initialFileInfo.basename;
     this.vault = this.app.vault;
     this.workspace = this.app.workspace;
+    this.transformer = new Transformer(builtInPlugins);
   }
 
   async onOpen() {
@@ -169,6 +153,21 @@ export default class MindmapView extends ItemView {
     this.pinAction.parentNode.removeChild(this.pinAction);
   }
 
+  collapseAll() {
+    try {
+      Array.from(this.markmapSVG.svg.node().querySelectorAll("g")).forEach(
+        (node: SVGGElement) => {
+          const circle = node.querySelector("circle");
+          if (circle?.getAttribute("fill") == "rgb(255, 255, 255)") {
+            circle.dispatchEvent(new CustomEvent("click"));
+          }
+        }
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   async update() {
     let root: INode;
     if (this.filePath) {
@@ -180,7 +179,8 @@ export default class MindmapView extends ItemView {
         this.displayEmpty(true);
         removeExistingSVG();
       } else {
-        let transformedMarkdown = await this.transformMarkdown();
+        let { scripts, styles, ...transformedMarkdown } =
+          await this.transformMarkdown();
         root = transformedMarkdown.root;
 
         this.displayEmpty(false);
@@ -193,14 +193,14 @@ export default class MindmapView extends ItemView {
             );
         this.svg = createSVG(this.containerEl, this.settings.lineHeight);
 
-        this.renderMarkmap(root, this.svg);
+        this.renderMarkmap(root, this.svg, scripts, styles);
       }
     }
     this.displayText =
       this.fileName != undefined ? `Mind Map of ${this.fileName}` : "Mind Map";
     this.load();
 
-    setTimeout(() => this.applyWidths(root), 100);
+    setTimeout(() => this.applyWidths(), 100);
   }
 
   async checkActiveLeaf() {
@@ -241,22 +241,22 @@ export default class MindmapView extends ItemView {
   }
 
   async transformMarkdown() {
-    let { root, features } = transform(this.currentMd);
+    let { root, features } = this.transformer.transform(this.currentMd);
+
+    const { scripts, styles } = this.transformer.getUsedAssets(features);
 
     this.obsMarkmap.updateInternalLinks(root);
-    return { root, features };
+    return { root, features, scripts, styles };
   }
 
-  applyColor({ d: depth }: INode) {
+  applyColor({ depth }: INode) {
     const colors = [
       this.settings.color1,
       this.settings.color2,
       this.settings.color3,
     ];
 
-    return depth - 1 < colors.length
-      ? colors[depth - 1]
-      : this.settings.defaultColor;
+    return depth < colors.length ? colors[depth] : this.settings.defaultColor;
   }
 
   hexToRgb(hex: string) {
@@ -269,128 +269,61 @@ export default class MindmapView extends ItemView {
     return result ? `rgb(${red}, ${green}, ${blue})` : null;
   }
 
-  applyWidths(root: INode) {
+  applyWidths() {
     const colors = [
-      [this.hexToRgb(this.settings.color1), this.settings.color1Thickness],
-      [this.hexToRgb(this.settings.color2), this.settings.color2Thickness],
-      [this.hexToRgb(this.settings.color3), this.settings.color3Thickness],
-      [
-        this.hexToRgb(this.settings.defaultColor),
-        this.settings.defaultColorThickness,
-      ],
-    ] as const;
+      this.settings.color1Thickness,
+      this.settings.color2Thickness,
+      this.settings.color3Thickness,
+      this.settings.defaultColorThickness,
+    ];
 
-    Array.from(this.svg.querySelectorAll("*")).forEach((el) => {
-      if (el.tagName == "circle") return;
+    this.svg
+      .querySelectorAll("path.markmap-link")
+      .forEach((el: SVGPathElement) => {
+        const colorIndex = Math.min(3, parseInt(el.dataset.depth));
 
-      colors.forEach(([color, thickness]) => {
-        if (el.getAttribute("stroke") === color) {
-          el.setAttribute("stroke-width", `${thickness}`);
-        } else if (el.getAttribute("fill") === color) {
-          el.setAttribute("height", `${thickness}`);
-        }
+        el.style.strokeWidth = `${colors[colorIndex]}`;
       });
+
+    this.svg.querySelectorAll("g.markmap-node").forEach((el: SVGGElement) => {
+      const line = el.querySelector("line");
+
+      const colorIndex = Math.min(3, parseInt(el.dataset.depth));
+      line.style.strokeWidth = `${colors[colorIndex]}`;
     });
 
-    return;
-
-    // the solution above only applies thickness to the the same color (colos and ok,
-    // they are passed via argument, so it's completely safe). The problem is in case someone
-    // selects the same color for all four colors (color1, 2, 3 and default). In this case, for all
-    // colors, the same thickness will be applied.
-
-    // below an beta solution that should be tested and improved later.
-
-    // This beta solution relies on the fact that the rects can be obtained via an INode, which
-    // is a hierarchical structure. The problem about the rect (the rectangle below the text),
-    // is that I take the element using the content (the text within it), but there may be repeating content.
-    // For the lines (path elements) I take advantage of the fact that they all come from a single node.
-    // But the current below solution only take that in account, not the fact that they must branch-siblings
-    // which means the node that this path is connected from is also connected to another path that comes
-    // from another node and all paths that come from this node are siblings, and so on. So it doesn't mean siblings
-    // come from the same node, but instead comes from the same "family", and so on. Which need further
-    // investigation, as Markmap itself doesn't suit this kind of personalisation (I've checked the source code,
-    // and those strokes are hard coded).
-
-    // possible workarounds for the rect problem:
-    // store the element position and compares on every ocurrence, if the new ocurrence comes before or after
-    // (in coordinates), the levels of the already found ocurrences should be reorganized.
-
-    const widths = ["20", "10", "5", "5"];
-
-    const queue = [root];
-
-    while (queue.length) {
-      const node = queue.shift();
-
-      queue.push(...node.c);
-
-      const text = node.p.el.innerHTML;
-
-      if (text) {
-        const nodesWithContent = Array.from(
-          this.svg.querySelectorAll("*")
-        ).filter((el) => el.innerHTML == text)[0];
-
-        const width = Math.min(4, node.d);
-
-        nodesWithContent.parentElement.parentElement
-          .querySelector("rect")
-          .setAttribute("height", widths[width - 1]);
-      }
-    }
-
-    const getD = (pathEl: SVGPathElement) => pathEl.getAttribute("d");
-    const getM = (dAttribute: string) =>
-      parseInt(dAttribute.split(",")[0].substring(1));
-
-    const sortedPaths = Array.from(this.svg.querySelectorAll("path")).sort(
-      (a, b) => getM(getD(a)) - getM(getD(b))
-    );
-
-    console.log(sortedPaths);
-
-    let currentMValue: number;
-    let currentIndex = 0;
-    for (let path of sortedPaths) {
-      if (Math.abs(getD(path).length - 33) > 5) continue;
-      console.log(getM(getD(path)));
-
-      if (currentMValue === undefined) {
-        currentMValue = getM(getD(path));
-      }
-
-      if (getM(getD(path)) !== currentMValue) {
-        currentIndex = Math.min(3, currentIndex + 1);
-        currentMValue = getM(getD(path));
-      }
-
-      path.style.strokeWidth = widths[currentIndex];
-    }
-
-    this.svg.querySelectorAll("g").forEach((el) => {
-      this.groupEventListenerFn = () => this.applyWidths(root);
+    this.svg.querySelectorAll("circle").forEach((el) => {
+      this.groupEventListenerFn = () =>
+        setTimeout(() => this.applyWidths(), 50);
       el.addEventListener("click", this.groupEventListenerFn);
     });
-
-    return root;
   }
 
-  async renderMarkmap(root: INode, svg: SVGElement) {
+  async renderMarkmap(
+    root: INode,
+    svg: SVGElement,
+    scripts: JSItem[],
+    styles: CSSItem[]
+  ) {
     const { font } = getComputedCss(this.containerEl);
-    const options: IMarkmapOptions = {
+    const options: Partial<IMarkmapOptions> = {
       autoFit: false,
       color: this.applyColor.bind(this),
       duration: 10,
-      nodeFont: font,
+      style: (id) => `${id} * {font: ${font}}`,
       nodeMinHeight: this.settings.nodeMinHeight ?? 16,
       spacingVertical: this.settings.spacingVertical ?? 5,
       spacingHorizontal: this.settings.spacingHorizontal ?? 80,
       paddingX: this.settings.paddingX ?? 8,
+      embedGlobalCSS: true,
+      fitRatio: 1,
     };
     try {
       let hasAppliedZoom = false;
       const previousTransform = this.currentTransform;
+
+      if (styles) loadCSS(styles);
+      if (scripts) loadJS(scripts);
 
       this.markmapSVG = Markmap.create(svg, options, root);
 
