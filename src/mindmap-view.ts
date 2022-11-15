@@ -71,23 +71,7 @@ export default class MindmapView extends ItemView {
         item
           .setIcon("folder")
           .setTitle("Collapse All")
-          .onClick(() => {
-            try {
-              this.markmapSVG.g
-                .selectAll("g")
-                .nodes()
-                .forEach((node: HTMLElement) => {
-                  if (
-                    node.querySelector("circle")?.getAttribute("fill") ==
-                    "rgb(255, 255, 255)"
-                  ) {
-                    node.dispatchEvent(new CustomEvent("click"));
-                  }
-                });
-            } catch (err) {
-              console.log(err);
-            }
-          })
+          .onClick(() => this.collapseAll())
       );
 
     menu.showAtPosition({ x: 0, y: 0 });
@@ -167,6 +151,21 @@ export default class MindmapView extends ItemView {
   unPin() {
     this.isLeafPinned = false;
     this.pinAction.parentNode.removeChild(this.pinAction);
+  }
+
+  collapseAll() {
+    try {
+      Array.from(this.markmapSVG.svg.node().querySelectorAll("g")).forEach(
+        (node: SVGGElement) => {
+          const circle = node.querySelector("circle");
+          if (circle?.getAttribute("fill") == "rgb(255, 255, 255)") {
+            circle.dispatchEvent(new CustomEvent("click"));
+          }
+        }
+      );
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async update() {
