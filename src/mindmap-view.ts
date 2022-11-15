@@ -201,7 +201,7 @@ export default class MindmapView extends ItemView {
       this.fileName != undefined ? `Mind Map of ${this.fileName}` : "Mind Map";
     this.load();
 
-    // setTimeout(() => this.applyWidths(root), 100);
+    setTimeout(() => this.applyWidths(), 100);
   }
 
   async checkActiveLeaf() {
@@ -270,30 +270,34 @@ export default class MindmapView extends ItemView {
     return result ? `rgb(${red}, ${green}, ${blue})` : null;
   }
 
-  applyWidths(root: INode) {
+  applyWidths() {
     const colors = [
-      [this.hexToRgb(this.settings.color1), this.settings.color1Thickness],
-      [this.hexToRgb(this.settings.color2), this.settings.color2Thickness],
-      [this.hexToRgb(this.settings.color3), this.settings.color3Thickness],
-      [
-        this.hexToRgb(this.settings.defaultColor),
-        this.settings.defaultColorThickness,
-      ],
-    ] as const;
+      this.settings.color1Thickness,
+      this.settings.color2Thickness,
+      this.settings.color3Thickness,
+      this.settings.defaultColorThickness,
+    ];
 
-    Array.from(this.svg.querySelectorAll("*")).forEach((el) => {
-      if (el.tagName == "circle") return;
-
-      colors.forEach(([color, thickness]) => {
-        if (el.getAttribute("stroke") === color) {
-          el.setAttribute("stroke-width", `${thickness}`);
-        } else if (el.getAttribute("fill") === color) {
-          el.setAttribute("height", `${thickness}`);
-        }
+    this.svg
+      .querySelectorAll("path.markmap-link")
+      .forEach((el: SVGPathElement) => {
+        const colorIndex = parseInt(el.dataset.depth);
+        el.style.strokeWidth = `${colors[colorIndex]}`;
       });
+
+    this.svg.querySelectorAll("g.markmap-node").forEach((el: SVGGElement) => {
+      const line = el.querySelector("line");
+
+      const colorIndex = parseInt(el.dataset.depth);
+      line.style.strokeWidth = `${colors[colorIndex]}`;
     });
 
-    return;
+    console.log("aplicando...");
+    this.svg.querySelectorAll("circle").forEach((el) => {
+      this.groupEventListenerFn = () =>
+        setTimeout(() => this.applyWidths(), 50);
+      el.addEventListener("click", this.groupEventListenerFn);
+    });
 
     // the solution above only applies thickness to the the same color (colos and ok,
     // they are passed via argument, so it's completely safe). The problem is in case someone
@@ -351,8 +355,6 @@ export default class MindmapView extends ItemView {
       (a, b) => getM(getD(a)) - getM(getD(b))
     );
 
-    console.log(sortedPaths);
-
     let currentMValue: number;
     let currentIndex = 0;
     for (let path of sortedPaths) {
@@ -370,11 +372,6 @@ export default class MindmapView extends ItemView {
 
       path.style.strokeWidth = widths[currentIndex];
     }
-
-    this.svg.querySelectorAll("g").forEach((el) => {
-      this.groupEventListenerFn = () => this.applyWidths(root);
-      el.addEventListener("click", this.groupEventListenerFn);
-    });
 
     return root;
   }
