@@ -292,88 +292,11 @@ export default class MindmapView extends ItemView {
       line.style.strokeWidth = `${colors[colorIndex]}`;
     });
 
-    console.log("aplicando...");
     this.svg.querySelectorAll("circle").forEach((el) => {
       this.groupEventListenerFn = () =>
         setTimeout(() => this.applyWidths(), 50);
       el.addEventListener("click", this.groupEventListenerFn);
     });
-
-    // the solution above only applies thickness to the the same color (colos and ok,
-    // they are passed via argument, so it's completely safe). The problem is in case someone
-    // selects the same color for all four colors (color1, 2, 3 and default). In this case, for all
-    // colors, the same thickness will be applied.
-
-    // below an beta solution that should be tested and improved later.
-
-    // This beta solution relies on the fact that the rects can be obtained via an INode, which
-    // is a hierarchical structure. The problem about the rect (the rectangle below the text),
-    // is that I take the element using the content (the text within it), but there may be repeating content.
-    // For the lines (path elements) I take advantage of the fact that they all come from a single node.
-    // But the current below solution only take that in account, not the fact that they must branch-siblings
-    // which means the node that this path is connected from is also connected to another path that comes
-    // from another node and all paths that come from this node are siblings, and so on. So it doesn't mean siblings
-    // come from the same node, but instead comes from the same "family", and so on. Which need further
-    // investigation, as Markmap itself doesn't suit this kind of personalisation (I've checked the source code,
-    // and those strokes are hard coded).
-
-    // possible workarounds for the rect problem:
-    // store the element position and compares on every ocurrence, if the new ocurrence comes before or after
-    // (in coordinates), the levels of the already found ocurrences should be reorganized.
-  }
-
-  applyWidthsOld(root: INode) {
-    const widths = ["20", "10", "5", "5"];
-
-    const queue = [root];
-
-    while (queue.length) {
-      const node = queue.shift();
-
-      queue.push(...node.children);
-
-      const text = node.state.el.innerHTML;
-
-      if (text) {
-        const nodesWithContent = Array.from(
-          this.svg.querySelectorAll("*")
-        ).filter((el) => el.innerHTML == text)[0];
-
-        const width = Math.min(4, node.depth);
-
-        nodesWithContent.parentElement.parentElement
-          .querySelector("rect")
-          .setAttribute("height", widths[width - 1]);
-      }
-    }
-
-    const getD = (pathEl: SVGPathElement) => pathEl.getAttribute("d");
-    const getM = (dAttribute: string) =>
-      parseInt(dAttribute.split(",")[0].substring(1));
-
-    const sortedPaths = Array.from(this.svg.querySelectorAll("path")).sort(
-      (a, b) => getM(getD(a)) - getM(getD(b))
-    );
-
-    let currentMValue: number;
-    let currentIndex = 0;
-    for (let path of sortedPaths) {
-      if (Math.abs(getD(path).length - 33) > 5) continue;
-      console.log(getM(getD(path)));
-
-      if (currentMValue === undefined) {
-        currentMValue = getM(getD(path));
-      }
-
-      if (getM(getD(path)) !== currentMValue) {
-        currentIndex = Math.min(3, currentIndex + 1);
-        currentMValue = getM(getD(path));
-      }
-
-      path.style.strokeWidth = widths[currentIndex];
-    }
-
-    return root;
   }
 
   async renderMarkmap(
