@@ -7,8 +7,8 @@ import {
   WorkspaceLeaf,
 } from "obsidian";
 import { Transformer, builtInPlugins } from "markmap-lib";
-import { Markmap } from "markmap-view";
-import { INode, IMarkmapOptions } from "markmap-common";
+import { Markmap, loadCSS, loadJS } from "markmap-view";
+import { INode, IMarkmapOptions, JSItem, CSSItem } from "markmap-common";
 import { FRONT_MATTER_REGEX, MD_VIEW_TYPE, MM_VIEW_TYPE } from "./constants";
 import ObsidianMarkmap from "./obsidian-markmap-plugin";
 import { createSVG, getComputedCss, removeExistingSVG } from "./markmap-svg";
@@ -180,7 +180,8 @@ export default class MindmapView extends ItemView {
         this.displayEmpty(true);
         removeExistingSVG();
       } else {
-        let transformedMarkdown = await this.transformMarkdown();
+        let { scripts, styles, ...transformedMarkdown } =
+          await this.transformMarkdown();
         root = transformedMarkdown.root;
 
         this.displayEmpty(false);
@@ -193,7 +194,7 @@ export default class MindmapView extends ItemView {
             );
         this.svg = createSVG(this.containerEl, this.settings.lineHeight);
 
-        this.renderMarkmap(root, this.svg);
+        this.renderMarkmap(root, this.svg, scripts, styles);
       }
     }
     this.displayText =
@@ -243,8 +244,10 @@ export default class MindmapView extends ItemView {
   async transformMarkdown() {
     let { root, features } = this.transformer.transform(this.currentMd);
 
+    const { scripts, styles } = this.transformer.getUsedAssets(features);
+
     this.obsMarkmap.updateInternalLinks(root);
-    return { root, features };
+    return { root, features, scripts, styles };
   }
 
   applyColor({ depth }: INode) {
@@ -376,7 +379,12 @@ export default class MindmapView extends ItemView {
     return root;
   }
 
-  async renderMarkmap(root: INode, svg: SVGElement) {
+  async renderMarkmap(
+    root: INode,
+    svg: SVGElement,
+    scripts: JSItem[],
+    styles: CSSItem[]
+  ) {
     const { font } = getComputedCss(this.containerEl);
     const options: Partial<IMarkmapOptions> = {
       autoFit: false,
@@ -393,6 +401,9 @@ export default class MindmapView extends ItemView {
     try {
       let hasAppliedZoom = false;
       const previousTransform = this.currentTransform;
+
+      if (styles) loadCSS(styles);
+      if (scripts) loadJS(scripts);
 
       this.markmapSVG = Markmap.create(svg, options, root);
 
