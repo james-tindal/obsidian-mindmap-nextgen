@@ -280,14 +280,15 @@ export default class MindmapView extends ItemView {
     this.svg
       .querySelectorAll("path.markmap-link")
       .forEach((el: SVGPathElement) => {
-        const colorIndex = parseInt(el.dataset.depth);
+        const colorIndex = Math.min(3, parseInt(el.dataset.depth));
+
         el.style.strokeWidth = `${colors[colorIndex]}`;
       });
 
     this.svg.querySelectorAll("g.markmap-node").forEach((el: SVGGElement) => {
       const line = el.querySelector("line");
 
-      const colorIndex = parseInt(el.dataset.depth);
+      const colorIndex = Math.min(3, parseInt(el.dataset.depth));
       line.style.strokeWidth = `${colors[colorIndex]}`;
     });
 
