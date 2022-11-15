@@ -20,4 +20,6 @@ export class MindMapSettings {
   defaultColorThickness: number = 2;
 
   initialExpandLevel: number = 1;
+
+  onlyUseDefaultColor = false;
 }
