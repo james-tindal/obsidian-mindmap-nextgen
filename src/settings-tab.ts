@@ -216,5 +216,17 @@ export class MindMapSettingsTab extends PluginSettingTab {
             save();
           })
       );
+
+    new Setting(containerEl)
+      .setName("Only use default color")
+      .setDesc("When on, all branches uses the default color")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.onlyUseDefaultColor)
+          .onChange((value) => {
+            this.plugin.settings.onlyUseDefaultColor = value;
+            save();
+          })
+      );
   }
 }

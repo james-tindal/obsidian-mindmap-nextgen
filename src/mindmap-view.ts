@@ -250,6 +250,8 @@ export default class MindmapView extends ItemView {
   }
 
   applyColor({ depth }: INode) {
+    if (this.settings.onlyUseDefaultColor) return this.settings.defaultColor;
+
     const colors = [
       this.settings.color1,
       this.settings.color2,
