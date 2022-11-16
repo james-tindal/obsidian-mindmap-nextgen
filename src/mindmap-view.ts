@@ -6,63 +6,17 @@ import {
   Workspace,
   WorkspaceLeaf,
 } from "obsidian";
-import { Transformer, builtInPlugins, ITransformPlugin } from "markmap-lib";
+import { Transformer, builtInPlugins } from "markmap-lib";
 import { Markmap, loadCSS, loadJS } from "markmap-view";
-import {
-  INode,
-  IMarkmapOptions,
-  JSItem,
-  CSSItem,
-  IWrapContext,
-} from "markmap-common";
+import { INode, IMarkmapOptions, JSItem, CSSItem } from "markmap-common";
+import { D3ZoomEvent, ZoomTransform, zoomIdentity } from "d3-zoom";
+
 import { FRONT_MATTER_REGEX, MD_VIEW_TYPE, MM_VIEW_TYPE } from "./constants";
 import ObsidianMarkmap from "./obsidian-markmap-plugin";
 import { createSVG, getComputedCss, removeExistingSVG } from "./markmap-svg";
 import { copyImageToClipboard } from "./copy-image";
+import { htmlEscapePlugin } from "./html-escape-plugin";
 import { MindMapSettings } from "./settings";
-import { D3ZoomEvent, ZoomTransform, zoomIdentity } from "d3-zoom";
-
-type Token = Remarkable.Remarkable.Token & {
-  content?: string;
-  children?: Token[];
-};
-
-function wrapFunction<T extends unknown[], U>(
-  fn: (...args: T) => U,
-  {
-    before,
-    after,
-  }: {
-    before?: (ctx: IWrapContext<T, U>) => void;
-    after?: (ctx: IWrapContext<T, U>) => void;
-  }
-) {
-  return function wrapped(...args: T) {
-    const ctx: IWrapContext<T, U> = {
-      args,
-      thisObj: this,
-    };
-    try {
-      if (before) before(ctx);
-    } catch {
-      // ignore
-    }
-    ctx.result = fn.apply(ctx.thisObj, ctx.args);
-    try {
-      if (after) after(ctx);
-    } catch {
-      // ignore
-    }
-    return ctx.result;
-  };
-}
-
-function escapeHTML(unsafe: string) {
-  return unsafe.replace(
-    /[\u0000-\u002F\u003A-\u0040\u005B-\u0060\u007B-\u00FF]/g,
-    (c) => "&#" + ("000" + c.charCodeAt(0)).slice(-4) + ";"
-  );
-}
 
 export default class MindmapView extends ItemView {
   filePath: string;
@@ -137,73 +91,7 @@ export default class MindmapView extends ItemView {
     this.vault = this.app.vault;
     this.workspace = this.app.workspace;
 
-    const myPlugin: ITransformPlugin = {
-      name: "myplugin",
-      config: {
-        version: {
-          my: "plugin",
-        },
-      },
-      transform: (transformHooks) => {
-        transformHooks.afterParse.tap((md, context) => {
-          console.log("afterParse", md, context);
-
-          md.parse = wrapFunction(md.parse, {
-            after: function (ctx) {
-              console.log("afterParse.wrapped: ", ctx);
-
-              const escapeAll = (token: Token) => {
-                if (token.type === "htmltag" && token.content) {
-                  console.log("escapando...", token);
-                  token.content = token.content
-                    .replace("<", "&lt;")
-                    .replace(">", "&gt;");
-                }
-
-                if (token.children) {
-                  token.children = token.children.map(escapeAll);
-                }
-
-                return token;
-              };
-
-              ctx.result = ctx.result.map(escapeAll);
-            },
-          });
-        });
-        transformHooks.htmltag.tap((c) => {
-          console.log("htmltag", c);
-        });
-
-        transformHooks.beforeParse.tap((md, context) => {
-          console.log("beforeParse", md, context);
-
-          md.parse = wrapFunction(md.parse, {
-            before: function (ctx) {
-              console.log(ctx);
-            },
-            after: function (ctx) {
-              console.log("beforeParse.wrapped: ", ctx);
-            },
-          });
-        });
-
-        transformHooks.parser.tap((md) => {
-          console.log("parser", md);
-
-          md.parse = wrapFunction(md.parse, {
-            after: function (ctx) {
-              console.log("parser.wrapped: ", ctx);
-            },
-          });
-        });
-
-        return { styles: void 0, scripts: void 0 };
-      },
-    };
-
-    this.transformer = new Transformer([...builtInPlugins, myPlugin]);
-    this.transformer.md.use(console.log);
+    this.transformer = new Transformer([...builtInPlugins, htmlEscapePlugin]);
   }
 
   async onOpen() {
