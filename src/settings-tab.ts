@@ -180,14 +180,13 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Color 2 thickness")
-      .setDesc("Color 2 thickess in points (px)")
-      .addSlider((slider) =>
-        slider
-          .setLimits(1, 10, 0.5)
-          .setValue(this.plugin.settings.color2Thickness)
+      .setName("Color 3 thickness")
+      .setDesc("Color 3 thickess in points (px)")
+      .addText((text) =>
+        text
+          .setValue(this.plugin.settings.color3Thickness)
           .onChange((value) => {
-            this.plugin.settings.color2Thickness = value;
+            this.plugin.settings.color3Thickness = value;
             save();
           })
       );
