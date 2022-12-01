@@ -132,13 +132,14 @@ export class MindMapSettingsTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Color 1 thickness")
       .setDesc("Color 1 thickess in points (px)")
-      .addSlider((slider) =>
+      .addText((slider) =>
         slider
-          .setLimits(1, 10, 0.5)
           .setValue(this.plugin.settings.color1Thickness)
           .onChange((value) => {
-            this.plugin.settings.color1Thickness = value;
-            save();
+            if (Boolean(parseFloat(value.replace(/[^0-9\.]/g, '')))) {
+              this.plugin.settings.color1Thickness = value;
+              save();
+            }
           })
       );
 
@@ -157,9 +158,8 @@ export class MindMapSettingsTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Color 2 thickness")
       .setDesc("Color 2 thickess in points (px)")
-      .addSlider((slider) =>
+      .addText((slider) =>
         slider
-          .setLimits(1, 10, 0.5)
           .setValue(this.plugin.settings.color2Thickness)
           .onChange((value) => {
             this.plugin.settings.color2Thickness = value;
@@ -182,9 +182,8 @@ export class MindMapSettingsTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Color 2 thickness")
       .setDesc("Color 2 thickess in points (px)")
-      .addSlider((slider) =>
+      .addText((slider) =>
         slider
-          .setLimits(1, 10, 0.5)
           .setValue(this.plugin.settings.color2Thickness)
           .onChange((value) => {
             this.plugin.settings.color2Thickness = value;
@@ -207,9 +206,8 @@ export class MindMapSettingsTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Default color thickness")
       .setDesc("Default color thickess in points (px)")
-      .addSlider((slider) =>
+      .addText((slider) =>
         slider
-          .setLimits(1, 10, 0.5)
           .setValue(this.plugin.settings.defaultColorThickness)
           .onChange((value) => {
             this.plugin.settings.defaultColorThickness = value;

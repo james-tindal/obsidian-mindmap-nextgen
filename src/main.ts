@@ -11,12 +11,11 @@ export default class MindMap extends Plugin {
   settings: MindMapSettings;
 
   async onload() {
-    console.log("Loading Mind Map plugin");
     this.vault = this.app.vault;
     this.workspace = this.app.workspace;
     this.settings = Object.assign(
       {
-        splitDirection: "Horizontal",
+        splitDirection: "horizontal",
         nodeMinHeight: 16,
         lineHeight: "1em",
         spacingVertical: 5,
@@ -25,16 +24,16 @@ export default class MindMap extends Plugin {
         initialExpandLevel: 1,
 
         color1: "#fed766",
-        color1Thickness: 10,
+        color1Thickness: '10',
 
         color2: "#2ab7ca",
-        color2Thickness: 6,
+        color2Thickness: '6',
 
         color3: "#fe4a49",
-        color3Thickness: 4,
+        color3Thickness: '4',
 
         defaultColor: "#000000",
-        defaultColorThickness: 2,
+        defaultColorThickness: '2',
       },
       await this.loadData()
     );
