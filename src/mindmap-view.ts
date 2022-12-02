@@ -8,7 +8,7 @@ import {
 } from "obsidian";
 import { Transformer, builtInPlugins } from "markmap-lib";
 import { Markmap, loadCSS, loadJS } from "markmap-view";
-import { INode, IMarkmapOptions, JSItem, CSSItem } from "markmap-common";
+import { INode, IMarkmapOptions } from "markmap-common";
 import { D3ZoomEvent, ZoomTransform, zoomIdentity } from "d3-zoom";
 
 import { FRONT_MATTER_REGEX, MD_VIEW_TYPE, MM_VIEW_TYPE } from "./constants";
@@ -30,12 +30,14 @@ export default class MindmapView extends ItemView {
   emptyDiv: HTMLDivElement;
   svg: SVGElement;
   obsMarkmap: ObsidianMarkmap;
-  isLeafPinned: boolean;
+  isLeafPinned: boolean = false;
   pinAction: HTMLElement;
   settings: MindMapSettings;
   currentTransform: ZoomTransform;
   markmapSVG: Markmap;
   transformer: Transformer;
+  options: Partial<IMarkmapOptions>;
+  hasFit: boolean;
 
   groupEventListenerFn: () => unknown;
 
@@ -92,43 +94,158 @@ export default class MindmapView extends ItemView {
     this.workspace = this.app.workspace;
 
     this.transformer = new Transformer([...builtInPlugins, htmlEscapePlugin]);
+    this.svg = createSVG(this.containerEl, this.settings.lineHeight);
+    this.hasFit = false;
+
+    this.createMarkmapSvg();
+
+    this.setListenersUp();
+
+    this.overrideStopPropagation();
+  }
+
+  createMarkmapSvg() {
+    const { font } = getComputedCss(this.containerEl);
+
+    this.options = {
+      autoFit: false,
+      color: this.applyColor.bind(this),
+      duration: 500,
+      style: (id) => `${id} * {font: ${font}}`,
+      nodeMinHeight: this.settings.nodeMinHeight ?? 16,
+      spacingVertical: this.settings.spacingVertical ?? 5,
+      spacingHorizontal: this.settings.spacingHorizontal ?? 80,
+      paddingX: this.settings.paddingX ?? 8,
+      embedGlobalCSS: true,
+      fitRatio: 1,
+    };
+
+    this.markmapSVG = Markmap.create(this.svg, this.options);
+  }
+
+  setListenersUp() {
+    let lastTimeout: number | undefined;
+    this.listeners = [
+      this.workspace.on("quick-preview", (_, content) => {
+        if (lastTimeout) {
+          window.clearTimeout(lastTimeout);
+        }
+
+        lastTimeout = window.setTimeout(async () => {
+          await this.update(content);
+          lastTimeout = undefined;
+        }, 300);
+      }),
+      this.workspace.on(
+        "resize",
+        async (...args) => await this.checkAndUpdate("resize", ...args)
+      ),
+      this.workspace.on(
+        "active-leaf-change",
+        async (...args) =>
+          await this.checkAndUpdate("active-leaf-change", ...args)
+      ),
+      this.workspace.on(
+        "layout-change",
+        async (...args) => await this.checkAndUpdate("layout-change", ...args)
+      ),
+      this.workspace.on(
+        "css-change",
+        async (...args) => await this.checkAndUpdate("css-change", ...args)
+      ),
+      this.workspace.on(
+        "file-menu",
+        async (...args) => await this.checkAndUpdate("file-menu", ...args)
+      ),
+      this.workspace.on(
+        "editor-menu",
+        async (...args) => await this.checkAndUpdate("editor-menu", ...args)
+      ),
+      this.workspace.on(
+        "editor-paste",
+        async (...args) => await this.checkAndUpdate("editor-paste", ...args)
+      ),
+      this.workspace.on(
+        "editor-drop",
+        async (...args) => await this.checkAndUpdate("editor-drop", ...args)
+      ),
+      this.workspace.on(
+        "codemirror",
+        async (...args) => await this.checkAndUpdate("codemirror", ...args)
+      ),
+      this.leaf.on(
+        "group-change",
+        async (group) => await this.updateLinkedLeaf(group, this)
+      ),
+    ];
+  }
+
+  overrideStopPropagation() {
+    const oldStopProgation = MouseEvent.prototype.stopPropagation;
+
+    MouseEvent.prototype.stopPropagation = function () {
+      const target = this.target as HTMLElement;
+
+      if (
+        target.tagName.toLowerCase() != "div" ||
+        target.tagName.toLowerCase() != "foreignObject"
+      )
+        oldStopProgation.bind(this)();
+
+      let parent = target;
+      while (parent) {
+        if (parent == this.svg) return;
+        parent = parent.parentElement;
+      }
+
+      oldStopProgation.bind(this)();
+    };
+  }
+
+  overrideStopPropagation() {
+    const oldStopProgation = MouseEvent.prototype.stopPropagation;
+
+    MouseEvent.prototype.stopPropagation = function () {
+      const target = this.target as HTMLElement;
+
+      if (
+        target.tagName.toLowerCase() != "div" ||
+        target.tagName.toLowerCase() != "foreignObject"
+      )
+        oldStopProgation.bind(this)();
+
+      let parent = target;
+      while (parent) {
+        if (parent == this.svg) return;
+        parent = parent.parentElement;
+      }
+
+      oldStopProgation.bind(this)();
+    };
   }
 
   async onOpen() {
     this.obsMarkmap = new ObsidianMarkmap(this.vault);
-    this.registerActiveLeafUpdate();
-    this.workspace.onLayoutReady(() => this.update());
-    this.listeners = [
-      this.workspace.on("layout-change", () => this.update()),
-      this.workspace.on("resize", () => this.update()),
-      this.workspace.on("css-change", () => this.update()),
-      this.leaf.on("group-change", (group) =>
-        this.updateLinkedLeaf(group, this)
-      ),
-    ];
+    this.workspace.onLayoutReady(async () => {
+      const x = await this.checkAndUpdate();
+    });
   }
 
   async onClose() {
     this.listeners.forEach((listener) => this.workspace.offref(listener));
   }
 
-  registerActiveLeafUpdate() {
-    this.registerInterval(
-      window.setInterval(() => this.checkAndUpdate(), 1000)
-    );
-  }
-
-  async checkAndUpdate() {
+  async checkAndUpdate(...args: any[]) {
     try {
       if (await this.checkActiveLeaf()) {
-        this.update();
+        await this.update();
       }
     } catch (error) {
       console.error(error);
     }
   }
 
-  updateLinkedLeaf(group: string, mmView: MindmapView) {
+  async updateLinkedLeaf(group: string, mmView: MindmapView) {
     if (group === null) {
       mmView.linkedLeaf = undefined;
       return;
@@ -137,7 +254,8 @@ export default class MindmapView extends ItemView {
       .getGroupLeaves(group)
       .filter((l) => l.view.getViewType() === MM_VIEW_TYPE)[0];
     mmView.linkedLeaf = mdLinkedLeaf;
-    this.checkAndUpdate();
+
+    await this.checkAndUpdate();
   }
 
   pinCurrentLeaf() {
@@ -157,57 +275,31 @@ export default class MindmapView extends ItemView {
   }
 
   collapseAll() {
-    try {
-      Array.from(this.markmapSVG.svg.node().querySelectorAll("g")).forEach(
-        (node: SVGGElement) => {
-          const circle = node.querySelector("circle");
-          if (circle?.getAttribute("fill") == "rgb(255, 255, 255)") {
-            circle.dispatchEvent(new CustomEvent("click"));
-          }
-        }
-      );
-    } catch (err) {
-      console.log(err);
-    }
+    this.markmapSVG.setData(this.markmapSVG.state.data, {
+      ...this.options,
+      initialExpandLevel: 0,
+    });
   }
 
-  async update() {
-    let root: INode;
-    if (this.filePath) {
-      await this.readMarkDown();
-      if (
-        this.currentMd.length === 0 ||
-        this.getLeafTarget().view.getViewType() != MD_VIEW_TYPE
-      ) {
-        this.displayEmpty(true);
-        removeExistingSVG();
-      } else {
-        let { scripts, styles, ...transformedMarkdown } =
-          await this.transformMarkdown();
-        root = transformedMarkdown.root;
+  async update(markdown?: string) {
+    if (markdown && typeof markdown === "string") this.currentMd = markdown;
+    else await this.readMarkDown();
 
-        this.displayEmpty(false);
+    let { root, scripts, styles } = await this.transformMarkdown();
 
-        if (this.svg)
-          this.svg
-            .querySelectorAll("g")
-            .forEach((elem) =>
-              elem.removeEventListener("click", this.groupEventListenerFn)
-            );
-        this.svg = createSVG(this.containerEl, this.settings.lineHeight);
+    if (styles) loadCSS(styles);
+    if (scripts) loadJS(scripts);
 
-        this.renderMarkmap(root, this.svg, scripts, styles);
-      }
-    }
+    this.renderMarkmap(root);
+
     this.displayText =
       this.fileName != undefined ? `Mind Map of ${this.fileName}` : "Mind Map";
-    this.load();
 
     setTimeout(() => this.applyWidths(), 100);
   }
 
   async checkActiveLeaf() {
-    if (this.app.workspace.activeLeaf.view.getViewType() === MM_VIEW_TYPE) {
+    if (this.app.workspace.activeLeaf.view.getViewType() !== MD_VIEW_TYPE) {
       return false;
     }
     const pathHasChanged = this.readFilePath();
@@ -240,6 +332,7 @@ export default class MindmapView extends ItemView {
     }
     const markDownHasChanged = this.currentMd != md;
     this.currentMd = md;
+
     return markDownHasChanged;
   }
 
@@ -249,7 +342,7 @@ export default class MindmapView extends ItemView {
     const { scripts, styles } = this.transformer.getUsedAssets(features);
 
     this.obsMarkmap.updateInternalLinks(root);
-    return { root, features, scripts, styles };
+    return { root, scripts, styles };
   }
 
   applyColor({ depth }: INode) {
@@ -275,6 +368,8 @@ export default class MindmapView extends ItemView {
   }
 
   applyWidths() {
+    if (!this.svg) return;
+
     const colors = [
       this.settings.color1Thickness,
       this.settings.color2Thickness,
@@ -304,60 +399,14 @@ export default class MindmapView extends ItemView {
     });
   }
 
-  async renderMarkmap(
-    root: INode,
-    svg: SVGElement,
-    scripts: JSItem[],
-    styles: CSSItem[]
-  ) {
-    const { font } = getComputedCss(this.containerEl);
-    const options: Partial<IMarkmapOptions> = {
-      autoFit: false,
-      color: this.applyColor.bind(this),
-      duration: 10,
-      style: (id) => `${id} * {font: ${font}}`,
-      nodeMinHeight: this.settings.nodeMinHeight ?? 16,
-      spacingVertical: this.settings.spacingVertical ?? 5,
-      spacingHorizontal: this.settings.spacingHorizontal ?? 80,
-      paddingX: this.settings.paddingX ?? 8,
-      embedGlobalCSS: true,
-      fitRatio: 1,
-    };
+  async renderMarkmap(root: INode) {
     try {
-      let hasAppliedZoom = false;
-      const previousTransform = this.currentTransform;
+      this.markmapSVG.setData(root, this.options);
 
-      if (styles) loadCSS(styles);
-      if (scripts) loadJS(scripts);
-
-      this.markmapSVG = Markmap.create(svg, options, root);
-
-      this.markmapSVG.zoom.on(
-        "start.keeper",
-        (evt: D3ZoomEvent<SVGElement, any>) => {
-          if (previousTransform && hasAppliedZoom) {
-            const { x, y, k } = previousTransform;
-            evt.transform.translate(x, y).scale(k);
-          }
-        }
-      );
-
-      this.markmapSVG.zoom.on(
-        "end.keeper",
-        (evt: D3ZoomEvent<SVGElement, any>) => {
-          if (previousTransform && !hasAppliedZoom) {
-            hasAppliedZoom = true;
-            const { x, y, k } = previousTransform;
-
-            this.markmapSVG.zoom.transform(
-              this.markmapSVG.svg,
-              zoomIdentity.translate(x, y).scale(k)
-            );
-          } else {
-            this.currentTransform = evt.transform;
-          }
-        }
-      );
+      if (!this.hasFit) {
+        this.markmapSVG.fit();
+        this.hasFit = true;
+      }
     } catch (error) {
       console.error(error);
     }

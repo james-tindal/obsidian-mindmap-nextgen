@@ -33,7 +33,16 @@ function drawInlineSVG(
   callback: () => void
 ): HTMLImageElement {
   // get svg data
-  const xml = new XMLSerializer().serializeToString(svg);
+  let xml = new XMLSerializer().serializeToString(svg);
+
+  const div = document.createElement("div");
+
+  div.innerHTML = xml;
+
+  const svgElement = div.querySelector("svg");
+  svgElement.style.backgroundColor = "black";
+
+  xml = new XMLSerializer().serializeToString(svgElement);
 
   // make it base64
   const svg64 = btoa(unescape(encodeURIComponent(xml)));

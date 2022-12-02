@@ -1,40 +1,10 @@
-import { IWrapContext } from "markmap-common";
+import { wrapFunction } from "markmap-common";
 import { ITransformPlugin } from "markmap-lib";
 
 type Token = Remarkable.Remarkable.Token & {
   content?: string;
   children?: Token[];
 };
-
-function wrapFunction<T extends unknown[], U>(
-  fn: (...args: T) => U,
-  {
-    before,
-    after,
-  }: {
-    before?: (ctx: IWrapContext<T, U>) => void;
-    after?: (ctx: IWrapContext<T, U>) => void;
-  }
-) {
-  return function wrapped(...args: T) {
-    const ctx: IWrapContext<T, U> = {
-      args,
-      thisObj: this,
-    };
-    try {
-      if (before) before(ctx);
-    } catch {
-      // ignore
-    }
-    ctx.result = fn.apply(ctx.thisObj, ctx.args);
-    try {
-      if (after) after(ctx);
-    } catch {
-      // ignore
-    }
-    return ctx.result;
-  };
-}
 
 export const htmlEscapePlugin: ITransformPlugin = {
   name: "htmlescape",
