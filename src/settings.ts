@@ -19,10 +19,15 @@ export class MindMapSettings {
   defaultColor: string = "#000";
   defaultColorThickness: string = "2";
 
-  initialExpandLevel: number = 1;
+  initialExpandLevel: number = -1;
 
   onlyUseDefaultColor = false;
 
+  coloring: "depth" | "branch" = "depth";
+
+  colorFreezeLevel: number = 0;
+  animationDuration: number = 500;
+  maxWidth: number = 0;
   // below a beautiful dark blue color
   screenshotBgColor: string = "#039614";
   screenshotTransparentBg: boolean = true;
