@@ -1,8 +1,12 @@
 import { Notice } from "obsidian";
+import { MindMapSettings } from "./settings";
 
-export function copyImageToClipboard(svg: SVGElement) {
+export function copyImageToClipboard(
+  svg: SVGElement,
+  settings: MindMapSettings
+) {
   const canvas = createCanvas(svg);
-  const img = generateImage(svg, canvas, () => {
+  const img = generateImage(svg, canvas, settings, () => {
     canvas.toBlob((blob: any) => {
       const item = new ClipboardItem({ "image/png": blob });
       navigator.clipboard.write([item]);
@@ -21,15 +25,17 @@ function createCanvas(svg: SVGElement): HTMLCanvasElement {
 function generateImage(
   svg: SVGElement,
   canvas: HTMLCanvasElement,
+  settings: MindMapSettings,
   callback: () => void
 ): HTMLImageElement {
   var ctx = canvas.getContext("2d");
-  return drawInlineSVG(ctx, svg, callback);
+  return drawInlineSVG(ctx, svg, settings, callback);
 }
 
 function drawInlineSVG(
   ctx: CanvasRenderingContext2D,
   svg: SVGElement,
+  settings: MindMapSettings,
   callback: () => void
 ): HTMLImageElement {
   // get svg data
@@ -40,7 +46,9 @@ function drawInlineSVG(
   div.innerHTML = xml;
 
   const svgElement = div.querySelector("svg");
-  svgElement.style.backgroundColor = "black";
+  if (settings.screenshotTransparentBg)
+    svgElement.style.backgroundColor = "transparent";
+  else svgElement.style.backgroundColor = settings.screenshotBgColor;
 
   xml = new XMLSerializer().serializeToString(svgElement);
 

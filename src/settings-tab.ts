@@ -226,5 +226,31 @@ export class MindMapSettingsTab extends PluginSettingTab {
             save();
           })
       );
+
+    new Setting(containerEl)
+      .setName("Screenshot background color")
+      .setDesc("Background color for the screenshot")
+      .addColorPicker((colPicker) =>
+        colPicker
+          .setValue(this.plugin.settings.screenshotBgColor?.toString())
+          .onChange((value: string) => {
+            this.plugin.settings.screenshotBgColor = value;
+            save();
+          })
+      );
+
+    // add toggle to use transparent background for screenshot or not
+
+    new Setting(containerEl)
+      .setName("Screenshot transparent background")
+      .setDesc("When on, the background of the screenshot is transparent")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.screenshotTransparentBg)
+          .onChange((value) => {
+            this.plugin.settings.screenshotTransparentBg = value;
+            save();
+          })
+      );
   }
 }
