@@ -22,7 +22,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
 
     const save = () => {
       this.plugin.saveData(this.plugin.settings);
-      this.app.workspace.trigger("css-change");
+      this.app.workspace.trigger("quick-preview");
     };
 
     new Setting(containerEl)
@@ -136,7 +136,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
         slider
           .setValue(this.plugin.settings.color1Thickness)
           .onChange((value) => {
-            if (Boolean(parseFloat(value.replace(/[^0-9\.]/g, '')))) {
+            if (Boolean(parseFloat(value.replace(/[^0-9\.]/g, "")))) {
               this.plugin.settings.color1Thickness = value;
               save();
             }
