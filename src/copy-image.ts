@@ -46,7 +46,9 @@ function drawInlineSVG(
   div.innerHTML = xml;
 
   const svgElement = div.querySelector("svg");
-  svgElement.style.backgroundColor = settings.screenshotBgColor;
+  if (settings.screenshotTransparentBg)
+    svgElement.style.backgroundColor = "transparent";
+  else svgElement.style.backgroundColor = settings.screenshotBgColor;
 
   xml = new XMLSerializer().serializeToString(svgElement);
 
