@@ -7,8 +7,8 @@ import {
   WorkspaceLeaf,
 } from "obsidian";
 import { Transformer, builtInPlugins } from "markmap-lib";
-import { Markmap, loadCSS, loadJS } from "markmap-view";
-import { INode, IMarkmapOptions } from "markmap-common";
+import { Markmap, loadCSS, loadJS, deriveOptions } from "markmap-view";
+import { INode, IMarkmapOptions, IMarkmapJSONOptions } from "markmap-common";
 import { D3ZoomEvent, ZoomTransform, zoomIdentity } from "d3-zoom";
 
 import { FRONT_MATTER_REGEX, MD_VIEW_TYPE, MM_VIEW_TYPE } from "./constants";
@@ -123,6 +123,12 @@ export default class MindmapView extends ItemView {
     this.markmapSVG = Markmap.create(this.svg, this.options);
   }
 
+  reloadMarkmapSVG() {
+    this.markmapSVG.destroy();
+    this.createMarkmapSvg();
+    this.update(this.currentMd);
+  }
+
   setListenersUp() {
     let lastTimeout: number | undefined;
     this.listeners = [
@@ -136,43 +142,23 @@ export default class MindmapView extends ItemView {
           lastTimeout = undefined;
         }, 300);
       }),
-      this.workspace.on(
-        "resize",
-        async (...args) => await this.checkAndUpdate("resize", ...args)
-      ),
-      this.workspace.on(
-        "active-leaf-change",
-        async (...args) =>
-          await this.checkAndUpdate("active-leaf-change", ...args)
-      ),
+      this.workspace.on("resize", async () => await this.checkAndUpdate()),
+      this.workspace.on("active-leaf-change", async (a) => {
+        await this.checkAndUpdate();
+      }),
       this.workspace.on(
         "layout-change",
-        async (...args) => await this.checkAndUpdate("layout-change", ...args)
+        async () => await this.checkAndUpdate()
       ),
-      this.workspace.on(
-        "css-change",
-        async (...args) => await this.checkAndUpdate("css-change", ...args)
-      ),
-      this.workspace.on(
-        "file-menu",
-        async (...args) => await this.checkAndUpdate("file-menu", ...args)
-      ),
-      this.workspace.on(
-        "editor-menu",
-        async (...args) => await this.checkAndUpdate("editor-menu", ...args)
-      ),
+      this.workspace.on("css-change", async () => await this.checkAndUpdate()),
+      this.workspace.on("file-menu", async () => await this.checkAndUpdate()),
+      this.workspace.on("editor-menu", async () => await this.checkAndUpdate()),
       this.workspace.on(
         "editor-paste",
-        async (...args) => await this.checkAndUpdate("editor-paste", ...args)
+        async () => await this.checkAndUpdate()
       ),
-      this.workspace.on(
-        "editor-drop",
-        async (...args) => await this.checkAndUpdate("editor-drop", ...args)
-      ),
-      this.workspace.on(
-        "codemirror",
-        async (...args) => await this.checkAndUpdate("codemirror", ...args)
-      ),
+      this.workspace.on("editor-drop", async () => await this.checkAndUpdate()),
+      this.workspace.on("codemirror", async () => await this.checkAndUpdate()),
       this.leaf.on(
         "group-change",
         async (group) => await this.updateLinkedLeaf(group, this)
@@ -227,22 +213,14 @@ export default class MindmapView extends ItemView {
   async onOpen() {
     this.obsMarkmap = new ObsidianMarkmap(this.vault);
     this.workspace.onLayoutReady(async () => {
-      const x = await this.checkAndUpdate();
+      console.log("Comecou agr");
+      await this.update();
+      console.log("Terminou agr");
     });
   }
 
   async onClose() {
     this.listeners.forEach((listener) => this.workspace.offref(listener));
-  }
-
-  async checkAndUpdate(...args: any[]) {
-    try {
-      if (await this.checkActiveLeaf()) {
-        await this.update();
-      }
-    } catch (error) {
-      console.error(error);
-    }
   }
 
   async updateLinkedLeaf(group: string, mmView: MindmapView) {
@@ -252,10 +230,10 @@ export default class MindmapView extends ItemView {
     }
     const mdLinkedLeaf = mmView.workspace
       .getGroupLeaves(group)
-      .filter((l) => l.view.getViewType() === MM_VIEW_TYPE)[0];
+      .filter((l) => l?.view?.getViewType() === MM_VIEW_TYPE)[0];
     mmView.linkedLeaf = mdLinkedLeaf;
 
-    await this.checkAndUpdate();
+    await this.update();
   }
 
   pinCurrentLeaf() {
@@ -285,12 +263,16 @@ export default class MindmapView extends ItemView {
     if (markdown && typeof markdown === "string") this.currentMd = markdown;
     else await this.readMarkDown();
 
-    let { root, scripts, styles } = await this.transformMarkdown();
+    if (!this.currentMd) return;
+
+    let { root, scripts, styles, frontmatter } = await this.transformMarkdown();
 
     if (styles) loadCSS(styles);
     if (scripts) loadJS(scripts);
 
-    this.renderMarkmap(root);
+    console.log(frontmatter);
+
+    this.renderMarkmap(root, frontmatter?.markmap);
 
     this.displayText =
       this.fileName != undefined ? `Mind Map of ${this.fileName}` : "Mind Map";
@@ -298,10 +280,21 @@ export default class MindmapView extends ItemView {
     setTimeout(() => this.applyWidths(), 100);
   }
 
+  async checkAndUpdate() {
+    try {
+      if (await this.checkActiveLeaf()) {
+        await this.update();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   async checkActiveLeaf() {
-    if (this.app.workspace.activeLeaf.view.getViewType() !== MD_VIEW_TYPE) {
+    if (this.app.workspace.activeLeaf?.view?.getViewType() !== MD_VIEW_TYPE) {
       return false;
     }
+
     const pathHasChanged = this.readFilePath();
     const markDownHasChanged = await this.readMarkDown();
     const updateRequired = pathHasChanged || markDownHasChanged;
@@ -326,23 +319,25 @@ export default class MindmapView extends ItemView {
   }
 
   async readMarkDown() {
-    let md = await this.app.vault.adapter.read(this.filePath);
-    if (md.startsWith("---")) {
-      md = md.replace(FRONT_MATTER_REGEX, "");
+    try {
+      let md = await this.app.vault.adapter.read(this.filePath);
+      const markDownHasChanged = this.currentMd != md;
+      this.currentMd = md;
+      return markDownHasChanged;
+    } catch (error) {
+      console.log(error);
     }
-    const markDownHasChanged = this.currentMd != md;
-    this.currentMd = md;
-
-    return markDownHasChanged;
   }
 
   async transformMarkdown() {
-    let { root, features } = this.transformer.transform(this.currentMd);
+    let { root, features, frontmatter } = this.transformer.transform(
+      this.currentMd
+    );
 
     const { scripts, styles } = this.transformer.getUsedAssets(features);
 
     this.obsMarkmap.updateInternalLinks(root);
-    return { root, scripts, styles };
+    return { root, scripts, styles, frontmatter };
   }
 
   applyColor({ depth }: INode) {
@@ -399,9 +394,29 @@ export default class MindmapView extends ItemView {
     });
   }
 
-  async renderMarkmap(root: INode) {
+  async renderMarkmap(root: INode, frontmatterOpts: IMarkmapJSONOptions) {
     try {
-      this.markmapSVG.setData(root, this.options);
+      const { font } = getComputedCss(this.containerEl);
+
+      this.options = {
+        autoFit: false,
+        color: this.applyColor.bind(this),
+        duration: 500,
+        style: (id) => `${id} * {font: ${font}}`,
+        nodeMinHeight: this.settings.nodeMinHeight ?? 16,
+        spacingVertical: this.settings.spacingVertical ?? 5,
+        spacingHorizontal: this.settings.spacingHorizontal ?? 80,
+        paddingX: this.settings.paddingX ?? 8,
+        embedGlobalCSS: true,
+        fitRatio: 1,
+      };
+
+      const markmapOptions = deriveOptions(frontmatterOpts);
+
+      this.markmapSVG.setData(root, {
+        ...this.options,
+        ...markmapOptions,
+      });
 
       if (!this.hasFit) {
         this.markmapSVG.fit();
