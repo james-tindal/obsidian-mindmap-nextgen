@@ -36,6 +36,9 @@ export default class MindMap extends Plugin {
 
         defaultColor: "#000000",
         defaultColorThickness: "2",
+
+        screenshotBgColor: "#039614",
+        screenshotTransparentBg: true,
       },
       await this.loadData()
     );

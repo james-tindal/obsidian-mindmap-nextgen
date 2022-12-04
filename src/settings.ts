@@ -24,5 +24,6 @@ export class MindMapSettings {
   onlyUseDefaultColor = false;
 
   // below a beautiful dark blue color
-  screenshotBgColor: string = "#0d1147";
+  screenshotBgColor: string = "#039614";
+  screenshotTransparentBg: boolean = true;
 }
