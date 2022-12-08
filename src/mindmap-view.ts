@@ -245,12 +245,12 @@ export default class MindmapView extends ItemView {
 
     let { root, scripts, styles, frontmatter } = await this.transformMarkdown();
 
+    const options = deriveOptions(frontmatter?.markmap);
+
     if (styles) loadCSS(styles);
     if (scripts) loadJS(scripts);
 
-    console.log(frontmatter);
-
-    this.renderMarkmap(root, frontmatter?.markmap);
+    this.renderMarkmap(root, options, frontmatter?.markmap);
 
     this.displayText =
       this.fileName != undefined ? `Mind Map of ${this.fileName}` : "Mind Map";
@@ -318,16 +318,20 @@ export default class MindmapView extends ItemView {
     return { root, scripts, styles, frontmatter };
   }
 
-  applyColor({ depth }: INode) {
-    if (this.settings.onlyUseDefaultColor) return this.settings.defaultColor;
+  applyColor(frontmatterColors: string[]) {
+    return ({ depth }: INode) => {
+      if (this.settings.onlyUseDefaultColor) return this.settings.defaultColor;
 
-    const colors = [
-      this.settings.color1,
-      this.settings.color2,
-      this.settings.color3,
-    ];
+      const colors = frontmatterColors?.length
+        ? frontmatterColors
+        : [this.settings.color1, this.settings.color2, this.settings.color3];
 
-    return depth < colors.length ? colors[depth] : this.settings.defaultColor;
+      if (frontmatterColors?.length) return colors[depth % colors.length];
+      else
+        return depth < colors.length
+          ? colors[depth]
+          : this.settings.defaultColor;
+    };
   }
 
   hexToRgb(hex: string) {
@@ -372,14 +376,23 @@ export default class MindmapView extends ItemView {
     });
   }
 
-  async renderMarkmap(root: INode, frontmatterOpts: IMarkmapJSONOptions) {
+  async renderMarkmap(
+    root: INode,
+    { color, ...frontmatterOptions }: Partial<IMarkmapOptions>,
+    frontmatter: Partial<IMarkmapJSONOptions> = {}
+  ) {
     try {
       const { font } = getComputedCss(this.containerEl);
 
+      const colorFn =
+        this.settings.coloring === "depth"
+          ? this.applyColor(frontmatter?.color)
+          : color;
+
+      console.log("Colorfn: ", colorFn);
+
       this.options = {
         autoFit: false,
-        color: this.applyColor.bind(this),
-        duration: 500,
         style: (id) => `${id} * {font: ${font}}`,
         nodeMinHeight: this.settings.nodeMinHeight ?? 16,
         spacingVertical: this.settings.spacingVertical ?? 5,
@@ -387,13 +400,18 @@ export default class MindmapView extends ItemView {
         paddingX: this.settings.paddingX ?? 8,
         embedGlobalCSS: true,
         fitRatio: 1,
+        initialExpandLevel: this.settings.initialExpandLevel ?? -1,
+        maxWidth: this.settings.maxWidth ?? 0,
+        duration: this.settings.animationDuration ?? 500,
       };
 
-      const markmapOptions = deriveOptions(frontmatterOpts);
+      if (colorFn) {
+        this.options.color = colorFn;
+      }
 
       this.markmapSVG.setData(root, {
         ...this.options,
-        ...markmapOptions,
+        ...frontmatterOptions,
       });
 
       if (!this.hasFit) {

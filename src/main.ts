@@ -23,7 +23,7 @@ export default class MindMap extends Plugin {
         spacingVertical: 5,
         spacingHorizontal: 80,
         paddingX: 8,
-        initialExpandLevel: 1,
+        initialExpandLevel: -1,
 
         color1: "#fed766",
         color1Thickness: "10",
@@ -37,6 +37,12 @@ export default class MindMap extends Plugin {
         defaultColor: "#000000",
         defaultColorThickness: "2",
 
+        onlyUseDefaultColor: false,
+
+        coloring: "depth",
+        colorFreezeLevel: 0,
+        animationDuration: 500,
+        maxWidth: 0,
         screenshotBgColor: "#039614",
         screenshotTransparentBg: true,
       },
