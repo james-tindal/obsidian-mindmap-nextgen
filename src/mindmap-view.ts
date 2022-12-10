@@ -68,7 +68,7 @@ export default class MindmapView extends ItemView {
         item
           .setIcon("image-file")
           .setTitle("Copy screenshot")
-          .onClick(() => copyImageToClipboard(this.settings))
+          .onClick(() => copyImageToClipboard(this.settings, this.markmapSVG))
       )
       .addSeparator()
       .addItem((item) =>

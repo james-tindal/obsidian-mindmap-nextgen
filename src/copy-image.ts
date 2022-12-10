@@ -3,7 +3,12 @@ import { MindMapSettings } from "./settings";
 import { Markmap } from "markmap-view";
 import d3SvgToPng from "d3-svg-to-png";
 
-export function copyImageToClipboard(settings: MindMapSettings) {
+export function copyImageToClipboard(
+  settings: MindMapSettings,
+  currentMm: Markmap
+) {
+  currentMm.fit();
+
   d3SvgToPng("#markmap", "markmap.png", {
     scale: 3,
     format: "png",
