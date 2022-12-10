@@ -15,7 +15,7 @@ import { FRONT_MATTER_REGEX, MD_VIEW_TYPE, MM_VIEW_TYPE } from "./constants";
 import ObsidianMarkmap from "./obsidian-markmap-plugin";
 import { createSVG, getComputedCss, removeExistingSVG } from "./markmap-svg";
 import { copyImageToClipboard } from "./copy-image";
-import { htmlEscapePlugin } from "./html-escape-plugin";
+import { htmlEscapePlugin, checkBoxPlugin } from "./html-escape-plugin";
 import { MindMapSettings } from "./settings";
 
 export default class MindmapView extends ItemView {
@@ -93,7 +93,11 @@ export default class MindmapView extends ItemView {
     this.vault = this.app.vault;
     this.workspace = this.app.workspace;
 
-    this.transformer = new Transformer([...builtInPlugins, htmlEscapePlugin]);
+    this.transformer = new Transformer([
+      ...builtInPlugins,
+      htmlEscapePlugin,
+      checkBoxPlugin,
+    ]);
     this.svg = createSVG(this.containerEl, this.settings.lineHeight);
     this.hasFit = false;
 
