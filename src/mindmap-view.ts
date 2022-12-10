@@ -15,7 +15,7 @@ import { FRONT_MATTER_REGEX, MD_VIEW_TYPE, MM_VIEW_TYPE } from "./constants";
 import ObsidianMarkmap from "./obsidian-markmap-plugin";
 import { createSVG, getComputedCss, removeExistingSVG } from "./markmap-svg";
 import { copyImageToClipboard } from "./copy-image";
-import { htmlEscapePlugin, checkBoxPlugin } from "./html-escape-plugin";
+import { htmlEscapePlugin, checkBoxPlugin } from "./custom-plugins";
 import { MindMapSettings } from "./settings";
 
 export default class MindmapView extends ItemView {
