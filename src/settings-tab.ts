@@ -118,6 +118,22 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
+      .setName("Coloring approach")
+      .setDesc(
+        "The 'depth' changes the color on each level, 'branch' changes the color on each new branch"
+      )
+      .addDropdown((dropDown) =>
+        dropDown
+          .addOption("depth", "Depth based coloring")
+          .addOption("branch", "Branch based coloring")
+          .setValue(this.plugin.settings.coloring || "depth")
+          .onChange((value: "branch" | "depth") => {
+            this.plugin.settings.coloring = value;
+            save();
+          })
+      );
+
+    new Setting(containerEl)
       .setName("Color 1")
       .setDesc("Color for the first level of the mind map")
       .addColorPicker((colPicker) =>
@@ -228,6 +244,36 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
+      .setName("Initial expand level")
+      .setDesc(
+        "Sets the initial depth of the mind map. 0 means all nodes are collapsed, 1 means only the root node is expanded, etc.\nTo expand all nodes, set this to -1."
+      )
+      .addText((text) =>
+        text
+          .setValue(this.plugin.settings.initialExpandLevel?.toString())
+          .setPlaceholder("Example: 2")
+          .onChange((value: string) => {
+            this.plugin.settings.initialExpandLevel = Number.parseInt(value);
+            save();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Color freeze level")
+      .setDesc(
+        "Freeze color at the specified level of branches, i.e. all child branches will use the color of their ancestor node at the freeze level."
+      )
+      .addText((text) =>
+        text
+          .setValue(this.plugin.settings.colorFreezeLevel?.toString())
+          .setPlaceholder("Example: 3")
+          .onChange((value: string) => {
+            this.plugin.settings.colorFreezeLevel = Number.parseInt(value);
+            save();
+          })
+      );
+
+    new Setting(containerEl)
       .setName("Screenshot background color")
       .setDesc("Background color for the screenshot")
       .addColorPicker((colPicker) =>
@@ -239,6 +285,33 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
+    // animation duration
+    new Setting(containerEl)
+      .setName("Animation duration")
+      .setDesc("The animation duration when folding/unfolding a node.")
+      .addText((text) =>
+        text
+          .setValue(this.plugin.settings.animationDuration?.toString())
+          .setPlaceholder("Example: 500")
+          .onChange((value: string) => {
+            this.plugin.settings.animationDuration = Number.parseInt(value);
+            save();
+          })
+      );
+
+    // max width
+    new Setting(containerEl)
+      .setName("Max width")
+      .setDesc("The max width of each node content. 0 for no limit.")
+      .addText((text) =>
+        text
+          .setValue(this.plugin.settings.maxWidth?.toString())
+          .setPlaceholder("Example: 130")
+          .onChange((value: string) => {
+            this.plugin.settings.maxWidth = Number.parseInt(value);
+            save();
+          })
+      );
     // add toggle to use transparent background for screenshot or not
 
     new Setting(containerEl)

@@ -1,5 +1,8 @@
 # Obsidian Mind Map
 
+
+### REAME coming soon...
+<!--
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/MasterTuto/obsidian-mindmap-vb/Release%20Build?logo=github&style=for-the-badge) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/MasterTuto/obsidian-mindmap-vb?style=for-the-badge&sort=semver)
 
 This repository contains a plugin for [Obsidian](https://obsidian.md/) for viewing Markdown notes as Mind Maps using [Markmap](https://markmap.js.org/).
@@ -56,3 +59,4 @@ As of version [0.9.7 of Obsidian](https://forum.obsidian.md/t/obsidian-release-v
 Pull requests are both welcome and appreciated. 😀
 
 If you would like to contribute to the development of this plugin, please follow the guidelines provided in [CONTRIBUTING.md](CONTRIBUTING.md).
+-->
