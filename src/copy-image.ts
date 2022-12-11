@@ -7,21 +7,21 @@ export function copyImageToClipboard(
   settings: MindMapSettings,
   currentMm: Markmap
 ) {
-  currentMm.fit();
+  currentMm.fit().then(() => {
+    d3SvgToPng("#markmap", "markmap.png", {
+      scale: 3,
+      format: "png",
+      download: false,
+      background: settings.screenshotTransparentBg
+        ? "transparent"
+        : settings.screenshotBgColor,
+      quality: 1,
+    }).then((output) => {
+      const blob = dataURItoBlob(output);
 
-  d3SvgToPng("#markmap", "markmap.png", {
-    scale: 3,
-    format: "png",
-    download: false,
-    background: settings.screenshotTransparentBg
-      ? "transparent"
-      : settings.screenshotBgColor,
-    quality: 1,
-  }).then((output) => {
-    const blob = dataURItoBlob(output);
-
-    navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-    new Notice("Image copied to clipboard");
+      navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+      new Notice("Image copied to clipboard");
+    });
   });
 }
 
