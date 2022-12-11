@@ -250,7 +250,6 @@ export default class MindmapView extends ItemView {
     if (styles) loadCSS(styles);
     if (scripts) loadJS(scripts);
 
-    this.renderMarkmap(root, frontmatter?.markmap ?? {});
     this.renderMarkmap(root, options, frontmatter?.markmap ?? {});
 
     this.displayText =
