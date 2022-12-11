@@ -48,43 +48,35 @@ export const checkBoxPlugin: ITransformPlugin = {
     },
   },
   transform: (transformHooks) => {
-    const tappers = [
-      "parser",
-      "beforeParse",
-      "afterParse",
-      "htmltag",
-      "retransform",
-    ] as const;
-
     transformHooks.beforeParse.tap((md, context) => {
       md.parse = wrapFunction(md.parse, {
         after: function (ctx) {
-          const escapeAll = (token: Token, index: number, tokens: Token[]) => {
-            if (
-              token.type === "inline" &&
-              tokens[index - 1].type === "paragraph_open"
-            ) {
-              if (token.content.startsWith("[ ] ")) {
-                token.content = token.content.replace("[ ] ", "⬜ ");
-              } else if (token.content.startsWith("[x] ")) {
-                token.content = token.content.replace("[x] ", "✅ ");
-              }
+          const replaceSingle = (token: Token) => {
+            const active = [
+              ["[ ] ", "⬜ "],
+              ["[x] ", "✅ "],
+              ["[X] ", "✅ "],
+
+              ["- [ ] ", "⬜ "],
+              ["- [x] ", "✅ "],
+              ["- [X] ", "✅ "],
+            ].find(([a, b]) => token.content?.startsWith(a));
+
+            if (active) {
+              token.content = token.content?.replace(active[0], active[1]);
             }
 
-            token.children = token.children?.map((newChild) => {
-              console.log(newChild);
-              if (newChild.content.startsWith("[ ] ")) {
-                newChild.content = newChild.content.replace("[ ] ", "⬜ ");
-              } else if (newChild.content.startsWith("[x] ")) {
-                newChild.content = newChild.content.replace("[x] ", "✅ ");
-              }
-
-              return newChild;
-            });
             return token;
           };
 
-          ctx.result = ctx.result.map(escapeAll);
+          const replaceSymbols = (token: Token) => {
+            if (token.children)
+              token.children = token.children.map(replaceSingle);
+
+            return token;
+          };
+
+          ctx.result = ctx.result.map(replaceSymbols);
         },
       });
     });
