@@ -1,7 +1,7 @@
 # Obsidian Mind Map
 
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/MasterTuto/obsidian-mindmap-vb/Release%20Build?logo=github&style=for-the-badge) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/MasterTuto/obsidian-mindmap-vb?style=for-the-badge&sort=semver)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/MasterTuto/obsidian-mindmap-vb/Release%20Build?logo=github&style=for-the-badge) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/MasterTuto/obsidian-mindmap-vb?style=for-the-badge&sort=semver)****
 
 This repository contains a plugin for [Obsidian](https://obsidian.md/) for viewing Markdown notes as Mind Maps using [Markmap](https://markmap.js.org/).
 
@@ -28,6 +28,10 @@ A similar plugin is available for [Visual Studio Code](https://marketplace.visua
 
 ![Mind Map Demo Image](https://user-images.githubusercontent.com/21978588/206906147-01c56767-b04e-41a2-875e-2b13b31f6e02.png)
 
+#### And below an inline markmap preview.
+
+![Inline Markmap Preview](images/mind-map-inline-demo.png)
+
 #### This plugin is highly customizable, as you can see in settings.
 
 ![image](https://user-images.githubusercontent.com/21978588/206906311-30b0f845-b9ee-4da4-812b-9ced97b3b0aa.png)
@@ -43,6 +47,29 @@ You can open the Mind Map preview for the current note with a command.
 
 ![Mind Map Preview Command](https://user-images.githubusercontent.com/21978588/206906548-8eb630fc-1b27-4842-8208-c1cd24030194.png)
 
+### Inline Markmap
+
+You can also use the inline markmap syntax to create a mindmap in your note. You must create a ` ```markmap ` code
+block. As an example, the following code:
+
+````markdown
+```markmap
+# parent
+
+## child 1
+
+- we are family
+
+## child 2
+
+- we are family
+```
+````
+
+will generate the following mindmap:
+
+![Inline Markmap Preview](images/mind-map-inline-demo.png)
+
 ### Notes
 
 Once you run the plugin using Ctrl+P and opening the MindMap, you can't open it again. It changes its content if you change the file, so that you can work on multiple files and check any of them easily. If you desire, you can close it and open it again later.
@@ -50,8 +77,6 @@ Once you run the plugin using Ctrl+P and opening the MindMap, you can't open it 
 ### Preview More Options Menu
 
 The Mind Map Preview view has 3 options from the "more options" menu:
-
-![Mind Map Preview More Options](https://user-images.githubusercontent.com/21978588/206906584-2b0cd9f9-4d3f-403e-8510-32945ccfc60e.png)
 
 #### Pin
 
