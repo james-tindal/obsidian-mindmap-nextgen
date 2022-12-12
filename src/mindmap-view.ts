@@ -68,7 +68,7 @@ export default class MindmapView extends ItemView {
         item
           .setIcon("image-file")
           .setTitle("Copy screenshot")
-          .onClick(() => copyImageToClipboard(this.svg, this.settings))
+          .onClick(() => copyImageToClipboard(this.settings, this.markmapSVG))
       )
       .addSeparator()
       .addItem((item) =>
@@ -250,7 +250,7 @@ export default class MindmapView extends ItemView {
     if (styles) loadCSS(styles);
     if (scripts) loadJS(scripts);
 
-    this.renderMarkmap(root, options, frontmatter?.markmap);
+    this.renderMarkmap(root, options, frontmatter?.markmap ?? {});
 
     this.displayText =
       this.fileName != undefined ? `Mind Map of ${this.fileName}` : "Mind Map";
