@@ -1,7 +1,7 @@
 # Obsidian Mind Map
 
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/MasterTuto/obsidian-mindmap-vb/Release%20Build?logo=github&style=for-the-badge) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/MasterTuto/obsidian-mindmap-vb?style=for-the-badge&sort=semver)****
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/MasterTuto/obsidian-mindmap-vb/Release%20Build?logo=github&style=for-the-badge) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/MasterTuto/obsidian-mindmap-vb?style=for-the-badge&sort=semver)
 
 This repository contains a plugin for [Obsidian](https://obsidian.md/) for viewing Markdown notes as Mind Maps using [Markmap](https://markmap.js.org/).
 
@@ -18,6 +18,7 @@ A similar plugin is available for [Visual Studio Code](https://marketplace.visua
    * as you resize the windows or anything related to layout
    * as you open the markdown on another page
 - [x] Frontmatter options
+- [x] Reads frontmatter options
 - [x] Copy preview to clipboard as PNG image
 - [x] Implements Katex (LaTex plugin)
 - [x] Implements checkmarks (such as this list)
@@ -46,6 +47,14 @@ A similar plugin is available for [Visual Studio Code](https://marketplace.visua
 You can open the Mind Map preview for the current note with a command.
 
 ![Mind Map Preview Command](https://user-images.githubusercontent.com/21978588/206906548-8eb630fc-1b27-4842-8208-c1cd24030194.png)
+
+### Frontmatter
+
+The plugin also accepts frontmatter options (each of the [official markmap docs](https://markmap.js.org/docs/json-options) except for `extraJs` and `extraCss`). Frontmatter configurations has higher priority than the settings from the settings tab which means that if you set `maxWidth` on settings to 400px and on frontmatter to 200px, the maxWidth will be set to 200px.
+
+The colors you list will always be used, no matter which coloring approach is set. Only colorFreezeLevel that only works with branch coloring approach. It is good to note that when using branch coloring approach and no color is listed, random colors will be used (as the default Markmap approach).
+
+It is also good to note that the frontmatter only works for that markdown it is in. If you open another Markdown file without frontmatter, the settings from settings tab will be used.
 
 ### Inline Markmap
 
