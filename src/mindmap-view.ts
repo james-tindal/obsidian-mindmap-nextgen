@@ -43,8 +43,6 @@ export default class MindmapView extends ItemView {
 
   groupEventListenerFn: () => unknown;
 
-  // workaround for zooming
-
   getViewType(): string {
     return MM_VIEW_TYPE;
   }
@@ -65,19 +63,23 @@ export default class MindmapView extends ItemView {
           .setTitle("Pin")
           .onClick(() => this.pinCurrentLeaf())
       )
-      .addSeparator()
       .addItem((item) =>
         item
           .setIcon("image-file")
           .setTitle("Copy screenshot")
           .onClick(() => copyImageToClipboard(this.settings, this.markmapSVG))
       )
-      .addSeparator()
       .addItem((item) =>
         item
           .setIcon("folder")
           .setTitle("Collapse All")
           .onClick(() => this.collapseAll())
+      )
+      .addItem((item) =>
+        item
+          .setIcon("view")
+          .setTitle("Toogle toolbar")
+          .onClick(() => this.toggleToolbar())
       );
 
     menu.showAtPosition({ x: 0, y: 0 });
@@ -126,6 +128,15 @@ export default class MindmapView extends ItemView {
     };
 
     this.markmapSVG = Markmap.create(this.svg, this.options);
+  }
+
+  toggleToolbar() {
+    const toolbar = document.querySelector(".markmap-toolbar-container");
+    if (toolbar) {
+      toolbar.remove();
+    } else {
+      this.createToolbar();
+    }
   }
 
   createToolbar() {
