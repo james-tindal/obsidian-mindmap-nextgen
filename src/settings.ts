@@ -30,5 +30,6 @@ export class MindMapSettings {
   maxWidth: number = 0;
   // below a beautiful dark blue color
   screenshotBgColor: string = "#039614";
+  screenshotFgColor: string = "#ffffff";
   screenshotTransparentBg: boolean = true;
 }
