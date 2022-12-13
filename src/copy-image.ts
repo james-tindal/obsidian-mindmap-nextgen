@@ -2,12 +2,18 @@ import { Notice } from "obsidian";
 import { MindMapSettings } from "./settings";
 import { Markmap } from "markmap-view";
 import d3SvgToPng from "d3-svg-to-png";
+import { FrontmatterOptions } from "./@types/models";
 
 export function copyImageToClipboard(
   settings: MindMapSettings,
-  currentMm: Markmap
+  currentMm: Markmap,
+  frontmatterOptions: FrontmatterOptions
 ) {
-  const oldForeground = setForeground(currentMm, settings.screenshotFgColor);
+  console.log(frontmatterOptions);
+  const oldForeground = setForeground(
+    currentMm,
+    frontmatterOptions?.screenshotFgColor || settings.screenshotFgColor
+  );
   currentMm.fit().then(() => {
     d3SvgToPng("#markmap", "markmap.png", {
       scale: 3,

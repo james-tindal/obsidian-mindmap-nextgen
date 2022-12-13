@@ -17,6 +17,11 @@ import { createSVG, getComputedCss, removeExistingSVG } from "./markmap-svg";
 import { copyImageToClipboard } from "./copy-image";
 import { htmlEscapePlugin } from "./html-escape-plugin";
 import { MindMapSettings } from "./settings";
+import { FrontmatterOptions } from "./@types/models";
+
+type CustomFrontmatter = {
+  markmap: IMarkmapJSONOptions & { screenshotFgColor: string };
+};
 
 export default class MindmapView extends ItemView {
   filePath: string;
@@ -37,6 +42,7 @@ export default class MindmapView extends ItemView {
   markmapSVG: Markmap;
   transformer: Transformer;
   options: Partial<IMarkmapOptions>;
+  frontmatterOptions: FrontmatterOptions;
   hasFit: boolean;
 
   groupEventListenerFn: () => unknown;
@@ -68,7 +74,13 @@ export default class MindmapView extends ItemView {
         item
           .setIcon("image-file")
           .setTitle("Copy screenshot")
-          .onClick(() => copyImageToClipboard(this.settings, this.markmapSVG))
+          .onClick(() =>
+            copyImageToClipboard(
+              this.settings,
+              this.markmapSVG,
+              this.frontmatterOptions
+            )
+          )
       )
       .addSeparator()
       .addItem((item) =>
@@ -245,7 +257,13 @@ export default class MindmapView extends ItemView {
 
     let { root, scripts, styles, frontmatter } = await this.transformMarkdown();
 
+    const actualFrontmatter = frontmatter as CustomFrontmatter;
+
     const options = deriveOptions(frontmatter?.markmap);
+    this.frontmatterOptions = {
+      ...options,
+      screenshotFgColor: actualFrontmatter?.markmap?.screenshotFgColor,
+    };
 
     if (styles) loadCSS(styles);
     if (scripts) loadJS(scripts);
