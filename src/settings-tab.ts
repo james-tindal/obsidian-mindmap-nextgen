@@ -325,12 +325,10 @@ export class MindMapSettingsTab extends PluginSettingTab {
         "When on, the inline markmap will be highlighted. Which means having a border and a different background color"
       )
       .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.highlightInlineMarkmap)
-          .onChange((value) => {
-            this.plugin.settings.highlightInlineMarkmap = value;
-            save();
-          })
+        toggle.setValue(this.plugin.settings.highlight).onChange((value) => {
+          this.plugin.settings.highlight = value;
+          save();
+        })
       );
   }
 }

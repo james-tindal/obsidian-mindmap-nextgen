@@ -17,7 +17,7 @@ type Renderer = (
 type CustomFrontmatter = {
   markmap: Partial<IMarkmapJSONOptions> & {
     screenshotFgColor?: string;
-    highlightInlineMarkmap?: boolean;
+    highlight?: boolean;
   };
 };
 
@@ -52,20 +52,16 @@ export const inlineRenderer: Renderer =
 
       const frontmatterOptions: FrontmatterOptions = {
         ...derivedFrontmatter,
-        highlightInlineMarkmap:
-          actualFrontmatter?.markmap?.highlightInlineMarkmap,
+        highlight: actualFrontmatter?.markmap?.highlight,
         screenshotFgColor: actualFrontmatter?.markmap?.screenshotFgColor,
       };
 
       let shouldHighlight: boolean = false;
-      console.log(
-        frontmatterOptions,
-        frontmatterOptions.highlightInlineMarkmap
-      );
-      if (frontmatterOptions.highlightInlineMarkmap !== undefined) {
-        if (frontmatterOptions.highlightInlineMarkmap) shouldHighlight = true;
-      } else if (settings.highlightInlineMarkmap) {
-        shouldHighlight = settings.highlightInlineMarkmap;
+      console.log(frontmatterOptions, frontmatterOptions.highlight);
+      if (frontmatterOptions.highlight !== undefined) {
+        if (frontmatterOptions.highlight) shouldHighlight = true;
+      } else if (settings.highlight) {
+        shouldHighlight = settings.highlight;
       }
 
       if (shouldHighlight) {
