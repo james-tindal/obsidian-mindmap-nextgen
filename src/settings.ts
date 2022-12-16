@@ -31,4 +31,5 @@ export class MindMapSettings {
   // below a beautiful dark blue color
   screenshotBgColor: string = "#039614";
   screenshotTransparentBg: boolean = true;
+  highlightInlineMarkmap: boolean = true;
 }

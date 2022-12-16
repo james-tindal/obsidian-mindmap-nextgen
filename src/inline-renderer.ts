@@ -3,7 +3,7 @@ import { MindMapSettings } from "./settings";
 import { Transformer } from "markmap-lib";
 import { Markmap, loadCSS, loadJS, deriveOptions } from "markmap-view";
 import { IMarkmapJSONOptions, IMarkmapOptions, INode } from "markmap-common";
-import { createSVG, getComputedCss } from "./markmap-svg";
+import { getComputedCss } from "./markmap-svg";
 
 type Renderer = (
   settings: MindMapSettings
@@ -14,19 +14,16 @@ type Renderer = (
 ) => void | Promise<any>;
 
 export const inlineRenderer: Renderer =
-  (settings: MindMapSettings) =>
-  (
-    source: string,
-    container: HTMLElement,
-    ctx: MarkdownPostProcessorContext
-  ) => {
+  (settings) => (source, container, ctx) => {
     try {
-      container.style.backgroundColor = "#1e232f";
-      container.style.borderColor = "#15171f";
-      container.style.borderRadius = "5px";
-      container.style.borderWidth = "2px";
-      container.style.borderStyle = "solid";
-      container.style.padding = "7px";
+      if (settings.highlightInlineMarkmap) {
+        container.style.backgroundColor = "#1e232f";
+        container.style.borderColor = "#15171f";
+        container.style.borderRadius = "5px";
+        container.style.borderWidth = "2px";
+        container.style.borderStyle = "solid";
+        container.style.padding = "7px";
+      }
 
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.id = `markmap-${Math.ceil(Math.random() * 10000)}`;
