@@ -85,11 +85,11 @@ export const checkBoxPlugin: ITransformPlugin = {
       });
 
       md.renderer.rules.checkbox_chkd = () => {
-        return `<span style="color: green; font-weight: bold;">✓</span>`;
+        return `<span style="color: green; font-weight: bold;">✓&nbsp;</span>`;
       };
 
       md.renderer.rules.checkbox_unchkd = () => {
-        return `<span style="color: red; font-weight: bold;">✗</span>`;
+        return `<span style="color: red; font-weight: bold;">✗&nbsp;</span>`;
       };
     });
 
