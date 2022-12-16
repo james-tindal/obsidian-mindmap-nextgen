@@ -7,14 +7,26 @@ export function copyImageToClipboard(
   settings: MindMapSettings,
   currentMm: Markmap
 ) {
+  let background: string;
+
+  const screenshotUseTheme = true;
+
+  if (settings.screenshotTransparentBg && !screenshotUseTheme) {
+    background = "transparent";
+  } else if (screenshotUseTheme) {
+    const computed = getComputedStyle(currentMm.svg.node().parentElement);
+
+    background = computed.backgroundColor;
+  } else {
+    background = settings.screenshotBgColor;
+  }
+
   currentMm.fit().then(() => {
     d3SvgToPng("#markmap", "markmap.png", {
       scale: 3,
       format: "png",
       download: false,
-      background: settings.screenshotTransparentBg
-        ? "transparent"
-        : settings.screenshotBgColor,
+      background,
       quality: 1,
     }).then((output) => {
       const blob = dataURItoBlob(output);
