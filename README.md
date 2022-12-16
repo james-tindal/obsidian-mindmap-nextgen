@@ -70,6 +70,10 @@ will generate the following mindmap:
 
 ![Inline Markmap Preview](images/mind-map-inline-demo.png)
 
+### Toolbar
+
+It also has a toolbar that can zoom in, zoom out, reset view and collapse all its children. The toolbar can also be toggled on and off, just click on more options and click on "toggle toolbar".
+
 ### Notes
 
 Once you run the plugin using Ctrl+P and opening the MindMap, you can't open it again. It changes its content if you change the file, so that you can work on multiple files and check any of them easily. If you desire, you can close it and open it again later.
