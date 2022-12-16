@@ -21,10 +21,18 @@ export const inlineRenderer: Renderer =
     ctx: MarkdownPostProcessorContext
   ) => {
     try {
+      container.style.backgroundColor = "#1e232f";
+      container.style.borderColor = "#15171f";
+      container.style.borderRadius = "5px";
+      container.style.borderWidth = "2px";
+      container.style.borderStyle = "solid";
+      container.style.padding = "7px";
+
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.id = `markmap-${Math.ceil(Math.random() * 10000)}`;
 
       const style = document.createElement("style");
+
       const { color } = getComputedCss(container);
       style.innerHTML = `#${svg.id} div {
           color: ${color};
