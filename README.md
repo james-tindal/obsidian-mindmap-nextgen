@@ -79,6 +79,25 @@ will generate the following mindmap:
 
 ![Inline Markmap Preview](images/mind-map-inline-demo.png)
 
+#### Highlighting markmap
+
+You can also activate a border and a different background color for the markmap. To do this, you must add the `highlight` option to the frontmatter code with values `true` or `false`, and you can also use the settings tab. And as always, if frontmatter is present, it will have higher priority than the settings tab.
+
+File example:
+
+```markdown
+---
+markmap:
+   highlight: true
+---
+
+# Parent
+
+## Child 1
+
+## Child 2
+
+```
 ### Toolbar
 
 It also has a toolbar that can zoom in, zoom out, reset view and collapse all its children. The toolbar can also be toggled on and off, just click on more options and click on "toggle toolbar".

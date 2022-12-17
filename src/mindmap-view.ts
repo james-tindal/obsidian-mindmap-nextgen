@@ -449,8 +449,6 @@ export default class MindmapView extends ItemView {
           ? this.applyColor(frontmatter?.color)
           : color;
 
-      console.log("Colorfn: ", colorFn);
-
       this.options = {
         autoFit: false,
         style: (id) => `${id} * {font: ${font}}`,
