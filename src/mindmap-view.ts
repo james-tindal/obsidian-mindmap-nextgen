@@ -265,11 +265,7 @@ export default class MindmapView extends ItemView {
 
   async onOpen() {
     this.obsMarkmap = new ObsidianMarkmap(this.vault);
-    this.workspace.onLayoutReady(async () => {
-      console.log("Comecou agr");
-      await this.update();
-      console.log("Terminou agr");
-    });
+    this.workspace.onLayoutReady(async () => await this.update());
   }
 
   async onClose() {

@@ -10,11 +10,6 @@ export function copyImageToClipboard(
   currentMm: Markmap,
   frontmatterOptions: FrontmatterOptions
 ) {
-  let oldForeground: string;
-  oldForeground = setForeground(
-    currentMm,
-    frontmatterOptions?.screenshotFgColor || settings.screenshotFgColor
-  );
   let background: string;
   switch (settings.screenshotBgStyle) {
     case ScreenshotBgStyle.Transparent:
@@ -30,6 +25,11 @@ export function copyImageToClipboard(
       break;
   }
 
+  let oldForeground: string;
+  oldForeground = setForeground(
+    currentMm,
+    frontmatterOptions?.screenshotFgColor || settings.screenshotFgColor
+  );
   currentMm.fit().then(() => {
     d3SvgToPng("#markmap", "markmap.png", {
       scale: 3,
