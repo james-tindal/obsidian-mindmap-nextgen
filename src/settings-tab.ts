@@ -267,6 +267,30 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
+    new Setting(containerEl)
+      .setName("Screenshot background color")
+      .setDesc("Background color for the screenshot")
+      .addColorPicker((colPicker) =>
+        colPicker
+          .setValue(this.plugin.settings.screenshotBgColor?.toString())
+          .onChange((value: string) => {
+            this.plugin.settings.screenshotBgColor = value;
+            save();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Screenshot foreground color")
+      .setDesc("Foreground color for the screenshot")
+      .addColorPicker((colPicker) =>
+        colPicker
+          .setValue(this.plugin.settings.screenshotFgColor?.toString())
+          .onChange((value: string) => {
+            this.plugin.settings.screenshotFgColor = value;
+            save();
+          })
+      );
+
     // animation duration
     new Setting(containerEl)
       .setName("Animation duration")
