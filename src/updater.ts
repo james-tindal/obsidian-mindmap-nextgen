@@ -10,10 +10,6 @@ export const updater = (mmView: MindmapView) =>
     update(value, tr) {
       const fullValue = tr.newDoc.sliceString(0);
 
-      if (tr.docChanged) {
-        mmView.update(fullValue).then(() => ({}));
-      }
-
       return value.map(tr.changes);
     },
     provide: (f) => EditorView.decorations.from(f),

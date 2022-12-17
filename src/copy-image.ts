@@ -1,72 +1,92 @@
 import { Notice } from "obsidian";
 import { MindMapSettings } from "./settings";
+import { Markmap } from "markmap-view";
+import d3SvgToPng from "d3-svg-to-png";
+import { FrontmatterOptions } from "./@types/models";
+import { ScreenshotBgStyle } from "./@types/screenshot";
 
 export function copyImageToClipboard(
-  svg: SVGElement,
-  settings: MindMapSettings
+  settings: MindMapSettings,
+  currentMm: Markmap,
+  frontmatterOptions: FrontmatterOptions
 ) {
-  const canvas = createCanvas(svg);
-  const img = generateImage(svg, canvas, settings, () => {
-    canvas.toBlob((blob: any) => {
-      const item = new ClipboardItem({ "image/png": blob });
-      navigator.clipboard.write([item]);
-      new Notice("Screenshot copied to the clipboard.");
+  let oldForeground: string;
+  oldForeground = setForeground(
+    currentMm,
+    frontmatterOptions?.screenshotFgColor || settings.screenshotFgColor
+  );
+  let background: string;
+  switch (settings.screenshotBgStyle) {
+    case ScreenshotBgStyle.Transparent:
+      background = "transparent";
+      break;
+    case ScreenshotBgStyle.Color:
+      background = settings.screenshotBgColor;
+      break;
+    case ScreenshotBgStyle.Theme:
+      const computed = getComputedStyle(currentMm.svg.node().parentElement);
+
+      background = computed.backgroundColor;
+      break;
+  }
+
+  currentMm.fit().then(() => {
+    d3SvgToPng("#markmap", "markmap.png", {
+      scale: 3,
+      format: "png",
+      download: false,
+      background,
+      quality: 1,
+    }).then((output) => {
+      setForeground(currentMm, oldForeground);
+
+      const blob = dataURItoBlob(output);
+
+      navigator.clipboard
+        .write([new ClipboardItem({ "image/png": blob })])
+        .then(() => {
+          new Notice("Image copied to clipboard");
+        });
     });
   });
 }
 
-function createCanvas(svg: SVGElement): HTMLCanvasElement {
-  const canvas = document.createElement("canvas");
-  canvas.width = svg.clientWidth;
-  canvas.height = svg.clientHeight;
-  return canvas;
+function setForeground(currentMm: Markmap, foreground: string) {
+  const svg = currentMm.svg;
+
+  let oldForeground = svg.style("color");
+  svg
+    .node()
+    .querySelectorAll("div")
+    .forEach((div) => {
+      oldForeground = oldForeground || div.style.color;
+    });
+
+  svg.style("color", foreground);
+
+  svg
+    .node()
+    .querySelectorAll("div")
+    .forEach((div) => {
+      div.style.color = foreground;
+    });
+
+  return oldForeground;
 }
 
-function generateImage(
-  svg: SVGElement,
-  canvas: HTMLCanvasElement,
-  settings: MindMapSettings,
-  callback: () => void
-): HTMLImageElement {
-  var ctx = canvas.getContext("2d");
-  return drawInlineSVG(ctx, svg, settings, callback);
-}
+function dataURItoBlob(dataURI: string) {
+  var byteString = atob(dataURI.split(",")[1]);
 
-function drawInlineSVG(
-  ctx: CanvasRenderingContext2D,
-  svg: SVGElement,
-  settings: MindMapSettings,
-  callback: () => void
-): HTMLImageElement {
-  // get svg data
-  let xml = new XMLSerializer().serializeToString(svg);
+  var mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
 
-  const div = document.createElement("div");
+  var ab = new ArrayBuffer(byteString.length);
 
-  div.innerHTML = xml;
+  var ia = new Uint8Array(ab);
 
-  const svgElement = div.querySelector("svg");
-  if (settings.screenshotTransparentBg)
-    svgElement.style.backgroundColor = "transparent";
-  else svgElement.style.backgroundColor = settings.screenshotBgColor;
+  for (var i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
 
-  xml = new XMLSerializer().serializeToString(svgElement);
-
-  // make it base64
-  const svg64 = btoa(unescape(encodeURIComponent(xml)));
-
-  const b64Start = "data:image/svg+xml;base64,";
-
-  // prepend a "header"
-  const image64 = b64Start + svg64;
-
-  const img = new Image();
-  // set it as the source of the img element
-  img.onload = function () {
-    // draw the image onto the canvas
-    ctx.drawImage(img, 0, 0);
-    callback();
-  };
-  img.src = image64;
-  return img;
+  var blob = new Blob([ab], { type: mimeString });
+  return blob;
 }

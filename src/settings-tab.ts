@@ -1,12 +1,6 @@
-import {
-  App,
-  PluginSettingTab,
-  Setting,
-  SliderComponent,
-  SplitDirection,
-} from "obsidian";
+import { App, PluginSettingTab, Setting, SplitDirection } from "obsidian";
+import { ScreenshotBgStyle } from "./@types/screenshot";
 import MindMap from "./main";
-import { MindMapSettings } from "./settings";
 
 export class MindMapSettingsTab extends PluginSettingTab {
   plugin: MindMap;
@@ -285,6 +279,18 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
+    new Setting(containerEl)
+      .setName("Screenshot foreground color")
+      .setDesc("Foreground color for the screenshot")
+      .addColorPicker((colPicker) =>
+        colPicker
+          .setValue(this.plugin.settings.screenshotFgColor?.toString())
+          .onChange((value: string) => {
+            this.plugin.settings.screenshotFgColor = value;
+            save();
+          })
+      );
+
     // animation duration
     new Setting(containerEl)
       .setName("Animation duration")
@@ -315,15 +321,42 @@ export class MindMapSettingsTab extends PluginSettingTab {
     // add toggle to use transparent background for screenshot or not
 
     new Setting(containerEl)
-      .setName("Screenshot transparent background")
-      .setDesc("When on, the background of the screenshot is transparent")
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.screenshotTransparentBg)
-          .onChange((value) => {
-            this.plugin.settings.screenshotTransparentBg = value;
+      .setName("Screenshot background style")
+      .setDesc(
+        "Select the background style for the screenshot, when using 'Color' the color picker value will be used."
+      )
+      .addDropdown((dropdown) =>
+        dropdown
+          .setValue(this.plugin.settings.screenshotBgStyle)
+          .addOptions({
+            [ScreenshotBgStyle.Transparent]: "Transparent",
+            [ScreenshotBgStyle.Color]: "Color",
+            [ScreenshotBgStyle.Theme]: "Theme",
+          })
+          .onChange((value: ScreenshotBgStyle) => {
+            this.plugin.settings.screenshotBgStyle = value;
             save();
           })
+      )
+      .addColorPicker((colPicker) =>
+        colPicker
+          .setValue(this.plugin.settings.screenshotBgColor?.toString())
+          .onChange((value: string) => {
+            this.plugin.settings.screenshotBgColor = value;
+            save();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Highlight inline markmap")
+      .setDesc(
+        "When on, the inline markmap will be highlighted. Which means having a border and a different background color"
+      )
+      .addToggle((toggle) =>
+        toggle.setValue(this.plugin.settings.highlight).onChange((value) => {
+          this.plugin.settings.highlight = value;
+          save();
+        })
       );
   }
 }

@@ -1,4 +1,5 @@
 import { SplitDirection } from "obsidian";
+import { ScreenshotBgStyle } from "./@types/screenshot";
 
 export class MindMapSettings {
   splitDirection: SplitDirection = "horizontal";
@@ -30,5 +31,8 @@ export class MindMapSettings {
   maxWidth: number = 0;
   // below a beautiful dark blue color
   screenshotBgColor: string = "#039614";
+  screenshotFgColor: string = "#ffffff";
+  screenshotBgStyle: ScreenshotBgStyle = ScreenshotBgStyle.Transparent;
   screenshotTransparentBg: boolean = true;
+  highlight: boolean = true;
 }
