@@ -98,6 +98,9 @@ markmap:
 ## Child 2
 
 ```
+### Toolbar
+
+It also has a toolbar that can zoom in, zoom out, reset view and collapse all its children. The toolbar can also be toggled on and off, just click on more options and click on "toggle toolbar".
 
 ### Notes
 
