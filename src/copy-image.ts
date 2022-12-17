@@ -2,19 +2,33 @@ import { Notice } from "obsidian";
 import { MindMapSettings } from "./settings";
 import { Markmap } from "markmap-view";
 import d3SvgToPng from "d3-svg-to-png";
+import { ScreenshotBgStyle } from "./@types/screenshot";
 
 export function copyImageToClipboard(
   settings: MindMapSettings,
   currentMm: Markmap
 ) {
+  let background: string;
+  switch (settings.screenshotBgStyle) {
+    case ScreenshotBgStyle.Transparent:
+      background = "transparent";
+      break;
+    case ScreenshotBgStyle.Color:
+      background = settings.screenshotBgColor;
+      break;
+    case ScreenshotBgStyle.Theme:
+      const computed = getComputedStyle(currentMm.svg.node().parentElement);
+
+      background = computed.backgroundColor;
+      break;
+  }
+
   currentMm.fit().then(() => {
     d3SvgToPng("#markmap", "markmap.png", {
       scale: 3,
       format: "png",
       download: false,
-      background: settings.screenshotTransparentBg
-        ? "transparent"
-        : settings.screenshotBgColor,
+      background,
       quality: 1,
     }).then((output) => {
       const blob = dataURItoBlob(output);

@@ -116,7 +116,11 @@ Allows you to pin the Mind Map preview pane to the current note so that you can 
 
 #### Copy screenshot
 
-Places a copy of the Mind Map SVG on your clipboard allowing you to paste it into a note in Obsidian or into an image editor of your choice.
+Places a copy of the Mind Map SVG on your clipboard allowing you to paste it into a note in Obsidian or into an image editor of your choice. About the background and foreground colors you have three options:
+
+1. Set the background as transparent, then the foreground color will be the default;
+2. Select a background color;
+3. Set the background and foreground colors to be as the current theme. So that the screenshot will look the same as the screenshot.
 
 #### Collapse all
 

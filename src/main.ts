@@ -5,6 +5,7 @@ import { MindMapSettings } from "./settings";
 import { MindMapSettingsTab } from "./settings-tab";
 import { updater } from "./updater";
 import { inlineRenderer } from "./inline-renderer";
+import { ScreenshotBgStyle } from "./@types/screenshot";
 
 export default class MindMap extends Plugin {
   vault: Vault;
@@ -45,6 +46,7 @@ export default class MindMap extends Plugin {
         animationDuration: 500,
         maxWidth: 0,
         screenshotBgColor: "#039614",
+        screenshotBgStyle: ScreenshotBgStyle.Transparent,
         screenshotTransparentBg: true,
         highlight: true,
       },
