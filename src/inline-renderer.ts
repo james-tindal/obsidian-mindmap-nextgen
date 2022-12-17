@@ -22,7 +22,7 @@ type CustomFrontmatter = {
 };
 
 export const inlineRenderer: Renderer =
-  (settings) => (source, container, ctx) => {
+  (settings) => (source, container, _) => {
     try {
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.id = `markmap-${Math.ceil(Math.random() * 10000)}`;
@@ -64,8 +64,8 @@ export const inlineRenderer: Renderer =
       }
 
       if (shouldHighlight) {
-        container.style.backgroundColor = "#1e232f";
-        container.style.borderColor = "#15171f";
+        container.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
+        container.style.borderColor = "rgba(0, 0, 0, 0.2)";
         container.style.borderRadius = "5px";
         container.style.borderWidth = "2px";
         container.style.borderStyle = "solid";
