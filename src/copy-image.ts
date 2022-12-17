@@ -10,12 +10,10 @@ export function copyImageToClipboard(
   frontmatterOptions: FrontmatterOptions
 ) {
   let oldForeground: string;
-  if (!settings.screenshotTransparentBg) {
-    oldForeground = setForeground(
-      currentMm,
-      frontmatterOptions?.screenshotFgColor || settings.screenshotFgColor
-    );
-  }
+  oldForeground = setForeground(
+    currentMm,
+    frontmatterOptions?.screenshotFgColor || settings.screenshotFgColor
+  );
   currentMm.fit().then(() => {
     d3SvgToPng("#markmap", "markmap.png", {
       scale: 3,
@@ -26,9 +24,8 @@ export function copyImageToClipboard(
         : settings.screenshotBgColor,
       quality: 1,
     }).then((output) => {
-      if (!settings.screenshotTransparentBg) {
-        setForeground(currentMm, oldForeground);
-      }
+      setForeground(currentMm, oldForeground);
+
       const blob = dataURItoBlob(output);
 
       navigator.clipboard

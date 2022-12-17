@@ -1,12 +1,5 @@
-import {
-  App,
-  PluginSettingTab,
-  Setting,
-  SliderComponent,
-  SplitDirection,
-} from "obsidian";
+import { App, PluginSettingTab, Setting, SplitDirection } from "obsidian";
 import MindMap from "./main";
-import { MindMapSettings } from "./settings";
 
 export class MindMapSettingsTab extends PluginSettingTab {
   plugin: MindMap;

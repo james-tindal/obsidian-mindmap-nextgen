@@ -58,7 +58,7 @@ It is also good to note that the frontmatter only works for that markdown it is 
 
 More than the default frontmatter options, it also supports another option (and may be upcomming more options):
 
-**screenshotFgColor:** Is an option that allows you to set the foreground color of the screenshot. It accepts any valid CSS color (hex, color name, rgb, rgba and hsl). It's nice to remember that this color is applied to foreground only. Not to using it.
+**screenshotFgColor:** Is an option that allows you to set the foreground color of the screenshot. It accepts any valid CSS color (hex, color name, rgb, rgba and hsl). It's nice to remember that this color is applied to screenshot only, and not while using the plugin.
 
 ### Inline Markmap
 
