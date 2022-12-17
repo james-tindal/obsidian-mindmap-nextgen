@@ -106,6 +106,34 @@ markmap:
 
 It also has a toolbar that can zoom in, zoom out, reset view and collapse all its children. The toolbar can also be toggled on and off, just click on more options and click on "toggle toolbar".
 
+### Rendering checkboxes
+
+This plugin can also render and display checkboxes, which can be the default lists or also headings. Below and markdown example:
+
+```
+---
+markmap:
+  screenshotFgColor: red
+  highlight: false
+---
+
+
+# Housework
+
+## Main
+
+- [x] Dishes
+- [ ] Cleaning the bathroom
+- [x] Change the light bulbs
+- [ ] something else
+
+## [x] Also works on titles
+```
+
+And below an result example:
+
+![Mind Map checkbox example](images/mind-map-checkboxes.png)
+
 ### Notes
 
 Once you run the plugin using Ctrl+P and opening the MindMap, you can't open it again. It changes its content if you change the file, so that you can work on multiple files and check any of them easily. If you desire, you can close it and open it again later.

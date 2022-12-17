@@ -10,14 +10,13 @@ import { Transformer, builtInPlugins } from "markmap-lib";
 import { Markmap, loadCSS, loadJS, deriveOptions } from "markmap-view";
 import { INode, IMarkmapOptions, IMarkmapJSONOptions } from "markmap-common";
 import { Toolbar } from "markmap-toolbar";
-import { D3ZoomEvent, ZoomTransform, zoomIdentity } from "d3-zoom";
+import { ZoomTransform } from "d3-zoom";
 
-import { FRONT_MATTER_REGEX, MD_VIEW_TYPE, MM_VIEW_TYPE } from "./constants";
+import { MD_VIEW_TYPE, MM_VIEW_TYPE } from "./constants";
 import ObsidianMarkmap from "./obsidian-markmap-plugin";
 import { createSVG, getComputedCss, removeExistingSVG } from "./markmap-svg";
 import { copyImageToClipboard } from "./copy-image";
-import { htmlEscapePlugin } from "./html-escape-plugin";
-
+import { htmlEscapePlugin, checkBoxPlugin } from "./custom-plugins";
 import { MindMapSettings } from "./settings";
 import { FrontmatterOptions } from "./@types/models";
 
@@ -109,7 +108,11 @@ export default class MindmapView extends ItemView {
     this.vault = this.app.vault;
     this.workspace = this.app.workspace;
 
-    this.transformer = new Transformer([...builtInPlugins, htmlEscapePlugin]);
+    this.transformer = new Transformer([
+      ...builtInPlugins,
+      htmlEscapePlugin,
+      checkBoxPlugin,
+    ]);
     this.svg = createSVG(this.containerEl, this.settings.lineHeight);
 
     this.hasFit = false;
