@@ -83,6 +83,29 @@ will generate the following mindmap:
 
 ![Inline Markmap Preview](images/mind-map-inline-demo.png)
 
+#### Highlighting markmap
+
+You can also activate a border and a different background color for the markmap. To do this, you must add the `highlight` option to the frontmatter code with values `true` or `false`, and you can also use the settings tab. And as always, if frontmatter is present, it will have higher priority than the settings tab.
+
+File example:
+
+```markdown
+---
+markmap:
+   highlight: true
+---
+
+# Parent
+
+## Child 1
+
+## Child 2
+
+```
+### Toolbar
+
+It also has a toolbar that can zoom in, zoom out, reset view and collapse all its children. The toolbar can also be toggled on and off, just click on more options and click on "toggle toolbar".
+
 ### Notes
 
 Once you run the plugin using Ctrl+P and opening the MindMap, you can't open it again. It changes its content if you change the file, so that you can work on multiple files and check any of them easily. If you desire, you can close it and open it again later.
@@ -97,7 +120,11 @@ Allows you to pin the Mind Map preview pane to the current note so that you can 
 
 #### Copy screenshot
 
-Places a copy of the Mind Map SVG on your clipboard allowing you to paste it into a note in Obsidian or into an image editor of your choice.
+Places a copy of the Mind Map SVG on your clipboard allowing you to paste it into a note in Obsidian or into an image editor of your choice. About the background and foreground colors you have three options:
+
+1. Set the background as transparent, then the foreground color will be the default;
+2. Select a background color;
+3. Set the background and foreground colors to be as the current theme. So that the screenshot will look the same as the screenshot.
 
 #### Collapse all
 
