@@ -57,7 +57,6 @@ export const inlineRenderer: Renderer =
       };
 
       let shouldHighlight: boolean = false;
-      console.log(frontmatterOptions, frontmatterOptions.highlight);
       if (frontmatterOptions.highlight !== undefined) {
         if (frontmatterOptions.highlight) shouldHighlight = true;
       } else if (settings.highlight) {
