@@ -32,6 +32,7 @@ export class MindMapSettings {
   // below a beautiful dark blue color
   screenshotBgColor: string = "#039614";
   screenshotFgColor: string = "#ffffff";
+  screenshotFgColorEnabled: boolean = false;
   screenshotBgStyle: ScreenshotBgStyle = ScreenshotBgStyle.Transparent;
   screenshotTransparentBg: boolean = true;
   highlight: boolean = true;

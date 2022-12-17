@@ -47,6 +47,7 @@ export default class MindMap extends Plugin {
         maxWidth: 0,
         screenshotBgColor: "#039614",
         screenshotFgColor: "#ffffff",
+        screenshotFgColorEnabled: false,
         screenshotBgStyle: ScreenshotBgStyle.Transparent,
         screenshotTransparentBg: true,
         highlight: true,

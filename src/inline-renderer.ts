@@ -16,7 +16,6 @@ type Renderer = (
 
 type CustomFrontmatter = {
   markmap: Partial<IMarkmapJSONOptions> & {
-    screenshotFgColor?: string;
     highlight?: boolean;
   };
 };
@@ -53,7 +52,6 @@ export const inlineRenderer: Renderer =
       const frontmatterOptions: FrontmatterOptions = {
         ...derivedFrontmatter,
         highlight: actualFrontmatter?.markmap?.highlight,
-        screenshotFgColor: actualFrontmatter?.markmap?.screenshotFgColor,
       };
 
       let shouldHighlight: boolean = false;
