@@ -9,6 +9,7 @@ import {
 import { Transformer, builtInPlugins } from "markmap-lib";
 import { Markmap, loadCSS, loadJS, deriveOptions } from "markmap-view";
 import { INode, IMarkmapOptions, IMarkmapJSONOptions } from "markmap-common";
+import { Toolbar } from "markmap-toolbar";
 import { D3ZoomEvent, ZoomTransform, zoomIdentity } from "d3-zoom";
 
 import { FRONT_MATTER_REGEX, MD_VIEW_TYPE, MM_VIEW_TYPE } from "./constants";
@@ -16,6 +17,7 @@ import ObsidianMarkmap from "./obsidian-markmap-plugin";
 import { createSVG, getComputedCss, removeExistingSVG } from "./markmap-svg";
 import { copyImageToClipboard } from "./copy-image";
 import { htmlEscapePlugin } from "./html-escape-plugin";
+
 import { MindMapSettings } from "./settings";
 
 export default class MindmapView extends ItemView {
@@ -41,8 +43,6 @@ export default class MindmapView extends ItemView {
 
   groupEventListenerFn: () => unknown;
 
-  // workaround for zooming
-
   getViewType(): string {
     return MM_VIEW_TYPE;
   }
@@ -63,19 +63,23 @@ export default class MindmapView extends ItemView {
           .setTitle("Pin")
           .onClick(() => this.pinCurrentLeaf())
       )
-      .addSeparator()
       .addItem((item) =>
         item
           .setIcon("image-file")
           .setTitle("Copy screenshot")
           .onClick(() => copyImageToClipboard(this.settings, this.markmapSVG))
       )
-      .addSeparator()
       .addItem((item) =>
         item
           .setIcon("folder")
           .setTitle("Collapse All")
           .onClick(() => this.collapseAll())
+      )
+      .addItem((item) =>
+        item
+          .setIcon("view")
+          .setTitle("Toogle toolbar")
+          .onClick(() => this.toggleToolbar())
       );
 
     menu.showAtPosition({ x: 0, y: 0 });
@@ -95,9 +99,12 @@ export default class MindmapView extends ItemView {
 
     this.transformer = new Transformer([...builtInPlugins, htmlEscapePlugin]);
     this.svg = createSVG(this.containerEl, this.settings.lineHeight);
+
     this.hasFit = false;
 
     this.createMarkmapSvg();
+
+    this.createToolbar();
 
     this.setListenersUp();
 
@@ -121,6 +128,59 @@ export default class MindmapView extends ItemView {
     };
 
     this.markmapSVG = Markmap.create(this.svg, this.options);
+  }
+
+  toggleToolbar() {
+    const toolbar = document.querySelector(".markmap-toolbar-container");
+    if (toolbar) {
+      toolbar.remove();
+    } else {
+      this.createToolbar();
+    }
+  }
+
+  createToolbar() {
+    const container = document.createElement("div");
+    container.className = "markmap-toolbar-container";
+
+    const styleContainer = document.createElement("style");
+    styleContainer.innerHTML = `
+    .markmap-toolbar-container .mm-toolbar {
+      position: absolute;
+      bottom: 2rem;
+      right: 1rem;
+      background-color: white;
+      border-radius: 0.5rem;
+      padding: 0.2rem;
+      box-shadow: 0 0 0.4rem 0 white;
+      zIndex: 1;
+      border: 1px solid #ccc;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .markmap-toolbar-container .mm-toolbar .mm-toolbar-brand {
+      display: none;
+    }
+
+    .markmap-toolbar-container .mm-toolbar .mm-toolbar-item {
+      height: 20px;
+      color: black;
+    }
+
+    .markmap-toolbar-container .mm-toolbar .mm-toolbar-item.active,
+    .markmap-toolbar-container .mm-toolbar .mm-toolbar-item:hover {
+      color: brown;
+    }
+    `;
+
+    const el = Toolbar.create(this.markmapSVG) as HTMLElement;
+
+    container.append(styleContainer);
+    container.append(el);
+    this.containerEl.append(container);
   }
 
   reloadMarkmapSVG() {
@@ -388,8 +448,6 @@ export default class MindmapView extends ItemView {
         this.settings.coloring === "depth"
           ? this.applyColor(frontmatter?.color)
           : color;
-
-      console.log("Colorfn: ", colorFn);
 
       this.options = {
         autoFit: false,

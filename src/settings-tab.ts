@@ -1,13 +1,6 @@
-import {
-  App,
-  PluginSettingTab,
-  Setting,
-  SliderComponent,
-  SplitDirection,
-} from "obsidian";
+import { App, PluginSettingTab, Setting, SplitDirection } from "obsidian";
 import { ScreenshotBgStyle } from "./@types/screenshot";
 import MindMap from "./main";
-import { MindMapSettings } from "./settings";
 
 export class MindMapSettingsTab extends PluginSettingTab {
   plugin: MindMap;
@@ -328,6 +321,18 @@ export class MindMapSettingsTab extends PluginSettingTab {
             this.plugin.settings.screenshotBgColor = value;
             save();
           })
+      );
+
+    new Setting(containerEl)
+      .setName("Highlight inline markmap")
+      .setDesc(
+        "When on, the inline markmap will be highlighted. Which means having a border and a different background color"
+      )
+      .addToggle((toggle) =>
+        toggle.setValue(this.plugin.settings.highlight).onChange((value) => {
+          this.plugin.settings.highlight = value;
+          save();
+        })
       );
   }
 }

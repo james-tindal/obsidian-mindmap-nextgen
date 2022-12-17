@@ -47,6 +47,8 @@ export default class MindMap extends Plugin {
         maxWidth: 0,
         screenshotBgColor: "#039614",
         screenshotBgStyle: ScreenshotBgStyle.Transparent,
+        screenshotTransparentBg: true,
+        highlight: true,
       },
       await this.loadData()
     );
