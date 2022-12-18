@@ -210,23 +210,18 @@ export default class MindmapView extends ItemView {
           lastTimeout = undefined;
         }, 300);
       }),
-      this.workspace.on("resize", async () => await this.checkAndUpdate()),
+      this.workspace.on("resize", async () => await this.update()),
       this.workspace.on("active-leaf-change", async (a) => {
-        await this.checkAndUpdate();
+        await this.update();
       }),
-      this.workspace.on(
-        "layout-change",
-        async () => await this.checkAndUpdate()
-      ),
-      this.workspace.on("css-change", async () => await this.checkAndUpdate()),
-      this.workspace.on("file-menu", async () => await this.checkAndUpdate()),
-      this.workspace.on("editor-menu", async () => await this.checkAndUpdate()),
-      this.workspace.on(
-        "editor-paste",
-        async () => await this.checkAndUpdate()
-      ),
-      this.workspace.on("editor-drop", async () => await this.checkAndUpdate()),
-      this.workspace.on("codemirror", async () => await this.checkAndUpdate()),
+      this.workspace.on("layout-change", async () => await this.update()),
+      this.workspace.on("css-change", async () => await this.update()),
+      this.workspace.on("file-menu", async () => await this.update()),
+      this.workspace.on("file-open", async () => await this.update()),
+      this.workspace.on("editor-menu", async () => await this.update()),
+      this.workspace.on("editor-paste", async () => await this.update()),
+      this.workspace.on("editor-drop", async () => await this.update()),
+      this.workspace.on("codemirror", async () => await this.update()),
       this.leaf.on(
         "group-change",
         async (group) => await this.updateLinkedLeaf(group, this)
@@ -302,59 +297,37 @@ export default class MindmapView extends ItemView {
   }
 
   async update(markdown?: string) {
-    if (markdown && typeof markdown === "string") this.currentMd = markdown;
-    else await this.readMarkDown();
-
-    if (!this.currentMd) return;
-
-    let { root, scripts, styles, frontmatter } = await this.transformMarkdown();
-
-    const actualFrontmatter = frontmatter as CustomFrontmatter;
-
-    const options = deriveOptions(frontmatter?.markmap);
-    this.frontmatterOptions = {
-      ...options,
-      screenshotFgColor: actualFrontmatter?.markmap?.screenshotFgColor,
-    };
-
-    if (styles) loadCSS(styles);
-    if (scripts) loadJS(scripts);
-
-    this.renderMarkmap(root, options, frontmatter?.markmap ?? {});
-
-    this.displayText =
-      this.fileName != undefined ? `Mind Map of ${this.fileName}` : "Mind Map";
-
-    setTimeout(() => this.applyWidths(), 100);
-  }
-
-  async checkAndUpdate() {
     try {
-      if (await this.checkActiveLeaf()) {
-        await this.update();
-      }
+      if (markdown && typeof markdown === "string") this.currentMd = markdown;
+      else await this.readMarkDown();
+
+      if (!this.currentMd) return;
+
+      let { root, scripts, styles, frontmatter } =
+        await this.transformMarkdown();
+
+      const actualFrontmatter = frontmatter as CustomFrontmatter;
+
+      const options = deriveOptions(frontmatter?.markmap);
+      this.frontmatterOptions = {
+        ...options,
+        screenshotFgColor: actualFrontmatter?.markmap?.screenshotFgColor,
+      };
+
+      if (styles) loadCSS(styles);
+      if (scripts) loadJS(scripts);
+
+      this.renderMarkmap(root, options, frontmatter?.markmap ?? {});
+
+      this.displayText =
+        this.fileName != undefined
+          ? `Mind Map of ${this.fileName}`
+          : "Mind Map";
+
+      setTimeout(() => this.applyWidths(), 100);
     } catch (error) {
-      console.error(error);
+      console.log("Error on update: ", error);
     }
-  }
-
-  async checkActiveLeaf() {
-    if (this.app.workspace.activeLeaf?.view?.getViewType() !== MD_VIEW_TYPE) {
-      return false;
-    }
-
-    const pathHasChanged = this.readFilePath();
-    const markDownHasChanged = await this.readMarkDown();
-    const updateRequired = pathHasChanged || markDownHasChanged;
-    return updateRequired;
-  }
-
-  readFilePath() {
-    const fileInfo = (this.getLeafTarget().view as any).file;
-    const pathHasChanged = this.filePath != fileInfo.path;
-    this.filePath = fileInfo.path;
-    this.fileName = fileInfo.basename;
-    return pathHasChanged;
   }
 
   getLeafTarget() {
