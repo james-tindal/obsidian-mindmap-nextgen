@@ -47,7 +47,6 @@ const DEFAULT_SETTINGS = {
 export default class MindMap extends Plugin {
   vault: Vault;
   workspace: Workspace;
-  mindmapView: MindmapView;
   settings: MindMapSettings;
 
   async onload() {
@@ -59,14 +58,14 @@ export default class MindMap extends Plugin {
       await this.loadData()
     );
 
-    this.registerView(MM_VIEW_TYPE, (leaf: WorkspaceLeaf) => {
-      this.mindmapView = new MindmapView(this.settings, leaf, {
-        path: this.activeLeafPath(this.workspace),
-        basename: this.activeLeafName(this.workspace),
-      });
-
-      return this.mindmapView;
-    });
+    this.registerView(
+      MM_VIEW_TYPE,
+      (leaf: WorkspaceLeaf) =>
+        new MindmapView(this.settings, leaf, {
+          path: this.activeLeafPath(this.workspace),
+          basename: this.activeLeafName(this.workspace),
+        })
+    );
 
     this.addCommand({
       id: "app:markmap-preview",
