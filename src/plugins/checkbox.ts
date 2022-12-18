@@ -9,10 +9,10 @@ export const checkBoxPlugin: ITransformPlugin = {
   },
   transform: (transformHooks) => {
     transformHooks.parser.tap((md) => {
-      md.use((md, options) => {
+      md.use((md) => {
         md.inline.ruler.push(
           "checkbox",
-          (state, silent) => {
+          (state) => {
             const mdCheckRegex = /^ *-? *\[[ xX]\] +/;
 
             if (!mdCheckRegex.test(state.src)) {

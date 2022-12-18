@@ -9,7 +9,7 @@ export const htmlEscapePlugin: ITransformPlugin = {
     },
   },
   transform: (transformHooks) => {
-    transformHooks.afterParse.tap((md, context) => {
+    transformHooks.afterParse.tap((md) => {
       md.parse = wrapFunction(md.parse, {
         after: function (ctx) {
           const escapeAll = (token: TokenWithChildren) => {
