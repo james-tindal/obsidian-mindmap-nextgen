@@ -2,7 +2,6 @@ import { Notice } from "obsidian";
 import { MindMapSettings } from "./settings";
 import { Markmap } from "markmap-view";
 import d3SvgToPng from "d3-svg-to-png";
-import { FrontmatterOptions } from "./@types/models";
 import { ScreenshotBgStyle } from "./@types/screenshot";
 
 export function copyImageToClipboard(

@@ -1,11 +1,6 @@
 import { wrapFunction } from "markmap-common";
 import { ITransformPlugin } from "markmap-lib";
 
-type Token = Remarkable.Remarkable.Token & {
-  content?: string;
-  children?: Token[];
-};
-
 export const htmlEscapePlugin: ITransformPlugin = {
   name: "htmlescape",
   config: {
@@ -17,7 +12,7 @@ export const htmlEscapePlugin: ITransformPlugin = {
     transformHooks.afterParse.tap((md, context) => {
       md.parse = wrapFunction(md.parse, {
         after: function (ctx) {
-          const escapeAll = (token: Token) => {
+          const escapeAll = (token: TokenWithChildren) => {
             if (token.type === "htmltag" && token.content) {
               token.content = token.content
                 .replace("<", "&lt;")

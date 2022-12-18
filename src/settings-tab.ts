@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting, SplitDirection } from "obsidian";
-import { ScreenshotBgStyle } from "./@types/screenshot";
 import MindMap from "./main";
+import { ScreenshotBgStyle } from "./@types/screenshot";
 
 export class MindMapSettingsTab extends PluginSettingTab {
   plugin: MindMap;

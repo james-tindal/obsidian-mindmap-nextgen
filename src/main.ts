@@ -3,7 +3,6 @@ import MindmapView from "./mindmap-view";
 import { MM_VIEW_TYPE } from "./constants";
 import { MindMapSettings } from "./settings";
 import { MindMapSettingsTab } from "./settings-tab";
-import { updater } from "./updater";
 import { inlineRenderer } from "./inline-renderer";
 import { ScreenshotBgStyle } from "./@types/screenshot";
 
@@ -75,7 +74,6 @@ export default class MindMap extends Plugin {
 
     this.addSettingTab(new MindMapSettingsTab(this.app, this));
 
-    this.registerEditorExtension(updater(this.mindmapView));
     this.registerMarkdownCodeBlockProcessor(
       "markmap",
       inlineRenderer(this.settings)

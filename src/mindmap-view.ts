@@ -18,11 +18,6 @@ import { createSVG, getComputedCss, removeExistingSVG } from "./markmap-svg";
 import { copyImageToClipboard } from "./copy-image";
 import { htmlEscapePlugin, checkBoxPlugin } from "./plugins";
 import { MindMapSettings } from "./settings";
-import { FrontmatterOptions } from "./@types/models";
-
-type CustomFrontmatter = {
-  markmap: IMarkmapJSONOptions & { screenshotFgColor: string };
-};
 
 export default class MindmapView extends ItemView {
   filePath: string;
