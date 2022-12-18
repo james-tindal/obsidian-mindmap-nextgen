@@ -17,7 +17,6 @@ import ObsidianMarkmap from "./obsidian-markmap-plugin";
 import { createSVG, getComputedCss, removeExistingSVG } from "./markmap-svg";
 import { copyImageToClipboard } from "./copy-image";
 import { htmlEscapePlugin, checkBoxPlugin } from "./plugins";
-import { MindMapSettings } from "./settings";
 
 export default class MindmapView extends ItemView {
   filePath: string;

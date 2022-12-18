@@ -4,7 +4,6 @@ import { Transformer } from "markmap-lib";
 import { Markmap, loadCSS, loadJS, deriveOptions } from "markmap-view";
 import { IMarkmapJSONOptions, IMarkmapOptions, INode } from "markmap-common";
 
-import { MindMapSettings } from "./settings";
 import { getComputedCss } from "./markmap-svg";
 
 type Renderer = (
