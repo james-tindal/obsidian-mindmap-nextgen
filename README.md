@@ -11,14 +11,14 @@ A similar plugin is available for [Visual Studio Code](https://marketplace.visua
 
 - [x] Preview your current note as a Mind Map
 - [x] **Markmap.js is totally up to date with the [original project](https://markmap.js.org)**
+- [x] **Inline markmap preview!**
 - [x] Mind Map preview updates
    * as you select other panes, similar to the [Local Graph](https://forum.obsidian.md/t/how-to-open-a-local-graph-view-pane-on-the-right-sidebar/7190), [Outline](https://publish.obsidian.md/help/Plugins/Outline) and [Backlink](https://publish.obsidian.md/help/Plugins/Backlinks) panes
    * as you change settings
-   * as you changes your file content
+   * as you change your file content
    * as you resize the windows or anything related to layout
    * as you open the markdown on another page
-- [x] Frontmatter options
-- [x] Reads frontmatter options
+- [x] Accepts custom and Markmap.js default frontmatter options
 - [x] Copy preview to clipboard as PNG image
 - [x] Implements Katex (LaTex plugin)
 - [x] Implements checkmarks (such as this list)
@@ -50,15 +50,17 @@ You can open the Mind Map preview for the current note with a command.
 
 ### Frontmatter
 
-The plugin also accepts frontmatter options (each of the [official markmap docs](https://markmap.js.org/docs/json-options) except for `extraJs` and `extraCss`). Frontmatter configurations has higher priority than the settings from the settings tab which means that if you set `maxWidth` on settings to 400px and on frontmatter to 200px, the maxWidth will be set to 200px.
+The plugin also accepts frontmatter options (each of the [official markmap docs](https://markmap.js.org/docs/json-options) except for `extraJs` and `extraCss`). Frontmatter options has higher priority than the settings from the settings tab which means that if you set `maxWidth` on settings to 400px and on frontmatter to 200px, the maxWidth will be set to 200px.
 
 The colors you list will always be used, no matter which coloring approach is set. Only colorFreezeLevel that only works with branch coloring approach. It is good to note that when using branch coloring approach and no color is listed, random colors will be used (as the default Markmap approach).
 
 It is also good to note that the frontmatter only works for that markdown it is in. If you open another Markdown file without frontmatter, the settings from settings tab will be used.
 
-More than the default frontmatter options, it also supports another option (and may be upcomming more options):
+More than the default frontmatter options, it also supports another options (and may be upcomming more options):
 
 **screenshotFgColor:** Is an option that allows you to set the foreground color of the screenshot. It accepts any valid CSS color (hex, color name, rgb, rgba and hsl). It's nice to remember that this color is applied to screenshot only, and not while using the plugin.
+
+**highlight:** A boolean option that allows you to activate a border and a different background color for the inline markmap. It is good to note that if frontmatter is present, it will have higher priority than the settings tab.
 
 ### Inline Markmap
 
@@ -85,7 +87,7 @@ will generate the following mindmap:
 
 #### Highlighting markmap
 
-You can also activate a border and a different background color for the markmap. To do this, you must add the `highlight` option to the frontmatter code with values `true` or `false`, and you can also use the settings tab. And as always, if frontmatter is present, it will have higher priority than the settings tab.
+You can also activate a border and a different background color for the markmap when rendering inline. To do this, you must add the `highlight` option to the frontmatter code with values `true` or `false`, and you can also use the settings tab. And as always, if frontmatter is present, it will have higher priority than the settings tab.
 
 File example:
 
@@ -104,7 +106,7 @@ markmap:
 ```
 ### Toolbar
 
-It also has a toolbar that can zoom in, zoom out, reset view and collapse all its children. The toolbar can also be toggled on and off, just click on more options and click on "toggle toolbar".
+It also has a toolbar that can zoom in, zoom out, reset view and toggle the descendants of the selected node. The toolbar can also be toggled on and off, just click on more options and click on "toggle toolbar".
 
 ### Rendering checkboxes
 
@@ -136,11 +138,13 @@ And below an result example:
 
 ### Notes
 
-Once you run the plugin using Ctrl+P and opening the MindMap, you can't open it again. It changes its content if you change the file, so that you can work on multiple files and check any of them easily. If you desire, you can close it and open it again later.
+Once you run the plugin using Ctrl+P and opening the MindMap, you can't open it again. It changes its content if you change the file you are working on, so that you can work on multiple files and check any of them easily. If you desire, you can close the preview and open it again later.
 
 ### Preview More Options Menu
 
-The Mind Map Preview view has 3 options from the "more options" menu:
+The Mind Map Preview view has 4 options from the "more options" menu:
+
+![Mindmap more options](images/mindmap-more-options.png)
 
 #### Pin
 
@@ -152,7 +156,7 @@ Places a copy of the Mind Map SVG on your clipboard allowing you to paste it int
 
 1. Set the background as transparent, then the foreground color will be the default;
 2. Select a background color;
-3. Set the background and foreground colors to be as the current theme. So that the screenshot will look the same as the screenshot.
+3. Set the background and foreground colors to be as the current theme. So that the screenshot will look the same as show the plugin is displayed.
 
 #### Collapse all
 
