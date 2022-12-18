@@ -16,13 +16,7 @@ import { MD_VIEW_TYPE, MM_VIEW_TYPE } from "./constants";
 import ObsidianMarkmap from "./obsidian-markmap-plugin";
 import { createSVG, getComputedCss, removeExistingSVG } from "./markmap-svg";
 import { copyImageToClipboard } from "./copy-image";
-import { htmlEscapePlugin, checkBoxPlugin } from "./custom-plugins";
-import { MindMapSettings } from "./settings";
-import { FrontmatterOptions } from "./@types/models";
-
-type CustomFrontmatter = {
-  markmap: IMarkmapJSONOptions & { screenshotFgColor: string };
-};
+import { htmlEscapePlugin, checkBoxPlugin } from "./plugins";
 
 export default class MindmapView extends ItemView {
   filePath: string;
@@ -265,11 +259,7 @@ export default class MindmapView extends ItemView {
 
   async onOpen() {
     this.obsMarkmap = new ObsidianMarkmap(this.vault);
-    this.workspace.onLayoutReady(async () => {
-      console.log("Comecou agr");
-      await this.update();
-      console.log("Terminou agr");
-    });
+    this.workspace.onLayoutReady(async () => await this.update());
   }
 
   async onClose() {

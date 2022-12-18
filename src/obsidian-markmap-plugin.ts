@@ -1,5 +1,6 @@
 import { INode } from "markmap-common";
 import { getLinkpath, Vault } from "obsidian";
+
 import { INTERNAL_LINK_REGEX } from "./constants";
 
 export default class ObsidianMarkmap {

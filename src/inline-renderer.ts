@@ -1,10 +1,10 @@
 import { MarkdownPostProcessorContext } from "obsidian";
-import { MindMapSettings } from "./settings";
+
 import { Transformer } from "markmap-lib";
 import { Markmap, loadCSS, loadJS, deriveOptions } from "markmap-view";
 import { IMarkmapJSONOptions, IMarkmapOptions, INode } from "markmap-common";
+
 import { getComputedCss } from "./markmap-svg";
-import { FrontmatterOptions } from "./@types/models";
 
 type Renderer = (
   settings: MindMapSettings
@@ -16,7 +16,6 @@ type Renderer = (
 
 type CustomFrontmatter = {
   markmap: Partial<IMarkmapJSONOptions> & {
-    screenshotFgColor?: string;
     highlight?: boolean;
   };
 };
@@ -53,7 +52,6 @@ export const inlineRenderer: Renderer =
       const frontmatterOptions: FrontmatterOptions = {
         ...derivedFrontmatter,
         highlight: actualFrontmatter?.markmap?.highlight,
-        screenshotFgColor: actualFrontmatter?.markmap?.screenshotFgColor,
       };
 
       let shouldHighlight: boolean = false;

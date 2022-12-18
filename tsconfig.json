@@ -10,14 +10,16 @@
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "importHelpers": true,
+    "esModuleInterop": true,
     "lib": [
       "dom",
       "es5",
       "scripthost",
       "es2015"
-    ]
+    ],
   },
   "include": [
-    "**/*.ts"
+    "**/*.ts",
+    "src/@types",
   ]
 }
