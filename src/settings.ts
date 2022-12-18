@@ -1,4 +1,5 @@
 import { SplitDirection } from "obsidian";
+
 import { ScreenshotBgStyle } from "./@types/screenshot";
 
 export class MindMapSettings {

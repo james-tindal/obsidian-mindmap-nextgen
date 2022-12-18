@@ -1,9 +1,11 @@
 import { Plugin, Vault, Workspace, WorkspaceLeaf } from "obsidian";
+
 import MindmapView from "./mindmap-view";
 import { MM_VIEW_TYPE } from "./constants";
 import { MindMapSettings } from "./settings";
 import { MindMapSettingsTab } from "./settings-tab";
 import { inlineRenderer } from "./inline-renderer";
+
 import { ScreenshotBgStyle } from "./@types/screenshot";
 
 export default class MindMap extends Plugin {

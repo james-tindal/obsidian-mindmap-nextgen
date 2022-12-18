@@ -1,4 +1,5 @@
 import { App, PluginSettingTab, Setting, SplitDirection } from "obsidian";
+
 import MindMap from "./main";
 import { ScreenshotBgStyle } from "./@types/screenshot";
 
