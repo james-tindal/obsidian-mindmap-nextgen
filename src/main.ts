@@ -62,7 +62,6 @@ export default class MindMap extends Plugin {
       MM_VIEW_TYPE,
       (leaf: WorkspaceLeaf) =>
         new MindmapView(this.settings, leaf, {
-          path: this.activeLeafPath(this.workspace),
           basename: this.activeLeafName(this.workspace),
         })
     );
@@ -85,14 +84,11 @@ export default class MindMap extends Plugin {
   }
 
   markMapPreview() {
-    const fileInfo = {
-      path: this.activeLeafPath(this.workspace),
-      basename: this.activeLeafName(this.workspace),
-    };
+    const fileInfo = { basename: this.activeLeafName(this.workspace) };
     this.initPreview(fileInfo);
   }
 
-  async initPreview(fileInfo: { path: string; basename: string }) {
+  async initPreview(fileInfo: { basename: string }) {
     if (this.app.workspace.getLeavesOfType(MM_VIEW_TYPE).length > 0) {
       return;
     }
@@ -107,10 +103,6 @@ export default class MindMap extends Plugin {
 
   async onunload() {
     console.log("Unloading Mind Map plugin");
-  }
-
-  activeLeafPath(workspace: Workspace) {
-    return workspace.activeLeaf?.view.getState().file;
   }
 
   activeLeafName(workspace: Workspace) {

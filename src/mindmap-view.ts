@@ -93,11 +93,10 @@ export default class MindmapView extends ItemView {
   constructor(
     settings: MindMapSettings,
     leaf: WorkspaceLeaf,
-    initialFileInfo: { path: string; basename: string }
+    initialFileInfo: { basename: string }
   ) {
     super(leaf);
     this.settings = settings;
-    this.filePath = initialFileInfo.path;
     this.fileName = initialFileInfo.basename;
     this.vault = this.app.vault;
     this.workspace = this.app.workspace;
