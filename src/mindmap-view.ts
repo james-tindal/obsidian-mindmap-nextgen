@@ -40,8 +40,7 @@ export default class MindmapView extends ItemView {
   options: Partial<IMarkmapOptions>;
   frontmatterOptions: FrontmatterOptions;
   hasFit: boolean;
-
-  groupEventListenerFn: () => unknown;
+  toolbar: HTMLElement;
 
   getViewType(): string {
     return MM_VIEW_TYPE;
@@ -132,9 +131,8 @@ export default class MindmapView extends ItemView {
   }
 
   toggleToolbar() {
-    const toolbar = document.querySelector(".markmap-toolbar-container");
-    if (toolbar) {
-      toolbar.remove();
+    if (this.toolbar) {
+      this.toolbar.remove();
     } else {
       this.createToolbar();
     }
@@ -148,6 +146,8 @@ export default class MindmapView extends ItemView {
 
     container.append(el);
     this.containerEl.append(container);
+
+    this.toolbar = container;
   }
 
   setListenersUp() {
@@ -312,9 +312,9 @@ export default class MindmapView extends ItemView {
     });
 
     this.svg.querySelectorAll("circle").forEach((el) => {
-      this.groupEventListenerFn = () =>
-        setTimeout(() => this.applyWidths(), 50);
-      el.addEventListener("click", this.groupEventListenerFn);
+      this.registerDomEvent(el as unknown as HTMLElement, "click", () =>
+        setTimeout(() => this.applyWidths(), 50)
+      );
     });
   }
 
