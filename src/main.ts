@@ -47,7 +47,6 @@ const DEFAULT_SETTINGS = {
 export default class MindMap extends Plugin {
   vault: Vault;
   workspace: Workspace;
-  mindmapView: MindmapView;
   settings: MindMapSettings;
 
   async onload() {
@@ -59,14 +58,10 @@ export default class MindMap extends Plugin {
       await this.loadData()
     );
 
-    this.registerView(MM_VIEW_TYPE, (leaf: WorkspaceLeaf) => {
-      this.mindmapView = new MindmapView(this.settings, leaf, {
-        path: this.activeLeafPath(this.workspace),
-        basename: this.activeLeafName(this.workspace),
-      });
-
-      return this.mindmapView;
-    });
+    this.registerView(
+      MM_VIEW_TYPE,
+      (leaf: WorkspaceLeaf) => new MindmapView(this.settings, leaf)
+    );
 
     this.addCommand({
       id: "app:markmap-preview",
@@ -86,14 +81,10 @@ export default class MindMap extends Plugin {
   }
 
   markMapPreview() {
-    const fileInfo = {
-      path: this.activeLeafPath(this.workspace),
-      basename: this.activeLeafName(this.workspace),
-    };
-    this.initPreview(fileInfo);
+    this.initPreview();
   }
 
-  async initPreview(fileInfo: { path: string; basename: string }) {
+  async initPreview() {
     if (this.app.workspace.getLeavesOfType(MM_VIEW_TYPE).length > 0) {
       return;
     }
@@ -101,17 +92,13 @@ export default class MindMap extends Plugin {
       "split",
       this.settings.splitDirection
     );
-    const mmPreview = new MindmapView(this.settings, preview, fileInfo);
+    const mmPreview = new MindmapView(this.settings, preview);
 
     preview.open(mmPreview);
   }
 
   async onunload() {
     console.log("Unloading Mind Map plugin");
-  }
-
-  activeLeafPath(workspace: Workspace) {
-    return workspace.activeLeaf?.view.getState().file;
   }
 
   activeLeafName(workspace: Workspace) {

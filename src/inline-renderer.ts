@@ -24,20 +24,17 @@ export const inlineRenderer: Renderer =
   (settings) => (source, container, _) => {
     try {
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      svg.id = `markmap-${Math.ceil(Math.random() * 10000)}`;
+      svg.classList.add("markmap-inline-svg");
 
       const style = document.createElement("style");
 
-      const { color } = getComputedCss(container);
-      style.innerHTML = `#${svg.id} div {
-          color: ${color};
-          line-height: ${settings.lineHeight ?? "1em"};
-      }
+      svg.setAttr(
+        "style",
+        `--mm-line-height: ${
+          settings.lineHeight ?? "1em"
+        }; width: 100%; height: 100%;`
+      );
 
-      #${svg.id} {
-        width: 100%;
-      }
-      `;
       svg.appendChild(style);
       container.appendChild(svg);
 
@@ -62,19 +59,11 @@ export const inlineRenderer: Renderer =
       }
 
       if (shouldHighlight) {
-        container.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
-        container.style.borderColor = "rgba(0, 0, 0, 0.2)";
-        container.style.borderRadius = "5px";
-        container.style.borderWidth = "2px";
-        container.style.borderStyle = "solid";
-        container.style.padding = "7px";
+        container.classList.remove("markmap-inline-container_unboxed");
+        container.classList.add("markmap-inline-container_boxed");
       } else {
-        container.style.backgroundColor = "transparent";
-        container.style.borderColor = "transparent";
-        container.style.borderRadius = "0px";
-        container.style.borderWidth = "0px";
-        container.style.borderStyle = "none";
-        container.style.padding = "0px";
+        container.classList.remove("markmap-inline-container_boxed");
+        container.classList.add("markmap-inline-container_unboxed");
       }
 
       const { scripts, styles } = transformer.getUsedAssets(features);

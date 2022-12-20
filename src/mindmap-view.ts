@@ -2,9 +2,13 @@ import {
   EventRef,
   ItemView,
   Menu,
+  TFile,
   Vault,
   Workspace,
   WorkspaceLeaf,
+  debounce,
+  MarkdownView,
+  Editor,
 } from "obsidian";
 import { Transformer, builtInPlugins } from "markmap-lib";
 import { Markmap, loadCSS, loadJS, deriveOptions } from "markmap-view";
@@ -19,12 +23,9 @@ import { copyImageToClipboard } from "./copy-image";
 import { htmlEscapePlugin, checkBoxPlugin } from "./plugins";
 
 export default class MindmapView extends ItemView {
-  filePath: string;
-  fileName: string;
+  file: TFile;
   linkedLeaf: WorkspaceLeaf;
   displayText: string;
-  currentMd: string;
-  vault: Vault;
   workspace: Workspace;
   listeners: EventRef[];
   emptyDiv: HTMLDivElement;
@@ -39,8 +40,7 @@ export default class MindmapView extends ItemView {
   options: Partial<IMarkmapOptions>;
   frontmatterOptions: FrontmatterOptions;
   hasFit: boolean;
-
-  groupEventListenerFn: () => unknown;
+  toolbar: HTMLElement;
 
   getViewType(): string {
     return MM_VIEW_TYPE;
@@ -90,16 +90,9 @@ export default class MindmapView extends ItemView {
     menu.showAtPosition({ x: 0, y: 0 });
   }
 
-  constructor(
-    settings: MindMapSettings,
-    leaf: WorkspaceLeaf,
-    initialFileInfo: { path: string; basename: string }
-  ) {
+  constructor(settings: MindMapSettings, leaf: WorkspaceLeaf) {
     super(leaf);
     this.settings = settings;
-    this.filePath = initialFileInfo.path;
-    this.fileName = initialFileInfo.basename;
-    this.vault = this.app.vault;
     this.workspace = this.app.workspace;
 
     this.transformer = new Transformer([
@@ -116,8 +109,6 @@ export default class MindmapView extends ItemView {
     this.createToolbar();
 
     this.setListenersUp();
-
-    this.overrideStopPropagation();
   }
 
   createMarkmapSvg() {
@@ -140,9 +131,9 @@ export default class MindmapView extends ItemView {
   }
 
   toggleToolbar() {
-    const toolbar = document.querySelector(".markmap-toolbar-container");
-    if (toolbar) {
-      toolbar.remove();
+    if (this.toolbar) {
+      this.toolbar.remove();
+      this.toolbar = undefined;
     } else {
       this.createToolbar();
     }
@@ -152,113 +143,39 @@ export default class MindmapView extends ItemView {
     const container = document.createElement("div");
     container.className = "markmap-toolbar-container";
 
-    const styleContainer = document.createElement("style");
-    styleContainer.innerHTML = `
-    .markmap-toolbar-container .mm-toolbar {
-      position: absolute;
-      bottom: 2rem;
-      right: 1rem;
-      background-color: white;
-      border-radius: 0.5rem;
-      padding: 0.2rem;
-      box-shadow: 0 0 0.4rem 0 white;
-      zIndex: 1;
-      border: 1px solid #ccc;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .markmap-toolbar-container .mm-toolbar .mm-toolbar-brand {
-      display: none;
-    }
-
-    .markmap-toolbar-container .mm-toolbar .mm-toolbar-item {
-      height: 20px;
-      color: black;
-    }
-
-    .markmap-toolbar-container .mm-toolbar .mm-toolbar-item.active,
-    .markmap-toolbar-container .mm-toolbar .mm-toolbar-item:hover {
-      color: brown;
-    }
-    `;
-
     const el = Toolbar.create(this.markmapSVG) as HTMLElement;
 
-    container.append(styleContainer);
     container.append(el);
     this.containerEl.append(container);
-  }
 
-  reloadMarkmapSVG() {
-    this.markmapSVG.destroy();
-    this.createMarkmapSvg();
-    this.update(this.currentMd);
+    this.toolbar = container;
   }
 
   setListenersUp() {
-    let lastTimeout: number | undefined;
-    this.listeners = [
-      this.workspace.on("quick-preview", (_, content) => {
-        if (lastTimeout) {
-          window.clearTimeout(lastTimeout);
-        }
+    const editorChange: (
+      editor: Editor,
+      markdownView: MarkdownView
+    ) => any = async (editor) => {
+      const content = editor.getValue();
+      await this.update(content);
+    };
 
-        lastTimeout = window.setTimeout(async () => {
-          await this.update(content);
-          lastTimeout = undefined;
-        }, 300);
+    const debouncedEditorChange = debounce(editorChange, 300, true);
+
+    this.listeners = [
+      this.workspace.on("editor-change", debouncedEditorChange),
+      this.workspace.on("file-open", async (file) => {
+        this.file = file;
+        await this.update();
       }),
-      this.workspace.on("resize", async () => await this.checkAndUpdate()),
-      this.workspace.on("active-leaf-change", async (a) => {
-        await this.checkAndUpdate();
-      }),
-      this.workspace.on(
-        "layout-change",
-        async () => await this.checkAndUpdate()
-      ),
-      this.workspace.on("css-change", async () => await this.checkAndUpdate()),
-      this.workspace.on("file-menu", async () => await this.checkAndUpdate()),
-      this.workspace.on("editor-menu", async () => await this.checkAndUpdate()),
-      this.workspace.on(
-        "editor-paste",
-        async () => await this.checkAndUpdate()
-      ),
-      this.workspace.on("editor-drop", async () => await this.checkAndUpdate()),
-      this.workspace.on("codemirror", async () => await this.checkAndUpdate()),
-      this.leaf.on(
-        "group-change",
-        async (group) => await this.updateLinkedLeaf(group, this)
-      ),
     ];
   }
 
-  overrideStopPropagation() {
-    const oldStopProgation = MouseEvent.prototype.stopPropagation;
-
-    MouseEvent.prototype.stopPropagation = function () {
-      const target = this.target as HTMLElement;
-
-      if (
-        target.tagName.toLowerCase() != "div" ||
-        target.tagName.toLowerCase() != "foreignObject"
-      )
-        oldStopProgation.bind(this)();
-
-      let parent = target;
-      while (parent) {
-        if (parent == this.svg) return;
-        parent = parent.parentElement;
-      }
-
-      oldStopProgation.bind(this)();
-    };
-  }
-
   async onOpen() {
-    this.obsMarkmap = new ObsidianMarkmap(this.vault);
+    this.obsMarkmap = new ObsidianMarkmap(this.app.vault);
+
+    this.file = this.app.workspace.getActiveFile();
+
     this.workspace.onLayoutReady(async () => await this.update());
   }
 
@@ -302,86 +219,51 @@ export default class MindmapView extends ItemView {
     });
   }
 
-  async update(markdown?: string) {
-    if (markdown && typeof markdown === "string") this.currentMd = markdown;
-    else await this.readMarkDown();
-
-    if (!this.currentMd) return;
-
-    let { root, scripts, styles, frontmatter } = await this.transformMarkdown();
-
-    const actualFrontmatter = frontmatter as CustomFrontmatter;
-
-    const options = deriveOptions(frontmatter?.markmap);
-    this.frontmatterOptions = {
-      ...options,
-      screenshotFgColor: actualFrontmatter?.markmap?.screenshotFgColor,
-    };
-
-    if (styles) loadCSS(styles);
-    if (scripts) loadJS(scripts);
-
-    this.renderMarkmap(root, options, frontmatter?.markmap ?? {});
-
-    this.displayText =
-      this.fileName != undefined ? `Mind Map of ${this.fileName}` : "Mind Map";
-
-    setTimeout(() => this.applyWidths(), 100);
-  }
-
-  async checkAndUpdate() {
+  async update(content?: string) {
     try {
-      if (await this.checkActiveLeaf()) {
-        await this.update();
-      }
+      const markdown =
+        typeof content === "string" ? content : await this.readMarkDown();
+
+      if (!markdown) return;
+
+      let { root, scripts, styles, frontmatter } = await this.transformMarkdown(
+        markdown
+      );
+
+      const actualFrontmatter = frontmatter as CustomFrontmatter;
+
+      const options = deriveOptions(frontmatter?.markmap);
+      this.frontmatterOptions = {
+        ...options,
+        screenshotFgColor: actualFrontmatter?.markmap?.screenshotFgColor,
+      };
+
+      if (styles) loadCSS(styles);
+      if (scripts) loadJS(scripts);
+
+      this.renderMarkmap(root, options, frontmatter?.markmap ?? {});
+
+      this.displayText =
+        this.file.name != undefined
+          ? `Mind Map of ${this.file.name}`
+          : "Mind Map";
+
+      setTimeout(() => this.applyWidths(), 100);
     } catch (error) {
-      console.error(error);
+      console.log("Error on update: ", error);
     }
-  }
-
-  async checkActiveLeaf() {
-    if (this.app.workspace.activeLeaf?.view?.getViewType() !== MD_VIEW_TYPE) {
-      return false;
-    }
-
-    const pathHasChanged = this.readFilePath();
-    const markDownHasChanged = await this.readMarkDown();
-    const updateRequired = pathHasChanged || markDownHasChanged;
-    return updateRequired;
-  }
-
-  readFilePath() {
-    const fileInfo = (this.getLeafTarget().view as any).file;
-    const pathHasChanged = this.filePath != fileInfo.path;
-    this.filePath = fileInfo.path;
-    this.fileName = fileInfo.basename;
-    return pathHasChanged;
-  }
-
-  getLeafTarget() {
-    if (!this.isLeafPinned) {
-      this.linkedLeaf = this.app.workspace.activeLeaf;
-    }
-    return this.linkedLeaf != undefined
-      ? this.linkedLeaf
-      : this.app.workspace.activeLeaf;
   }
 
   async readMarkDown() {
     try {
-      let md = await this.app.vault.adapter.read(this.filePath);
-      const markDownHasChanged = this.currentMd != md;
-      this.currentMd = md;
-      return markDownHasChanged;
+      return await this.app.vault.cachedRead(this.file);
     } catch (error) {
       console.log(error);
     }
   }
 
-  async transformMarkdown() {
-    let { root, features, frontmatter } = this.transformer.transform(
-      this.currentMd
-    );
+  async transformMarkdown(markdown: string) {
+    let { root, features, frontmatter } = this.transformer.transform(markdown);
 
     const { scripts, styles } = this.transformer.getUsedAssets(features);
 
@@ -403,16 +285,6 @@ export default class MindmapView extends ItemView {
           ? colors[depth]
           : this.settings.defaultColor;
     };
-  }
-
-  hexToRgb(hex: string) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-
-    const red = parseInt(result[1], 16);
-    const green = parseInt(result[2], 16);
-    const blue = parseInt(result[3], 16);
-
-    return result ? `rgb(${red}, ${green}, ${blue})` : null;
   }
 
   applyWidths() {
@@ -441,9 +313,9 @@ export default class MindmapView extends ItemView {
     });
 
     this.svg.querySelectorAll("circle").forEach((el) => {
-      this.groupEventListenerFn = () =>
-        setTimeout(() => this.applyWidths(), 50);
-      el.addEventListener("click", this.groupEventListenerFn);
+      this.registerDomEvent(el as unknown as HTMLElement, "click", () =>
+        setTimeout(() => this.applyWidths(), 50)
+      );
     });
   }
 
@@ -453,7 +325,7 @@ export default class MindmapView extends ItemView {
     frontmatter: Partial<IMarkmapJSONOptions> = {}
   ) {
     try {
-      const { font } = getComputedCss(this.containerEl);
+      const { font, color: computedColor } = getComputedCss(this.containerEl);
 
       const colorFn =
         this.settings.coloring === "depth"
@@ -478,6 +350,13 @@ export default class MindmapView extends ItemView {
         this.options.color = colorFn;
       }
 
+      if (computedColor) {
+        this.svg.setAttr(
+          "style",
+          `--mm-line-height: ${this.settings.lineHeight ?? "1em"};`
+        );
+      }
+
       this.markmapSVG.setData(root, {
         ...this.options,
         ...frontmatterOptions,
@@ -490,17 +369,5 @@ export default class MindmapView extends ItemView {
     } catch (error) {
       console.error(error);
     }
-  }
-
-  displayEmpty(display: boolean) {
-    if (this.emptyDiv === undefined) {
-      const div = document.createElement("div");
-      div.className = "pane-empty";
-      div.innerText = "No content found";
-      removeExistingSVG();
-      this.containerEl.children[1].appendChild(div);
-      this.emptyDiv = div;
-    }
-    this.emptyDiv.toggle(display);
   }
 }

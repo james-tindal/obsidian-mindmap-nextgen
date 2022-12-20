@@ -3,18 +3,14 @@ export function createSVG(
   lineHeight: string
 ): SVGElement {
   removeExistingSVG();
+
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.id = "markmap";
   svg.setAttr("style", "height: 100%; width: 100%;");
+
   const container = containerEl.children[1];
-  const style = document.createElement("style");
-  const { color } = getComputedCss(containerEl);
-  style.innerHTML = `#markmap div {
-        color: ${color};
-        line-height: ${lineHeight ?? "1em"};
-    }`;
-  svg.appendChild(style);
   container.appendChild(svg);
+
   return svg;
 }
 
