@@ -144,42 +144,8 @@ export default class MindmapView extends ItemView {
     const container = document.createElement("div");
     container.className = "markmap-toolbar-container";
 
-    const styleContainer = document.createElement("style");
-    styleContainer.innerHTML = `
-    .markmap-toolbar-container .mm-toolbar {
-      position: absolute;
-      bottom: 2rem;
-      right: 1rem;
-      background-color: white;
-      border-radius: 0.5rem;
-      padding: 0.2rem;
-      box-shadow: 0 0 0.4rem 0 white;
-      zIndex: 1;
-      border: 1px solid #ccc;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .markmap-toolbar-container .mm-toolbar .mm-toolbar-brand {
-      display: none;
-    }
-
-    .markmap-toolbar-container .mm-toolbar .mm-toolbar-item {
-      height: 20px;
-      color: black;
-    }
-
-    .markmap-toolbar-container .mm-toolbar .mm-toolbar-item.active,
-    .markmap-toolbar-container .mm-toolbar .mm-toolbar-item:hover {
-      color: brown;
-    }
-    `;
-
     const el = Toolbar.create(this.markmapSVG) as HTMLElement;
 
-    container.append(styleContainer);
     container.append(el);
     this.containerEl.append(container);
   }
@@ -188,7 +154,7 @@ export default class MindmapView extends ItemView {
     const editorChange: (
       editor: Editor,
       markdownView: MarkdownView
-    ) => any = async (editor, markdownView) => {
+    ) => any = async (editor) => {
       const content = editor.getValue();
       await this.update(content);
     };
@@ -287,15 +253,6 @@ export default class MindmapView extends ItemView {
     }
   }
 
-  getLeafTarget() {
-    if (!this.isLeafPinned) {
-      this.linkedLeaf = this.app.workspace.activeLeaf;
-    }
-    return this.linkedLeaf != undefined
-      ? this.linkedLeaf
-      : this.app.workspace.activeLeaf;
-  }
-
   async readMarkDown() {
     try {
       return await this.app.vault.cachedRead(this.file);
@@ -327,16 +284,6 @@ export default class MindmapView extends ItemView {
           ? colors[depth]
           : this.settings.defaultColor;
     };
-  }
-
-  hexToRgb(hex: string) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-
-    const red = parseInt(result[1], 16);
-    const green = parseInt(result[2], 16);
-    const blue = parseInt(result[3], 16);
-
-    return result ? `rgb(${red}, ${green}, ${blue})` : null;
   }
 
   applyWidths() {
@@ -377,7 +324,7 @@ export default class MindmapView extends ItemView {
     frontmatter: Partial<IMarkmapJSONOptions> = {}
   ) {
     try {
-      const { font } = getComputedCss(this.containerEl);
+      const { font, color: computedColor } = getComputedCss(this.containerEl);
 
       const colorFn =
         this.settings.coloring === "depth"
@@ -402,6 +349,13 @@ export default class MindmapView extends ItemView {
         this.options.color = colorFn;
       }
 
+      if (computedColor) {
+        this.svg.setAttr(
+          "style",
+          `--mm-line-height: ${this.settings.lineHeight ?? "1em"};`
+        );
+      }
+
       this.markmapSVG.setData(root, {
         ...this.options,
         ...frontmatterOptions,
@@ -414,17 +368,5 @@ export default class MindmapView extends ItemView {
     } catch (error) {
       console.error(error);
     }
-  }
-
-  displayEmpty(display: boolean) {
-    if (this.emptyDiv === undefined) {
-      const div = document.createElement("div");
-      div.className = "pane-empty";
-      div.innerText = "No content found";
-      removeExistingSVG();
-      this.containerEl.children[1].appendChild(div);
-      this.emptyDiv = div;
-    }
-    this.emptyDiv.toggle(display);
   }
 }
