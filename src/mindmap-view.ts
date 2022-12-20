@@ -107,8 +107,6 @@ export default class MindmapView extends ItemView {
     this.createToolbar();
 
     this.setListenersUp();
-
-    this.overrideStopPropagation();
   }
 
   createMarkmapSvg() {
@@ -202,28 +200,6 @@ export default class MindmapView extends ItemView {
         await this.update();
       }),
     ];
-  }
-
-  overrideStopPropagation() {
-    const oldStopProgation = MouseEvent.prototype.stopPropagation;
-
-    MouseEvent.prototype.stopPropagation = function () {
-      const target = this.target as HTMLElement;
-
-      if (
-        target.tagName.toLowerCase() != "div" ||
-        target.tagName.toLowerCase() != "foreignObject"
-      )
-        oldStopProgation.bind(this)();
-
-      let parent = target;
-      while (parent) {
-        if (parent == this.svg) return;
-        parent = parent.parentElement;
-      }
-
-      oldStopProgation.bind(this)();
-    };
   }
 
   async onOpen() {
