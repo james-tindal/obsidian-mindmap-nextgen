@@ -6,6 +6,9 @@ import {
   Vault,
   Workspace,
   WorkspaceLeaf,
+  debounce,
+  MarkdownView,
+  Editor,
 } from "obsidian";
 import { Transformer, builtInPlugins } from "markmap-lib";
 import { Markmap, loadCSS, loadJS, deriveOptions } from "markmap-view";
@@ -182,19 +185,18 @@ export default class MindmapView extends ItemView {
   }
 
   setListenersUp() {
-    let lastTimeout: number | undefined;
+    const editorChange: (
+      editor: Editor,
+      markdownView: MarkdownView
+    ) => any = async (editor, markdownView) => {
+      const content = editor.getValue();
+      await this.update(content);
+    };
+
+    const debouncedEditorChange = debounce(editorChange, 300, true);
 
     this.listeners = [
-      this.workspace.on("quick-preview", (_, content) => {
-        if (lastTimeout) {
-          window.clearTimeout(lastTimeout);
-        }
-
-        lastTimeout = window.setTimeout(async () => {
-          await this.update(content);
-          lastTimeout = undefined;
-        }, 300);
-      }),
+      this.workspace.on("editor-change", debouncedEditorChange),
       this.workspace.on("file-open", async (file) => {
         this.file = file;
         await this.update();
