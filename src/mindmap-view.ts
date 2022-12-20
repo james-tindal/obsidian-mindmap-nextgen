@@ -23,8 +23,6 @@ export default class MindmapView extends ItemView {
   fileName: string;
   linkedLeaf: WorkspaceLeaf;
   displayText: string;
-  currentMd: string;
-  vault: Vault;
   workspace: Workspace;
   listeners: EventRef[];
   emptyDiv: HTMLDivElement;
@@ -98,7 +96,6 @@ export default class MindmapView extends ItemView {
     super(leaf);
     this.settings = settings;
     this.fileName = initialFileInfo.basename;
-    this.vault = this.app.vault;
     this.workspace = this.app.workspace;
 
     this.transformer = new Transformer([
@@ -191,14 +188,9 @@ export default class MindmapView extends ItemView {
     this.containerEl.append(container);
   }
 
-  reloadMarkmapSVG() {
-    this.markmapSVG.destroy();
-    this.createMarkmapSvg();
-    this.update(this.currentMd);
-  }
-
   setListenersUp() {
     let lastTimeout: number | undefined;
+
     this.listeners = [
       this.workspace.on("quick-preview", (_, content) => {
         if (lastTimeout) {
@@ -210,22 +202,10 @@ export default class MindmapView extends ItemView {
           lastTimeout = undefined;
         }, 300);
       }),
-      this.workspace.on("resize", async () => await this.update()),
-      this.workspace.on("active-leaf-change", async (a) => {
+      this.workspace.on("file-open", async (file) => {
+        this.filePath = file.path;
         await this.update();
       }),
-      this.workspace.on("layout-change", async () => await this.update()),
-      this.workspace.on("css-change", async () => await this.update()),
-      this.workspace.on("file-menu", async () => await this.update()),
-      this.workspace.on("file-open", async () => await this.update()),
-      this.workspace.on("editor-menu", async () => await this.update()),
-      this.workspace.on("editor-paste", async () => await this.update()),
-      this.workspace.on("editor-drop", async () => await this.update()),
-      this.workspace.on("codemirror", async () => await this.update()),
-      this.leaf.on(
-        "group-change",
-        async (group) => await this.updateLinkedLeaf(group, this)
-      ),
     ];
   }
 
@@ -252,7 +232,10 @@ export default class MindmapView extends ItemView {
   }
 
   async onOpen() {
-    this.obsMarkmap = new ObsidianMarkmap(this.vault);
+    this.obsMarkmap = new ObsidianMarkmap(this.app.vault);
+
+    this.filePath = this.app.workspace.getActiveFile().path;
+
     this.workspace.onLayoutReady(async () => await this.update());
   }
 
@@ -296,15 +279,16 @@ export default class MindmapView extends ItemView {
     });
   }
 
-  async update(markdown?: string) {
+  async update(content?: string) {
     try {
-      if (markdown && typeof markdown === "string") this.currentMd = markdown;
-      else await this.readMarkDown();
+      const markdown =
+        typeof content === "string" ? content : await this.readMarkDown();
 
-      if (!this.currentMd) return;
+      if (!markdown) return;
 
-      let { root, scripts, styles, frontmatter } =
-        await this.transformMarkdown();
+      let { root, scripts, styles, frontmatter } = await this.transformMarkdown(
+        markdown
+      );
 
       const actualFrontmatter = frontmatter as CustomFrontmatter;
 
@@ -341,19 +325,14 @@ export default class MindmapView extends ItemView {
 
   async readMarkDown() {
     try {
-      let md = await this.app.vault.adapter.read(this.filePath);
-      const markDownHasChanged = this.currentMd != md;
-      this.currentMd = md;
-      return markDownHasChanged;
+      return await this.app.vault.adapter.read(this.filePath);
     } catch (error) {
       console.log(error);
     }
   }
 
-  async transformMarkdown() {
-    let { root, features, frontmatter } = this.transformer.transform(
-      this.currentMd
-    );
+  async transformMarkdown(markdown: string) {
+    let { root, features, frontmatter } = this.transformer.transform(markdown);
 
     const { scripts, styles } = this.transformer.getUsedAssets(features);
 
