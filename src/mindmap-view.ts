@@ -133,6 +133,7 @@ export default class MindmapView extends ItemView {
   toggleToolbar() {
     if (this.toolbar) {
       this.toolbar.remove();
+      this.toolbar = undefined;
     } else {
       this.createToolbar();
     }
