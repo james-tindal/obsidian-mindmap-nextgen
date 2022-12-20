@@ -60,10 +60,7 @@ export default class MindMap extends Plugin {
 
     this.registerView(
       MM_VIEW_TYPE,
-      (leaf: WorkspaceLeaf) =>
-        new MindmapView(this.settings, leaf, {
-          basename: this.activeLeafName(this.workspace),
-        })
+      (leaf: WorkspaceLeaf) => new MindmapView(this.settings, leaf)
     );
 
     this.addCommand({
@@ -84,11 +81,10 @@ export default class MindMap extends Plugin {
   }
 
   markMapPreview() {
-    const fileInfo = { basename: this.activeLeafName(this.workspace) };
-    this.initPreview(fileInfo);
+    this.initPreview();
   }
 
-  async initPreview(fileInfo: { basename: string }) {
+  async initPreview() {
     if (this.app.workspace.getLeavesOfType(MM_VIEW_TYPE).length > 0) {
       return;
     }
@@ -96,7 +92,7 @@ export default class MindMap extends Plugin {
       "split",
       this.settings.splitDirection
     );
-    const mmPreview = new MindmapView(this.settings, preview, fileInfo);
+    const mmPreview = new MindmapView(this.settings, preview);
 
     preview.open(mmPreview);
   }

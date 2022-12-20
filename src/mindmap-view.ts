@@ -2,6 +2,7 @@ import {
   EventRef,
   ItemView,
   Menu,
+  TFile,
   Vault,
   Workspace,
   WorkspaceLeaf,
@@ -19,8 +20,7 @@ import { copyImageToClipboard } from "./copy-image";
 import { htmlEscapePlugin, checkBoxPlugin } from "./plugins";
 
 export default class MindmapView extends ItemView {
-  filePath: string;
-  fileName: string;
+  file: TFile;
   linkedLeaf: WorkspaceLeaf;
   displayText: string;
   workspace: Workspace;
@@ -88,14 +88,9 @@ export default class MindmapView extends ItemView {
     menu.showAtPosition({ x: 0, y: 0 });
   }
 
-  constructor(
-    settings: MindMapSettings,
-    leaf: WorkspaceLeaf,
-    initialFileInfo: { basename: string }
-  ) {
+  constructor(settings: MindMapSettings, leaf: WorkspaceLeaf) {
     super(leaf);
     this.settings = settings;
-    this.fileName = initialFileInfo.basename;
     this.workspace = this.app.workspace;
 
     this.transformer = new Transformer([
@@ -203,7 +198,7 @@ export default class MindmapView extends ItemView {
         }, 300);
       }),
       this.workspace.on("file-open", async (file) => {
-        this.filePath = file.path;
+        this.file = file;
         await this.update();
       }),
     ];
@@ -234,7 +229,7 @@ export default class MindmapView extends ItemView {
   async onOpen() {
     this.obsMarkmap = new ObsidianMarkmap(this.app.vault);
 
-    this.filePath = this.app.workspace.getActiveFile().path;
+    this.file = this.app.workspace.getActiveFile();
 
     this.workspace.onLayoutReady(async () => await this.update());
   }
@@ -304,8 +299,8 @@ export default class MindmapView extends ItemView {
       this.renderMarkmap(root, options, frontmatter?.markmap ?? {});
 
       this.displayText =
-        this.fileName != undefined
-          ? `Mind Map of ${this.fileName}`
+        this.file.name != undefined
+          ? `Mind Map of ${this.file.name}`
           : "Mind Map";
 
       setTimeout(() => this.applyWidths(), 100);
@@ -325,7 +320,7 @@ export default class MindmapView extends ItemView {
 
   async readMarkDown() {
     try {
-      return await this.app.vault.adapter.read(this.filePath);
+      return await this.app.vault.cachedRead(this.file);
     } catch (error) {
       console.log(error);
     }
