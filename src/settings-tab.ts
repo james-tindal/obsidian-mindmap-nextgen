@@ -268,9 +268,26 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
+
+    // add toggle to use transparent background for screenshot or not
     new Setting(containerEl)
-      .setName("Screenshot background color")
-      .setDesc("Background color for the screenshot")
+      .setName("Screenshot background style")
+      .setDesc(
+        "Select the background style for the screenshot, when using 'Color' the color picker value will be used."
+      )
+      .addDropdown((dropdown) =>
+        dropdown
+          .setValue(this.plugin.settings.screenshotBgStyle)
+          .addOptions({
+            [ScreenshotBgStyle.Transparent]: "Transparent",
+            [ScreenshotBgStyle.Color]: "Color",
+            [ScreenshotBgStyle.Theme]: "Theme",
+          })
+          .onChange((value: ScreenshotBgStyle) => {
+            this.plugin.settings.screenshotBgStyle = value;
+            save();
+          })
+      )
       .addColorPicker((colPicker) =>
         colPicker
           .setValue(this.plugin.settings.screenshotBgColor?.toString())
@@ -326,34 +343,6 @@ export class MindMapSettingsTab extends PluginSettingTab {
           .setPlaceholder("Example: 130")
           .onChange((value: string) => {
             this.plugin.settings.maxWidth = Number.parseInt(value);
-            save();
-          })
-      );
-    // add toggle to use transparent background for screenshot or not
-
-    new Setting(containerEl)
-      .setName("Screenshot background style")
-      .setDesc(
-        "Select the background style for the screenshot, when using 'Color' the color picker value will be used."
-      )
-      .addDropdown((dropdown) =>
-        dropdown
-          .setValue(this.plugin.settings.screenshotBgStyle)
-          .addOptions({
-            [ScreenshotBgStyle.Transparent]: "Transparent",
-            [ScreenshotBgStyle.Color]: "Color",
-            [ScreenshotBgStyle.Theme]: "Theme",
-          })
-          .onChange((value: ScreenshotBgStyle) => {
-            this.plugin.settings.screenshotBgStyle = value;
-            save();
-          })
-      )
-      .addColorPicker((colPicker) =>
-        colPicker
-          .setValue(this.plugin.settings.screenshotBgColor?.toString())
-          .onChange((value: string) => {
-            this.plugin.settings.screenshotBgColor = value;
             save();
           })
       );
