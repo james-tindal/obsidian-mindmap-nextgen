@@ -36,8 +36,8 @@ const DEFAULT_SETTINGS = {
   animationDuration: 500,
   maxWidth: 0,
   // below a beautiful dark blue color
-  screenshotBgColor: "#039614",
-  screenshotFgColor: "#ffffff",
+  screenshotBgColor: "#002b36",
+  screenshotFgColor: "#fdf6e3",
   screenshotFgColorEnabled: false,
   screenshotBgStyle: ScreenshotBgStyle.Transparent,
   screenshotTransparentBg: true,
