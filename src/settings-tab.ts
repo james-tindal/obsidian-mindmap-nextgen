@@ -100,19 +100,6 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Horizontal padding")
-      .setDesc("Leading space before the content of mind map nodes")
-      .addText((text) =>
-        text
-          .setValue(this.plugin.settings.paddingX?.toString())
-          .setPlaceholder("Example: 8")
-          .onChange((value: string) => {
-            this.plugin.settings.paddingX = Number.parseInt(value);
-            save();
-          })
-      );
-
-    new Setting(containerEl)
       .setName("Coloring approach")
       .setDesc(
         "The 'depth' changes the color on each level, 'branch' changes the color on each new branch"
