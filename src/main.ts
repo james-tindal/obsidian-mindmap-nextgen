@@ -15,13 +15,13 @@ const DEFAULT_SETTINGS = {
   spacingHorizontal: 80,
   paddingX: 8,
   color1: "#cb4b16",
-  color1Thickness: "8",
+  color1Thickness: "3",
 
   color2: "#6c71c4",
-  color2Thickness: "6",
+  color2Thickness: "1.5",
 
   color3: "#859900",
-  color3Thickness: "4",
+  color3Thickness: "1",
 
   defaultColor: "#b58900",
   defaultColorThickness: "1",
