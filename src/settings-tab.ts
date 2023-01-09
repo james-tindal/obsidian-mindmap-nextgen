@@ -357,7 +357,6 @@ export class MindMapSettingsTab extends PluginSettingTab {
             save();
           })
       );
-    console.log('load', this.plugin.settings.screenshotBgStyle)
 
     new Setting(containerEl)
       .setName("Highlight inline markmap")
