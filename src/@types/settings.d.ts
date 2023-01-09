@@ -23,9 +23,7 @@ type MindMapSettings = {
 
   initialExpandLevel: number;
 
-  onlyUseDefaultColor: boolean;
-
-  coloring: "depth" | "branch";
+  coloring: "depth" | "branch" | "single";
 
   colorFreezeLevel: number;
   animationDuration: number;
