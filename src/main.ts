@@ -14,17 +14,17 @@ const DEFAULT_SETTINGS = {
   spacingVertical: 5,
   spacingHorizontal: 80,
   paddingX: 8,
-  color1: "#fed766",
+  color1: "#cb4b16",
   color1Thickness: "8",
 
-  color2: "#2ab7ca",
+  color2: "#6c71c4",
   color2Thickness: "6",
 
-  color3: "#fe4a49",
+  color3: "#859900",
   color3Thickness: "4",
 
-  defaultColor: "#000",
-  defaultColorThickness: "2",
+  defaultColor: "#b58900",
+  defaultColorThickness: "1",
 
   initialExpandLevel: -1,
 

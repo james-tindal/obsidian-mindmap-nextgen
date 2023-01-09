@@ -116,7 +116,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Color 1")
+      .setName("Depth 1 color")
       .setDesc("Color for the first level of the mind map")
       .addColorPicker((colPicker) =>
         colPicker
@@ -128,8 +128,8 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Color 1 thickness")
-      .setDesc("Color 1 thickess in points (px)")
+      .setName("Depth 1 color thickness")
+      .setDesc("Depth 1 color thickness in points (px)")
       .addText((slider) =>
         slider
           .setValue(this.plugin.settings.color1Thickness)
@@ -142,7 +142,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Color 2")
+      .setName("Depth 2 color")
       .setDesc("Color for the second level of the mind map")
       .addColorPicker((colPicker) =>
         colPicker
@@ -154,8 +154,8 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Color 2 thickness")
-      .setDesc("Color 2 thickess in points (px)")
+      .setName("Depth 2 color thickness")
+      .setDesc("Depth 2 color thickess in points (px)")
       .addText((slider) =>
         slider
           .setValue(this.plugin.settings.color2Thickness)
@@ -166,7 +166,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Color 3")
+      .setName("Depth 3 color")
       .setDesc("Color for the third level of the mind map")
       .addColorPicker((colPicker) =>
         colPicker
@@ -178,8 +178,8 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Color 3 thickness")
-      .setDesc("Color 3 thickess in points (px)")
+      .setName("Depth 3 color thickness")
+      .setDesc("Depth 3 color thickess in points (px)")
       .addText((text) =>
         text
           .setValue(this.plugin.settings.color3Thickness)
