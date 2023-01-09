@@ -3,11 +3,27 @@ import { App, PluginSettingTab, Setting, SplitDirection } from "obsidian";
 import MindMap from "./main";
 import { ScreenshotBgStyle } from "./@types/screenshot";
 
+type ColorSettings = Record<number | 'default', Setting>
+
 export class MindMapSettingsTab extends PluginSettingTab {
   plugin: MindMap;
+  colorSettings: ColorSettings;
   constructor(app: App, plugin: MindMap) {
     super(app, plugin);
     this.plugin = plugin;
+    this.colorSettings = {} as ColorSettings;
+  }
+
+  decideDisplayColors() {
+    const approach = this.plugin.settings.coloring;
+    const colors = this.colorSettings;
+    const options = {
+      branch: [] as Setting[],
+      depth: [colors[1], colors[2], colors[3], colors.default],
+      single: [colors.default]
+    };
+    Object.values(this.colorSettings).forEach(setting => setting.settingEl.hidden = true);
+    options[approach].forEach(setting => setting.settingEl.hidden = false);
   }
 
   display(): void {
@@ -112,17 +128,6 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
-    function decide_display_colors(approach: MindMapSettings['coloring']) {
-      const all = [color_1, color_2, color_3, color_default]
-      const settings = {
-        branch: [],
-        depth: all,
-        single: [color_default]
-      }
-      all.forEach(setting => setting.settingEl.hidden = true)
-      settings[approach].forEach(setting => setting.settingEl.hidden = false)
-    }
-
     new Setting(containerEl)
     .setName("Coloring approach")
     .setDesc(
@@ -137,12 +142,11 @@ export class MindMapSettingsTab extends PluginSettingTab {
         .onChange((value: "branch" | "depth" | "single") => {
           this.plugin.settings.coloring = value;
           save();
-          decide_display_colors(value);
+          this.decideDisplayColors();
         })
     );
 
-    const color_1 =
-    new Setting(containerEl)
+    this.colorSettings[1] = new Setting(containerEl)
       .setName("Color 1")
       .setDesc("Color for the first level of the mind map")
       .addColorPicker((colPicker) =>
@@ -168,8 +172,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
-    const color_2 =
-    new Setting(containerEl)
+    this.colorSettings[2] = new Setting(containerEl)
       .setName("Color 2")
       .setDesc("Color for the second level of the mind map")
       .addColorPicker((colPicker) =>
@@ -193,8 +196,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
-    const color_3 =
-    new Setting(containerEl)
+    this.colorSettings[3] = new Setting(containerEl)
       .setName("Color 3")
       .setDesc("Color for the third level of the mind map")
       .addColorPicker((colPicker) =>
@@ -218,8 +220,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
-    const color_default =
-    new Setting(containerEl)
+    this.colorSettings.default = new Setting(containerEl)
       .setName("Default Color")
       .setDesc("Color for fourth level and beyond")
       .addColorPicker((colPicker) =>
@@ -375,6 +376,6 @@ export class MindMapSettingsTab extends PluginSettingTab {
         })
       );
 
-    decide_display_colors(this.plugin.settings.coloring)
+    this.decideDisplayColors();
   }
 }
