@@ -112,22 +112,36 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
-    new Setting(containerEl)
-      .setName("Coloring approach")
-      .setDesc(
-        "The 'depth' changes the color on each level, 'branch' changes the color on each new branch"
-      )
-      .addDropdown((dropDown) =>
-        dropDown
-          .addOption("depth", "Depth based coloring")
-          .addOption("branch", "Branch based coloring")
-          .setValue(this.plugin.settings.coloring || "depth")
-          .onChange((value: "branch" | "depth") => {
-            this.plugin.settings.coloring = value;
-            save();
-          })
-      );
+    function decide_display_colors(approach: MindMapSettings['coloring']) {
+      const all = [color_1, color_2, color_3, color_default]
+      const settings = {
+        branch: [],
+        depth: all,
+        single: [color_default]
+      }
+      all.forEach(setting => setting.settingEl.hidden = true)
+      settings[approach].forEach(setting => setting.settingEl.hidden = false)
+    }
 
+    new Setting(containerEl)
+    .setName("Coloring approach")
+    .setDesc(
+      "The 'depth' changes the color on each level, 'branch' changes the color on each new branch"
+    )
+    .addDropdown((dropDown) =>
+      dropDown
+        .addOption("depth", "Depth based coloring")
+        .addOption("branch", "Branch based coloring")
+        .addOption("single", "Single color")
+        .setValue(this.plugin.settings.coloring || "depth")
+        .onChange((value: "branch" | "depth" | "single") => {
+          this.plugin.settings.coloring = value;
+          save();
+          decide_display_colors(value);
+        })
+    );
+
+    const color_1 =
     new Setting(containerEl)
       .setName("Color 1")
       .setDesc("Color for the first level of the mind map")
@@ -154,6 +168,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
+    const color_2 =
     new Setting(containerEl)
       .setName("Color 2")
       .setDesc("Color for the second level of the mind map")
@@ -178,6 +193,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
+    const color_3 =
     new Setting(containerEl)
       .setName("Color 3")
       .setDesc("Color for the third level of the mind map")
@@ -202,6 +218,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
+    const color_default =
     new Setting(containerEl)
       .setName("Default Color")
       .setDesc("Color for fourth level and beyond")
@@ -222,18 +239,6 @@ export class MindMapSettingsTab extends PluginSettingTab {
           .setValue(this.plugin.settings.defaultColorThickness)
           .onChange((value) => {
             this.plugin.settings.defaultColorThickness = value;
-            save();
-          })
-      );
-
-    new Setting(containerEl)
-      .setName("Only use default color")
-      .setDesc("When on, all branches uses the default color")
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.onlyUseDefaultColor)
-          .onChange((value) => {
-            this.plugin.settings.onlyUseDefaultColor = value;
             save();
           })
       );
@@ -369,5 +374,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
           save();
         })
       );
+
+    decide_display_colors(this.plugin.settings.coloring)
   }
 }

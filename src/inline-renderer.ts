@@ -97,7 +97,7 @@ export const inlineRenderer: Renderer =
 
 function applyColor(frontmatterColors: string[], settings: MindMapSettings) {
   return ({ depth }: INode) => {
-    if (settings.onlyUseDefaultColor) return settings.defaultColor;
+    if (settings.coloring == "single") return settings.defaultColor;
 
     const colors = frontmatterColors?.length
       ? frontmatterColors

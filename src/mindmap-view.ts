@@ -273,7 +273,7 @@ export default class MindmapView extends ItemView {
 
   applyColor(frontmatterColors: string[]) {
     return ({ depth }: INode) => {
-      if (this.settings.onlyUseDefaultColor) return this.settings.defaultColor;
+      if (this.settings.coloring == "single") return this.settings.defaultColor;
 
       const colors = frontmatterColors?.length
         ? frontmatterColors

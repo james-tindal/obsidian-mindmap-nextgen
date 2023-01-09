@@ -7,7 +7,7 @@ import { inlineRenderer } from "./inline-renderer";
 
 import { ScreenshotBgStyle } from "./@types/screenshot";
 
-const DEFAULT_SETTINGS = {
+const DEFAULT_SETTINGS: MindMapSettings = {
   splitDirection: "horizontal",
   nodeMinHeight: 16,
   lineHeight: "1em",
@@ -27,8 +27,6 @@ const DEFAULT_SETTINGS = {
   defaultColorThickness: "2",
 
   initialExpandLevel: -1,
-
-  onlyUseDefaultColor: false,
 
   coloring: "depth",
 
