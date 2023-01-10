@@ -31,7 +31,6 @@ export default class MindmapView extends ItemView {
   emptyDiv: HTMLDivElement;
   svg: SVGElement;
   obsMarkmap: ObsidianMarkmap;
-  isLeafPinned: boolean = false;
   pinAction: HTMLElement;
   settings: MindMapSettings;
   currentTransform: ZoomTransform;
@@ -59,8 +58,8 @@ export default class MindmapView extends ItemView {
       .addItem((item) =>
         item
           .setIcon("pin")
-          .setTitle(this.isLeafPinned ? "Unpin" : "Pin" )
-          .onClick(() => this.isLeafPinned ? this.unPin() : this.pinCurrentLeaf())
+          .setTitle(this.leaf.getViewState().pinned ? "Unpin" : "Pin" )
+          .onClick(() => this.leaf.getViewState().pinned ? this.unPin() : this.pinCurrentLeaf())
       )
       .addItem((item) =>
         item
@@ -197,7 +196,6 @@ export default class MindmapView extends ItemView {
   }
 
   pinCurrentLeaf() {
-    this.isLeafPinned = true;
     this.pinAction = this.addAction(
       "filled-pin",
       "Pin",
@@ -208,7 +206,6 @@ export default class MindmapView extends ItemView {
   }
 
   unPin() {
-    this.isLeafPinned = false;
     this.pinAction.parentNode.removeChild(this.pinAction);
   }
 
