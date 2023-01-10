@@ -197,19 +197,11 @@ export default class MindmapView extends ItemView {
   }
 
   pinCurrentLeaf() {
-    this.isLeafPinned = true;
-    this.pinAction = this.addAction(
-      "filled-pin",
-      "Pin",
-      () => this.unPin(),
-      20
-    );
-    this.pinAction.addClass("is-active");
+    this.leaf.setPinned(true);
   }
 
   unPin() {
-    this.isLeafPinned = false;
-    this.pinAction.parentNode.removeChild(this.pinAction);
+    this.leaf.setPinned(false);
   }
 
   collapseAll() {
