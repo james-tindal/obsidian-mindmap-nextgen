@@ -3,6 +3,7 @@ type IMarkmapJSONOptions = import("markmap-common").IMarkmapJSONOptions;
 
 type FrontmatterOptions = Partial<IMarkmapOptions> & {
   screenshotTextColor?: string;
+  screenshotBgColor: string;
   highlight?: boolean;
 };
 
@@ -14,6 +15,7 @@ type TokenWithChildren = Remarkable.Remarkable.Token & {
 type CustomFrontmatter = {
   markmap: IMarkmapJSONOptions & {
     screenshotTextColor: string;
+    screenshotBgColor: string;
     highlight?: boolean;
   };
 };

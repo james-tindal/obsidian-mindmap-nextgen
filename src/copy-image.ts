@@ -39,17 +39,21 @@ function getScreenshotSettings(
   themeColors: ThemeColors
 ): ScreenshotSettings {
 
-  const backgroundColor = {
+  const pluginSettingsBGC = {
     [ScreenshotBgStyle.Transparent]: "transparent",
     [ScreenshotBgStyle.Color]: pluginSettings.screenshotBgColor,
     [ScreenshotBgStyle.Theme]: themeColors.background
-  }[pluginSettings.screenshotBgStyle]
+  }[ pluginSettings.screenshotBgStyle ]
+
+  const frontmatterBGC = frontmatterOptions?.screenshotBgColor
+
+  const backgroundColor = frontmatterBGC || pluginSettingsBGC
 
   const textColor =
     frontmatterOptions?.screenshotTextColor ||
     pluginSettings.screenshotTextColorEnabled && pluginSettings.screenshotTextColor ||
     themeColors.text
-
+  
   return { backgroundColor, textColor }
 }
 

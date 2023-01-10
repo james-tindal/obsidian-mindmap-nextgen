@@ -232,16 +232,17 @@ export default class MindmapView extends ItemView {
 
       const actualFrontmatter = frontmatter as CustomFrontmatter;
 
-      const options = deriveOptions(frontmatter?.markmap);
+      const markmapOptions = deriveOptions(frontmatter?.markmap);
       this.frontmatterOptions = {
-        ...options,
+        ...markmapOptions,
         screenshotTextColor: actualFrontmatter?.markmap?.screenshotTextColor,
+        screenshotBgColor: actualFrontmatter?.markmap?.screenshotBgColor,
       };
 
       if (styles) loadCSS(styles);
       if (scripts) loadJS(scripts);
 
-      this.renderMarkmap(root, options, frontmatter?.markmap ?? {});
+      this.renderMarkmap(root, markmapOptions, frontmatter?.markmap ?? {});
 
       this.displayText =
         this.file.name != undefined
