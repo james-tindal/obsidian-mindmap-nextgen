@@ -235,7 +235,7 @@ export default class MindmapView extends ItemView {
       const options = deriveOptions(frontmatter?.markmap);
       this.frontmatterOptions = {
         ...options,
-        screenshotFgColor: actualFrontmatter?.markmap?.screenshotFgColor,
+        screenshotTextColor: actualFrontmatter?.markmap?.screenshotTextColor,
       };
 
       if (styles) loadCSS(styles);

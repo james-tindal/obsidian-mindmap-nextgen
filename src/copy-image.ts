@@ -24,18 +24,18 @@ export function copyImageToClipboard(
       break;
   }
 
-  const screenshotFgColorSource = frontmatterOptions?.screenshotFgColor
+  const screenshotTextColorSource = frontmatterOptions?.screenshotTextColor
     ? "frontmatter"
     : "settings";
 
-  let oldForeground: string;
+  let oldTextColor: string;
   if (
-    settings.screenshotFgColorEnabled ||
-    screenshotFgColorSource === "frontmatter"
+    settings.screenshotTextColorEnabled ||
+    screenshotTextColorSource === "frontmatter"
   ) {
-    oldForeground = setForeground(
+    oldTextColor = setTextColor(
       currentMm,
-      frontmatterOptions?.screenshotFgColor || settings.screenshotFgColor
+      frontmatterOptions?.screenshotTextColor || settings.screenshotTextColor
     );
   }
   currentMm.fit().then(() => {
@@ -47,10 +47,10 @@ export function copyImageToClipboard(
       quality: 1,
     }).then((output) => {
       if (
-        settings.screenshotFgColorEnabled ||
-        screenshotFgColorSource === "frontmatter"
+        settings.screenshotTextColorEnabled ||
+        screenshotTextColorSource === "frontmatter"
       ) {
-        setForeground(currentMm, oldForeground);
+        setTextColor(currentMm, oldTextColor);
       }
 
       const blob = dataURItoBlob(output);
@@ -64,27 +64,27 @@ export function copyImageToClipboard(
   });
 }
 
-function setForeground(currentMm: Markmap, foreground: string) {
+function setTextColor(currentMm: Markmap, textColor: string) {
   const svg = currentMm.svg;
 
-  let oldForeground = svg.style("color");
+  let oldTextColor = svg.style("color");
   svg
     .node()
     .querySelectorAll("div")
     .forEach((div) => {
-      oldForeground = oldForeground || div.style.color;
+      oldTextColor = oldTextColor || div.style.color;
     });
 
-  svg.style("color", foreground);
+  svg.style("color", textColor);
 
   svg
     .node()
     .querySelectorAll("div")
     .forEach((div) => {
-      div.style.color = foreground;
+      div.style.color = textColor;
     });
 
-  return oldForeground;
+  return oldTextColor;
 }
 
 function dataURItoBlob(dataURI: string) {
