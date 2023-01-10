@@ -262,8 +262,22 @@ export default class MindmapView extends ItemView {
     }
   }
 
+  sanitiseMarkdown(markdown: string) {
+    // Remove info string from code fence unless it is "js" or "javascript"
+    // transformer.transform can't handle other languages
+    const allowedLanguages = ["js", "javascript", "css", "html"]
+    return markdown.replace(/```(.+)/, (_, capture) => {
+      const backticks = capture.match(/(`*).*/)?.[1]
+      const infoString = capture.match(/`*(.*)/)?.[1]
+      const t = infoString?.trim()
+      const sanitisedInfoString = allowedLanguages.includes(t) ? t : ""
+      return "```" + (backticks || "") + sanitisedInfoString
+    })
+  }
+
   async transformMarkdown(markdown: string) {
-    let { root, features, frontmatter } = this.transformer.transform(markdown);
+    const sanitisedMarkdown = this.sanitiseMarkdown(markdown)
+    let { root, features, frontmatter } = this.transformer.transform(sanitisedMarkdown);
 
     const { scripts, styles } = this.transformer.getUsedAssets(features);
 
