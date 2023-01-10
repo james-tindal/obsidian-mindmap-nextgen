@@ -31,7 +31,6 @@ export default class MindmapView extends ItemView {
   emptyDiv: HTMLDivElement;
   svg: SVGElement;
   obsMarkmap: ObsidianMarkmap;
-  isLeafPinned: boolean = false;
   pinAction: HTMLElement;
   settings: MindMapSettings;
   currentTransform: ZoomTransform;
