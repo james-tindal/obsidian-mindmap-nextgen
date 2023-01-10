@@ -31,7 +31,6 @@ export default class MindmapView extends ItemView {
   emptyDiv: HTMLDivElement;
   svg: SVGElement;
   obsMarkmap: ObsidianMarkmap;
-  pinAction: HTMLElement;
   settings: MindMapSettings;
   currentTransform: ZoomTransform;
   markmapSVG: Markmap;
@@ -154,18 +153,23 @@ export default class MindmapView extends ItemView {
     const editorChange: (
       editor: Editor,
       markdownView: MarkdownView
-    ) => any = async (editor) => {
+    ) => any = (editor) => {
       const content = editor.getValue();
-      await this.update(content);
+      const pinned = this.leaf.getViewState().pinned
+      if (! pinned) this.update(content);
     };
 
     const debouncedEditorChange = debounce(editorChange, 300, true);
 
     this.listeners = [
       this.workspace.on("editor-change", debouncedEditorChange),
-      this.workspace.on("file-open", async (file) => {
+      this.workspace.on("file-open", (file) => {
         this.file = file;
-        await this.update();
+        const pinned = this.leaf.getViewState().pinned
+        if (! pinned) this.update();
+      }),
+      this.leaf.on("pinned-change", (pinned) => {
+        if (! pinned) this.update();
       }),
     ];
   }
