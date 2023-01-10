@@ -19,7 +19,7 @@ import { ZoomTransform } from "d3-zoom";
 import { MD_VIEW_TYPE, MM_VIEW_TYPE } from "./constants";
 import ObsidianMarkmap from "./obsidian-markmap-plugin";
 import { createSVG, getComputedCss, removeExistingSVG } from "./markmap-svg";
-import { copyImageToClipboard } from "./copy-image";
+import { takeScreenshot } from "./copy-image";
 import { htmlEscapePlugin, checkBoxPlugin } from "./plugins";
 
 export default class MindmapView extends ItemView {
@@ -67,7 +67,7 @@ export default class MindmapView extends ItemView {
           .setIcon("image-file")
           .setTitle("Copy screenshot")
           .onClick(() =>
-            copyImageToClipboard(
+            takeScreenshot(
               this.settings,
               this.markmapSVG,
               this.frontmatterOptions

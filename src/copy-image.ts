@@ -4,76 +4,61 @@ import d3SvgToPng from "d3-svg-to-png";
 
 import { ScreenshotBgStyle } from "./@types/screenshot";
 
-export function copyImageToClipboard(
-  settings: MindMapSettings,
+interface ScreenshotSettings {
+  backgroundColor: string
+  textColor: string
+}
+
+interface ThemeColors {
+  text: string,
+  background: string
+}
+
+export async function takeScreenshot(
+  pluginSettings: MindMapSettings,
   currentMm: Markmap,
   frontmatterOptions: FrontmatterOptions
 ) {
-  let background: string;
-  switch (settings.screenshotBgStyle) {
-    case ScreenshotBgStyle.Transparent:
-      background = "transparent";
-      break;
-    case ScreenshotBgStyle.Color:
-      background = settings.screenshotBgColor;
-      break;
-    case ScreenshotBgStyle.Theme:
-      const computed = getComputedStyle(currentMm.svg.node().parentElement);
-
-      background = computed.backgroundColor;
-      break;
-  }
-
-  const screenshotTextColorSource = frontmatterOptions?.screenshotTextColor
-    ? "frontmatter"
-    : "settings";
-
-  let oldTextColor: string;
-  if (
-    settings.screenshotTextColorEnabled ||
-    screenshotTextColorSource === "frontmatter"
-  ) {
-    oldTextColor = setTextColor(
-      currentMm,
-      frontmatterOptions?.screenshotTextColor || settings.screenshotTextColor
-    );
-  }
-  currentMm.fit().then(() => {
-    d3SvgToPng("#markmap", "markmap.png", {
-      scale: 3,
-      format: "png",
-      download: false,
-      background,
-      quality: 1,
-    }).then((output) => {
-      if (
-        settings.screenshotTextColorEnabled ||
-        screenshotTextColorSource === "frontmatter"
-      ) {
-        setTextColor(currentMm, oldTextColor);
-      }
-
-      const blob = dataURItoBlob(output);
-
-      navigator.clipboard
-        .write([new ClipboardItem({ "image/png": blob })])
-        .then(() => {
-          new Notice("Image copied to clipboard");
-        });
-    });
-  });
+  const themeColors = getThemeColors(currentMm);
+  const screenshotSettings = getScreenshotSettings(pluginSettings, frontmatterOptions, themeColors);
+  prepareSvgDom(screenshotSettings, currentMm);
+  const pngDataUrl: string = await createPng(screenshotSettings, currentMm);
+  restoreSvgDom(themeColors, currentMm);
+  copyImageToClipboard(pngDataUrl);
 }
 
-function setTextColor(currentMm: Markmap, textColor: string) {
-  const svg = currentMm.svg;
+const getThemeColors = (currentMm: Markmap): ThemeColors => ({
+  // Could probably get these colours without depending on currentMm
+  text: currentMm.svg.style("color"),
+  background: getComputedStyle(currentMm.svg.node().parentElement).backgroundColor
+})
 
-  let oldTextColor = svg.style("color");
-  svg
-    .node()
-    .querySelectorAll("div")
-    .forEach((div) => {
-      oldTextColor = oldTextColor || div.style.color;
-    });
+function getScreenshotSettings(
+  pluginSettings: MindMapSettings,
+  frontmatterOptions: FrontmatterOptions,
+  themeColors: ThemeColors
+): ScreenshotSettings {
+
+  const backgroundColor = {
+    [ScreenshotBgStyle.Transparent]: "transparent",
+    [ScreenshotBgStyle.Color]: pluginSettings.screenshotBgColor,
+    [ScreenshotBgStyle.Theme]: themeColors.background
+  }[pluginSettings.screenshotBgStyle]
+
+  const textColor =
+    frontmatterOptions?.screenshotTextColor ||
+    pluginSettings.screenshotTextColorEnabled && pluginSettings.screenshotTextColor ||
+    themeColors.text
+
+  return { backgroundColor, textColor }
+}
+
+function prepareSvgDom({ textColor }: ScreenshotSettings, currentMm: Markmap) {
+  setTextColor(textColor, currentMm)
+}
+
+function setTextColor(textColor: string, currentMm: Markmap) {
+  const svg = currentMm.svg
 
   svg.style("color", textColor);
 
@@ -83,8 +68,31 @@ function setTextColor(currentMm: Markmap, textColor: string) {
     .forEach((div) => {
       div.style.color = textColor;
     });
+}
 
-  return oldTextColor;
+function createPng({ backgroundColor }: ScreenshotSettings, currentMm: Markmap) {
+  return currentMm.fit().then(() => 
+    d3SvgToPng("#markmap", "markmap.png", {
+      scale: 3,
+      format: "png",
+      download: false,
+      background: backgroundColor,
+      quality: 1,
+    }))
+}
+
+function restoreSvgDom(themeColors: ThemeColors, currentMm: Markmap) {
+  setTextColor(themeColors.text, currentMm)
+}
+
+function copyImageToClipboard(pngDataUrl: string) {
+  const blob = dataURItoBlob(pngDataUrl);
+
+  navigator.clipboard
+    .write([new ClipboardItem({ "image/png": blob })])
+    .then(() => {
+      new Notice("Image copied to clipboard");
+    });
 }
 
 function dataURItoBlob(dataURI: string) {
