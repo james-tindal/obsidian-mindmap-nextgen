@@ -22,7 +22,7 @@ A similar plugin is available for [Visual Studio Code](https://marketplace.visua
 - [x] Copy preview to clipboard as PNG image
 - [x] Implements Katex (LaTex plugin)
 - [x] Implements checkmarks (such as this list)
-- [x] Has branch coloring branch and depth coloring branch approaches
+- [x] Has branch coloring and depth coloring approaches
 - [x] Avoids XSS injection.
 
 #### Below an preview image with the default content of the official [markmap website](https://markmap.js.org/repl) try it out. Just with the `maxWidth` option.
@@ -52,15 +52,42 @@ You can open the Mind Map preview for the current note with a command.
 
 The plugin also accepts frontmatter options (each of the [official markmap docs](https://markmap.js.org/docs/json-options) except for `extraJs` and `extraCss`). Frontmatter options has higher priority than the settings from the settings tab which means that if you set `maxWidth` on settings to 400px and on frontmatter to 200px, the maxWidth will be set to 200px.
 
-The colors you list will always be used, no matter which coloring approach is set. Only colorFreezeLevel that only works with branch coloring approach. It is good to note that when using branch coloring approach and no color is listed, random colors will be used (as the default Markmap approach).
+The settings in each document's frontmatter take priority over those selected in your plugin settings.
 
 It is also good to note that the frontmatter only works for that markdown it is in. If you open another Markdown file without frontmatter, the settings from settings tab will be used.
 
-More than the default frontmatter options, it also supports another options (and may be upcomming more options):
+As well as the default frontmatter options, it also supports these other options (and maybe more soon):
 
 **screenshotTextColor:** Set the text color of the screenshot. It accepts any valid CSS color (hex, color name, rgb, rgba and hsl). This color is applied to screenshots only, and not while using the plugin.
 
 **highlight:** A boolean option that allows you to activate a border and a different background color for the inline markmap. If the frontmatter setting is present, it will have higher priority than the settings tab.
+
+**titleAsRootNode:** Set the ["Use title as root node" option](#document-title-as-root-node) for this document.
+
+**Example:**
+```markdown
+---
+markmap:
+  screenshotFgColor: #28F48D
+  highlight: true
+  titleAsRootNode: true
+---
+```
+
+### Coloring approaches
+There are three approaches to coloring the branches of the mind map for you to choose from, either in plugin settings or each document's frontmatter.
+
+#### Branch coloring
+This mode will choose random different colors per branch. The "Color freeze level" setting decides at what depth the branches will stop picking new colors.
+
+#### Depth coloring
+In this mode, branches are coloured depending on their depth level. In your plugin settings, you can choose the first three levels' colors, plus a default color for levels deeper than three.
+
+#### Single color
+In this mode, all branches are colored with a single color, which you can choose in your plugin settings.
+
+#### Branch thickness
+Regardless which coloring approach you choose, you can set branch thickness for the first three depth levels, and a default thickness for levels beyond that.
 
 ### Inline Markmap
 
@@ -161,6 +188,18 @@ Places a copy of the Mind Map SVG on your clipboard allowing you to paste it int
 #### Collapse all
 
 Hides all nodes except the root.
+
+### Document title as root node
+
+Select "Use title as root node" in plugin settings to generate mind maps with the title at the bottom level, so you can avoid repeating the title.
+You can also enable this setting per document by putting ```titleAsRootNode: true``` inside a ```markmap:``` block in the frontmatter at the top of your document.
+```markdown
+---
+markmap:
+   titleAsRootNode: true
+---
+document text
+```
 
 ## Compatibility
 
