@@ -40,6 +40,7 @@ export default class MindmapView extends ItemView {
   frontmatterOptions: FrontmatterOptions;
   hasFit: boolean;
   toolbar: HTMLElement;
+  pinned: boolean = false;
 
   getViewType(): string {
     return MM_VIEW_TYPE;
@@ -58,8 +59,8 @@ export default class MindmapView extends ItemView {
       .addItem((item) =>
         item
           .setIcon("pin")
-          .setTitle(this.leaf.getViewState().pinned ? "Unpin" : "Pin" )
-          .onClick(() => this.leaf.getViewState().pinned ? this.unPin() : this.pinCurrentLeaf())
+          .setTitle(this.pinned ? "Unpin" : "Pin" )
+          .onClick(() => this.pinned ? this.unPin() : this.pinCurrentLeaf())
       )
       .addItem((item) =>
         item
@@ -108,6 +109,8 @@ export default class MindmapView extends ItemView {
     this.createToolbar();
 
     this.setListenersUp();
+
+    this.leaf.on('pinned-change', (pinned) => this.pinned = pinned)
   }
 
   createMarkmapSvg() {
