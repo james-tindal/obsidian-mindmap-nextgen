@@ -59,7 +59,7 @@ export default class MindmapView extends ItemView {
       .addItem((item) =>
         item
           .setIcon("pin")
-          .setTitle(this.pinned ? "Unpin" : "Pin" )
+          .setTitle(this.pinned ? "Unpin" : "Pin")
           .onClick(() => this.pinned ? this.unPin() : this.pinCurrentLeaf())
       )
       .addItem((item) =>
