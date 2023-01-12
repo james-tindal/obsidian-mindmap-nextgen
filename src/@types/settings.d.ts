@@ -32,8 +32,8 @@ type MindMapSettings = {
   maxWidth: number;
 
   screenshotBgColor: string;
-  screenshotFgColor: string;
-  screenshotFgColorEnabled: boolean;
+  screenshotTextColor: string;
+  screenshotTextColorEnabled: boolean;
   screenshotBgStyle: ScreenshotBgStyle;
   screenshotTransparentBg: boolean;
   highlight: boolean;

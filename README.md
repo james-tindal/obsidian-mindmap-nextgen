@@ -58,9 +58,9 @@ It is also good to note that the frontmatter only works for that markdown it is 
 
 More than the default frontmatter options, it also supports another options (and may be upcomming more options):
 
-**screenshotFgColor:** Is an option that allows you to set the foreground color of the screenshot. It accepts any valid CSS color (hex, color name, rgb, rgba and hsl). It's nice to remember that this color is applied to screenshot only, and not while using the plugin.
+**screenshotTextColor:** Set the text color of the screenshot. It accepts any valid CSS color (hex, color name, rgb, rgba and hsl). This color is applied to screenshots only, and not while using the plugin.
 
-**highlight:** A boolean option that allows you to activate a border and a different background color for the inline markmap. It is good to note that if frontmatter is present, it will have higher priority than the settings tab.
+**highlight:** A boolean option that allows you to activate a border and a different background color for the inline markmap. If the frontmatter setting is present, it will have higher priority than the settings tab.
 
 ### Inline Markmap
 
@@ -115,7 +115,7 @@ This plugin can also render and display checkboxes, which can be the default lis
 ```
 ---
 markmap:
-  screenshotFgColor: red
+  screenshotTextColor: red
   highlight: false
 ---
 

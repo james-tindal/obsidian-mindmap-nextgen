@@ -19,7 +19,7 @@ import { ZoomTransform } from "d3-zoom";
 import { MD_VIEW_TYPE, MM_VIEW_TYPE } from "./constants";
 import ObsidianMarkmap from "./obsidian-markmap-plugin";
 import { createSVG, getComputedCss, removeExistingSVG } from "./markmap-svg";
-import { copyImageToClipboard } from "./copy-image";
+import { takeScreenshot } from "./copy-image";
 import { htmlEscapePlugin, checkBoxPlugin } from "./plugins";
 
 export default class MindmapView extends ItemView {
@@ -31,8 +31,6 @@ export default class MindmapView extends ItemView {
   emptyDiv: HTMLDivElement;
   svg: SVGElement;
   obsMarkmap: ObsidianMarkmap;
-  isLeafPinned: boolean = false;
-  pinAction: HTMLElement;
   settings: MindMapSettings;
   currentTransform: ZoomTransform;
   markmapSVG: Markmap;
@@ -41,6 +39,7 @@ export default class MindmapView extends ItemView {
   frontmatterOptions: FrontmatterOptions;
   hasFit: boolean;
   toolbar: HTMLElement;
+  pinned: boolean = false;
 
   getViewType(): string {
     return MM_VIEW_TYPE;
@@ -59,15 +58,15 @@ export default class MindmapView extends ItemView {
       .addItem((item) =>
         item
           .setIcon("pin")
-          .setTitle("Pin")
-          .onClick(() => this.pinCurrentLeaf())
+          .setTitle(this.pinned ? "Unpin" : "Pin")
+          .onClick(() => this.pinned ? this.unPin() : this.pinCurrentLeaf())
       )
       .addItem((item) =>
         item
           .setIcon("image-file")
           .setTitle("Copy screenshot")
           .onClick(() =>
-            copyImageToClipboard(
+            takeScreenshot(
               this.settings,
               this.markmapSVG,
               this.frontmatterOptions
@@ -109,6 +108,8 @@ export default class MindmapView extends ItemView {
     this.createToolbar();
 
     this.setListenersUp();
+
+    this.leaf.on('pinned-change', (pinned) => this.pinned = pinned)
   }
 
   createMarkmapSvg() {
@@ -155,18 +156,23 @@ export default class MindmapView extends ItemView {
     const editorChange: (
       editor: Editor,
       markdownView: MarkdownView
-    ) => any = async (editor) => {
+    ) => any = (editor) => {
       const content = editor.getValue();
-      await this.update(content);
+      const pinned = this.leaf.getViewState().pinned
+      if (! pinned) this.update(content);
     };
 
     const debouncedEditorChange = debounce(editorChange, 300, true);
 
     this.listeners = [
       this.workspace.on("editor-change", debouncedEditorChange),
-      this.workspace.on("file-open", async (file) => {
+      this.workspace.on("file-open", (file) => {
         this.file = file;
-        await this.update();
+        const pinned = this.leaf.getViewState().pinned
+        if (! pinned) this.update();
+      }),
+      this.leaf.on("pinned-change", (pinned) => {
+        if (! pinned) this.update();
       }),
     ];
   }
@@ -197,19 +203,11 @@ export default class MindmapView extends ItemView {
   }
 
   pinCurrentLeaf() {
-    this.isLeafPinned = true;
-    this.pinAction = this.addAction(
-      "filled-pin",
-      "Pin",
-      () => this.unPin(),
-      20
-    );
-    this.pinAction.addClass("is-active");
+    this.leaf.setPinned(true);
   }
 
   unPin() {
-    this.isLeafPinned = false;
-    this.pinAction.parentNode.removeChild(this.pinAction);
+    this.leaf.setPinned(false);
   }
 
   collapseAll() {
@@ -232,16 +230,17 @@ export default class MindmapView extends ItemView {
 
       const actualFrontmatter = frontmatter as CustomFrontmatter;
 
-      const options = deriveOptions(frontmatter?.markmap);
+      const markmapOptions = deriveOptions(frontmatter?.markmap);
       this.frontmatterOptions = {
-        ...options,
-        screenshotFgColor: actualFrontmatter?.markmap?.screenshotFgColor,
+        ...markmapOptions,
+        screenshotTextColor: actualFrontmatter?.markmap?.screenshotTextColor,
+        screenshotBgColor: actualFrontmatter?.markmap?.screenshotBgColor,
       };
 
       if (styles) loadCSS(styles);
       if (scripts) loadJS(scripts);
 
-      this.renderMarkmap(root, options, frontmatter?.markmap ?? {});
+      this.renderMarkmap(root, markmapOptions, frontmatter?.markmap ?? {});
 
       this.displayText =
         this.file.name != undefined
@@ -262,8 +261,22 @@ export default class MindmapView extends ItemView {
     }
   }
 
+  sanitiseMarkdown(markdown: string) {
+    // Remove info string from code fence unless it is "js" or "javascript"
+    // transformer.transform can't handle other languages
+    const allowedLanguages = ["js", "javascript", "css", "html"]
+    return markdown.replace(/```(.+)/, (_, capture) => {
+      const backticks = capture.match(/(`*).*/)?.[1]
+      const infoString = capture.match(/`*(.*)/)?.[1]
+      const t = infoString?.trim()
+      const sanitisedInfoString = allowedLanguages.includes(t) ? t : ""
+      return "```" + (backticks || "") + sanitisedInfoString
+    })
+  }
+
   async transformMarkdown(markdown: string) {
-    let { root, features, frontmatter } = this.transformer.transform(markdown);
+    const sanitisedMarkdown = this.sanitiseMarkdown(markdown)
+    let { root, features, frontmatter } = this.transformer.transform(sanitisedMarkdown);
 
     const { scripts, styles } = this.transformer.getUsedAssets(features);
 

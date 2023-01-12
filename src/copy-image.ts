@@ -4,87 +4,99 @@ import d3SvgToPng from "d3-svg-to-png";
 
 import { ScreenshotBgStyle } from "./@types/screenshot";
 
-export function copyImageToClipboard(
-  settings: MindMapSettings,
+interface ScreenshotSettings {
+  backgroundColor: string;
+  textColor: string;
+}
+
+interface ThemeColors {
+  text: string,
+  background: string;
+}
+
+export async function takeScreenshot(
+  pluginSettings: MindMapSettings,
   currentMm: Markmap,
   frontmatterOptions: FrontmatterOptions
 ) {
-  let background: string;
-  switch (settings.screenshotBgStyle) {
-    case ScreenshotBgStyle.Transparent:
-      background = "transparent";
-      break;
-    case ScreenshotBgStyle.Color:
-      background = settings.screenshotBgColor;
-      break;
-    case ScreenshotBgStyle.Theme:
-      const computed = getComputedStyle(currentMm.svg.node().parentElement);
+  const themeColors = getThemeColors(currentMm);
+  const screenshotSettings = getScreenshotSettings(pluginSettings, frontmatterOptions, themeColors);
+  prepareSvgDom(screenshotSettings, currentMm);
+  const pngDataUrl: string = await createPng(screenshotSettings, currentMm);
+  restoreSvgDom(themeColors, currentMm);
+  copyImageToClipboard(pngDataUrl);
+}
 
-      background = computed.backgroundColor;
-      break;
-  }
+const getThemeColors = (currentMm: Markmap): ThemeColors => ({
+  // Could probably get these colours without depending on currentMm
+  text: currentMm.svg.style("color"),
+  background: getComputedStyle(currentMm.svg.node().parentElement).backgroundColor
+});
 
-  const screenshotFgColorSource = frontmatterOptions?.screenshotFgColor
-    ? "frontmatter"
-    : "settings";
+function getScreenshotSettings(
+  pluginSettings: MindMapSettings,
+  frontmatterOptions: FrontmatterOptions,
+  themeColors: ThemeColors
+): ScreenshotSettings {
 
-  let oldForeground: string;
-  if (
-    settings.screenshotFgColorEnabled ||
-    screenshotFgColorSource === "frontmatter"
-  ) {
-    oldForeground = setForeground(
-      currentMm,
-      frontmatterOptions?.screenshotFgColor || settings.screenshotFgColor
-    );
-  }
-  currentMm.fit().then(() => {
+  const pluginSettingsBGC = {
+    [ScreenshotBgStyle.Transparent]: "transparent",
+    [ScreenshotBgStyle.Color]: pluginSettings.screenshotBgColor,
+    [ScreenshotBgStyle.Theme]: themeColors.background
+  }[ pluginSettings.screenshotBgStyle ];
+
+  const frontmatterBGC = frontmatterOptions?.screenshotBgColor;
+
+  const backgroundColor = frontmatterBGC || pluginSettingsBGC;
+
+  const textColor =
+    frontmatterOptions?.screenshotTextColor ||
+    pluginSettings.screenshotTextColorEnabled && pluginSettings.screenshotTextColor ||
+    themeColors.text;
+
+  return { backgroundColor, textColor };
+}
+
+function prepareSvgDom({ textColor }: ScreenshotSettings, currentMm: Markmap) {
+  setTextColor(textColor, currentMm);
+}
+
+function setTextColor(textColor: string, currentMm: Markmap) {
+  const svg = currentMm.svg;
+
+  svg.style("color", textColor);
+
+  svg
+    .node()
+    .querySelectorAll("div")
+    .forEach((div) => {
+      div.style.color = textColor;
+    });
+}
+
+function createPng({ backgroundColor }: ScreenshotSettings, currentMm: Markmap) {
+  return currentMm.fit().then(() =>
     d3SvgToPng("#markmap", "markmap.png", {
       scale: 3,
       format: "png",
       download: false,
-      background,
+      background: backgroundColor,
       quality: 1,
-    }).then((output) => {
-      if (
-        settings.screenshotFgColorEnabled ||
-        screenshotFgColorSource === "frontmatter"
-      ) {
-        setForeground(currentMm, oldForeground);
-      }
-
-      const blob = dataURItoBlob(output);
-
-      navigator.clipboard
-        .write([new ClipboardItem({ "image/png": blob })])
-        .then(() => {
-          new Notice("Image copied to clipboard");
-        });
-    });
-  });
+    }));
 }
 
-function setForeground(currentMm: Markmap, foreground: string) {
-  const svg = currentMm.svg;
+function restoreSvgDom(themeColors: ThemeColors, currentMm: Markmap) {
+  setTextColor(themeColors.text, currentMm);
+}
 
-  let oldForeground = svg.style("color");
-  svg
-    .node()
-    .querySelectorAll("div")
-    .forEach((div) => {
-      oldForeground = oldForeground || div.style.color;
+function copyImageToClipboard(pngDataUrl: string) {
+  const blob = dataURItoBlob(pngDataUrl);
+
+  navigator.clipboard
+    .write([new ClipboardItem({ "image/png": blob })])
+    .then(() => {
+      new Notice("Image copied to clipboard");
     });
-
-  svg.style("color", foreground);
-
-  svg
-    .node()
-    .querySelectorAll("div")
-    .forEach((div) => {
-      div.style.color = foreground;
-    });
-
-  return oldForeground;
 }
 
 function dataURItoBlob(dataURI: string) {

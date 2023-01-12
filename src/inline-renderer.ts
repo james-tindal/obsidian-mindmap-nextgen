@@ -44,10 +44,10 @@ export const inlineRenderer: Renderer =
 
       const actualFrontmatter = frontmatter as CustomFrontmatter;
 
-      const derivedFrontmatter = deriveOptions(frontmatter?.markmap ?? {});
+      const markmapFrontmatter = deriveOptions(frontmatter?.markmap ?? {});
 
-      const frontmatterOptions: FrontmatterOptions = {
-        ...derivedFrontmatter,
+      const frontmatterOptions: Partial<FrontmatterOptions> = {
+        ...markmapFrontmatter,
         highlight: actualFrontmatter?.markmap?.highlight,
       };
 
@@ -84,7 +84,7 @@ export const inlineRenderer: Renderer =
         paddingX: settings.paddingX ?? 8,
         embedGlobalCSS: true,
         fitRatio: 1,
-        ...derivedFrontmatter,
+        ...markmapFrontmatter,
       };
 
       const mm = Markmap.create(svg, { ...options });
