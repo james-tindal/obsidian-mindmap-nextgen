@@ -255,7 +255,6 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
-
     // add toggle to use transparent background for screenshot or not
     new Setting(containerEl)
       .setName("Screenshot background style")
