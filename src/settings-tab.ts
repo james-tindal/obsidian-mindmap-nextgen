@@ -281,23 +281,23 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Screenshot foreground color")
+      .setName("Screenshot text color")
       .setDesc(
-        "Foreground color for the screenshot. Toggle the switch on and off to disable/enable this color on the screenshot."
+        "Text color for the screenshot. Toggle the switch on and off to disable/enable this color on the screenshot."
       )
       .addColorPicker((colPicker) =>
         colPicker
-          .setValue(this.plugin.settings.screenshotFgColor?.toString())
+          .setValue(this.plugin.settings.screenshotTextColor?.toString())
           .onChange((value: string) => {
-            this.plugin.settings.screenshotFgColor = value;
+            this.plugin.settings.screenshotTextColor = value;
             save();
           })
       )
       .addToggle((toggle) =>
         toggle
-          .setValue(this.plugin.settings.screenshotFgColorEnabled)
+          .setValue(this.plugin.settings.screenshotTextColorEnabled)
           .onChange((value) => {
-            this.plugin.settings.screenshotFgColorEnabled = value;
+            this.plugin.settings.screenshotTextColorEnabled = value;
             save();
           })
       );

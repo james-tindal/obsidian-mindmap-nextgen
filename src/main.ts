@@ -37,10 +37,10 @@ const DEFAULT_SETTINGS = {
   maxWidth: 0,
   // below a beautiful dark blue color
   screenshotBgColor: "#039614",
-  screenshotFgColor: "#ffffff",
-  screenshotFgColorEnabled: false,
   screenshotBgStyle: ScreenshotBgStyle.Transparent,
   screenshotTransparentBg: true,
+  screenshotTextColor: "#ffffff",
+  screenshotTextColorEnabled: false,
   highlight: true,
 };
 
