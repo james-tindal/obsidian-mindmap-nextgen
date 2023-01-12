@@ -338,12 +338,12 @@ export class MindMapSettingsTab extends PluginSettingTab {
       )
       .addDropdown((dropdown) =>
         dropdown
-          .setValue(this.plugin.settings.screenshotBgStyle)
           .addOptions({
             [ScreenshotBgStyle.Transparent]: "Transparent",
             [ScreenshotBgStyle.Color]: "Color",
             [ScreenshotBgStyle.Theme]: "Theme",
           })
+          .setValue(this.plugin.settings.screenshotBgStyle)
           .onChange((value: ScreenshotBgStyle) => {
             this.plugin.settings.screenshotBgStyle = value;
             save();
