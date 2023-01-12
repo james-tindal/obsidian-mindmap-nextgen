@@ -5,13 +5,13 @@ import d3SvgToPng from "d3-svg-to-png";
 import { ScreenshotBgStyle } from "./@types/screenshot";
 
 interface ScreenshotSettings {
-  backgroundColor: string
-  textColor: string
+  backgroundColor: string;
+  textColor: string;
 }
 
 interface ThemeColors {
   text: string,
-  background: string
+  background: string;
 }
 
 export async function takeScreenshot(
@@ -31,7 +31,7 @@ const getThemeColors = (currentMm: Markmap): ThemeColors => ({
   // Could probably get these colours without depending on currentMm
   text: currentMm.svg.style("color"),
   background: getComputedStyle(currentMm.svg.node().parentElement).backgroundColor
-})
+});
 
 function getScreenshotSettings(
   pluginSettings: MindMapSettings,
@@ -43,26 +43,26 @@ function getScreenshotSettings(
     [ScreenshotBgStyle.Transparent]: "transparent",
     [ScreenshotBgStyle.Color]: pluginSettings.screenshotBgColor,
     [ScreenshotBgStyle.Theme]: themeColors.background
-  }[ pluginSettings.screenshotBgStyle ]
+  }[ pluginSettings.screenshotBgStyle ];
 
-  const frontmatterBGC = frontmatterOptions?.screenshotBgColor
+  const frontmatterBGC = frontmatterOptions?.screenshotBgColor;
 
-  const backgroundColor = frontmatterBGC || pluginSettingsBGC
+  const backgroundColor = frontmatterBGC || pluginSettingsBGC;
 
   const textColor =
     frontmatterOptions?.screenshotTextColor ||
     pluginSettings.screenshotTextColorEnabled && pluginSettings.screenshotTextColor ||
-    themeColors.text
-  
-  return { backgroundColor, textColor }
+    themeColors.text;
+
+  return { backgroundColor, textColor };
 }
 
 function prepareSvgDom({ textColor }: ScreenshotSettings, currentMm: Markmap) {
-  setTextColor(textColor, currentMm)
+  setTextColor(textColor, currentMm);
 }
 
 function setTextColor(textColor: string, currentMm: Markmap) {
-  const svg = currentMm.svg
+  const svg = currentMm.svg;
 
   svg.style("color", textColor);
 
@@ -75,18 +75,18 @@ function setTextColor(textColor: string, currentMm: Markmap) {
 }
 
 function createPng({ backgroundColor }: ScreenshotSettings, currentMm: Markmap) {
-  return currentMm.fit().then(() => 
+  return currentMm.fit().then(() =>
     d3SvgToPng("#markmap", "markmap.png", {
       scale: 3,
       format: "png",
       download: false,
       background: backgroundColor,
       quality: 1,
-    }))
+    }));
 }
 
 function restoreSvgDom(themeColors: ThemeColors, currentMm: Markmap) {
-  setTextColor(themeColors.text, currentMm)
+  setTextColor(themeColors.text, currentMm);
 }
 
 function copyImageToClipboard(pngDataUrl: string) {
