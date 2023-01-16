@@ -3,7 +3,6 @@ import {
   ItemView,
   Menu,
   TFile,
-  Vault,
   Workspace,
   WorkspaceLeaf,
   debounce,
@@ -16,13 +15,14 @@ import { INode, IMarkmapOptions, IMarkmapJSONOptions } from "markmap-common";
 import { Toolbar } from "markmap-toolbar";
 import { ZoomTransform } from "d3-zoom";
 
-import { MD_VIEW_TYPE, MM_VIEW_TYPE } from "./constants";
+import { MM_VIEW_TYPE } from "./constants";
 import ObsidianMarkmap from "./obsidian-markmap-plugin";
-import { createSVG, getComputedCss, removeExistingSVG } from "./markmap-svg";
+import { createSVG, getComputedCss } from "./markmap-svg";
 import { takeScreenshot } from "./copy-image";
 import { htmlEscapePlugin, checkBoxPlugin } from "./plugins";
+import { MindMapSettings } from "./@types/settings";
 
-export default class MindmapView extends ItemView {
+export default class View extends ItemView {
   file: TFile;
   linkedLeaf: WorkspaceLeaf;
   displayText: string;
@@ -189,7 +189,7 @@ export default class MindmapView extends ItemView {
     this.listeners.forEach((listener) => this.workspace.offref(listener));
   }
 
-  async updateLinkedLeaf(group: string, mmView: MindmapView) {
+  async updateLinkedLeaf(group: string, mmView: View) {
     if (group === null) {
       mmView.linkedLeaf = undefined;
       return;

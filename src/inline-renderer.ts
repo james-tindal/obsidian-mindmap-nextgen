@@ -5,6 +5,7 @@ import { Markmap, loadCSS, loadJS, deriveOptions } from "markmap-view";
 import { IMarkmapJSONOptions, IMarkmapOptions, INode } from "markmap-common";
 
 import { getComputedCss } from "./markmap-svg";
+import { MindMapSettings } from "./@types/settings";
 
 type Renderer = (
   settings: MindMapSettings

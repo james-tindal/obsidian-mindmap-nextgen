@@ -1,14 +1,14 @@
 import { App, PluginSettingTab, Setting, SplitDirection } from "obsidian";
+import { ScreenshotBgStyle } from "./@types/settings";
 
-import MindMap from "./main";
-import { ScreenshotBgStyle } from "./@types/screenshot";
+import Plugin from "./main";
 
 type ColorSettings = Record<number | 'default', Setting>
 
-export class MindMapSettingsTab extends PluginSettingTab {
-  plugin: MindMap;
+export class SettingsTab extends PluginSettingTab {
+  plugin: Plugin;
   colorSettings: ColorSettings;
-  constructor(app: App, plugin: MindMap) {
+  constructor(app: App, plugin: Plugin) {
     super(app, plugin);
     this.plugin = plugin;
     this.colorSettings = {} as ColorSettings;
