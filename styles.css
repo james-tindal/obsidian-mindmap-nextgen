@@ -81,3 +81,7 @@ color: black;
 .markmap-toolbar-container .mm-toolbar .mm-toolbar-item:hover {
 color: brown;
 }
+
+[hidden] {
+    display: none;
+}

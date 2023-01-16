@@ -3,11 +3,27 @@ import { App, PluginSettingTab, Setting, SplitDirection } from "obsidian";
 import MindMap from "./main";
 import { ScreenshotBgStyle } from "./@types/screenshot";
 
+type ColorSettings = Record<number | 'default', Setting>
+
 export class MindMapSettingsTab extends PluginSettingTab {
   plugin: MindMap;
+  colorSettings: ColorSettings;
   constructor(app: App, plugin: MindMap) {
     super(app, plugin);
     this.plugin = plugin;
+    this.colorSettings = {} as ColorSettings;
+  }
+
+  decideDisplayColors() {
+    const approach = this.plugin.settings.coloring;
+    const colors = this.colorSettings;
+    const options = {
+      branch: [] as Setting[],
+      depth: [colors[1], colors[2], colors[3], colors.default],
+      single: [colors.default]
+    };
+    Object.values(this.colorSettings).forEach(setting => setting.settingEl.hidden = true);
+    options[approach].forEach(setting => setting.settingEl.hidden = false);
   }
 
   display(): void {
@@ -141,7 +157,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
-    new Setting(containerEl)
+    this.colorSettings[2] = new Setting(containerEl)
       .setName("Depth 2 color")
       .setDesc("Color for the second level of the mind map")
       .addColorPicker((colPicker) =>
@@ -165,7 +181,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
-    new Setting(containerEl)
+    this.colorSettings[3] = new Setting(containerEl)
       .setName("Depth 3 color")
       .setDesc("Color for the third level of the mind map")
       .addColorPicker((colPicker) =>
@@ -189,7 +205,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
-    new Setting(containerEl)
+    this.colorSettings.default = new Setting(containerEl)
       .setName("Default Color")
       .setDesc("Color for fourth level and beyond")
       .addColorPicker((colPicker) =>
@@ -209,18 +225,6 @@ export class MindMapSettingsTab extends PluginSettingTab {
           .setValue(this.plugin.settings.defaultColorThickness)
           .onChange((value) => {
             this.plugin.settings.defaultColorThickness = value;
-            save();
-          })
-      );
-
-    new Setting(containerEl)
-      .setName("Only use default color")
-      .setDesc("When on, all branches uses the default color")
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.onlyUseDefaultColor)
-          .onChange((value) => {
-            this.plugin.settings.onlyUseDefaultColor = value;
             save();
           })
       );
@@ -344,5 +348,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
           save();
         })
       );
+
+    this.decideDisplayColors();
   }
 }
