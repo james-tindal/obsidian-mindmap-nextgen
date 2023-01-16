@@ -2,7 +2,7 @@ import { Notice } from "obsidian";
 import { Markmap } from "markmap-view";
 import d3SvgToPng from "d3-svg-to-png";
 
-import { ScreenshotBgStyle } from "./@types/screenshot";
+import { MindMapSettings, ScreenshotBgStyle } from "./@types/settings";
 
 interface ScreenshotSettings {
   backgroundColor: string;
