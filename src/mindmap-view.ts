@@ -290,7 +290,7 @@ export default class View extends ItemView {
 
       const colors = frontmatterColors?.length
         ? frontmatterColors
-        : [this.settings.color1, this.settings.color2, this.settings.color3];
+        : [this.settings.depth1Color, this.settings.depth2Color, this.settings.depth3Color];
 
       if (frontmatterColors?.length) return colors[depth % colors.length];
       else
@@ -304,10 +304,10 @@ export default class View extends ItemView {
     if (!this.svg) return;
 
     const colors = [
-      this.settings.color1Thickness,
-      this.settings.color2Thickness,
-      this.settings.color3Thickness,
-      this.settings.defaultColorThickness,
+      this.settings.depth1Thickness,
+      this.settings.depth2Thickness,
+      this.settings.depth3Thickness,
+      this.settings.defaultThickness,
     ];
 
     this.svg

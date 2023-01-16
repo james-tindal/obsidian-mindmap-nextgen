@@ -102,7 +102,7 @@ function applyColor(frontmatterColors: string[], settings: MindMapSettings) {
 
     const colors = frontmatterColors?.length
       ? frontmatterColors
-      : [settings.color1, settings.color2, settings.color3];
+      : [settings.depth1Color, settings.depth2Color, settings.depth3Color];
 
     if (frontmatterColors?.length) return colors[depth % colors.length];
     else return depth < colors.length ? colors[depth] : settings.defaultColor;
