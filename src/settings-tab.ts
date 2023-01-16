@@ -128,8 +128,8 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Depth 1 color thickness")
-      .setDesc("Depth 1 color thickness in points (px)")
+      .setName("Depth 1 thickness")
+      .setDesc("Depth 1 thickness in points (px)")
       .addText((slider) =>
         slider
           .setValue(this.plugin.settings.color1Thickness)
@@ -154,8 +154,8 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Depth 2 color thickness")
-      .setDesc("Depth 2 color thickess in points (px)")
+      .setName("Depth 2 thickness")
+      .setDesc("Depth 2 thickness in points (px)")
       .addText((slider) =>
         slider
           .setValue(this.plugin.settings.color2Thickness)
@@ -178,8 +178,8 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Depth 3 color thickness")
-      .setDesc("Depth 3 color thickess in points (px)")
+      .setName("Depth 3 thickness")
+      .setDesc("Depth 3 thickness in points (px)")
       .addText((text) =>
         text
           .setValue(this.plugin.settings.color3Thickness)
@@ -202,8 +202,8 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Default color thickness")
-      .setDesc("Default color thickess in points (px)")
+      .setName("Default thickness")
+      .setDesc("Default thickness in points (px)")
       .addText((slider) =>
         slider
           .setValue(this.plugin.settings.defaultColorThickness)
