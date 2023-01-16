@@ -13,17 +13,18 @@ export type MindMapSettings = {
   spacingVertical: number;
   spacingHorizontal: number;
   paddingX: number;
-  color1: string;
-  color1Thickness: string;
 
-  color2: string;
-  color2Thickness: string;
+  depth1Color: string;
+  depth1Thickness: string;
 
-  color3: string;
-  color3Thickness: string;
+  depth2Color: string;
+  depth2Thickness: string;
+
+  depth3Color: string;
+  depth3Thickness: string;
 
   defaultColor: string;
-  defaultColorThickness: string;
+  defaultThickness: string;
 
   initialExpandLevel: number;
 
@@ -48,17 +49,18 @@ export const DEFAULT_SETTINGS: MindMapSettings = {
   spacingVertical: 5,
   spacingHorizontal: 80,
   paddingX: 8,
-  color1: "#fed766",
-  color1Thickness: "8",
 
-  color2: "#2ab7ca",
-  color2Thickness: "6",
+  depth1Color: "#cb4b16",
+  depth1Thickness: "3",
 
-  color3: "#fe4a49",
-  color3Thickness: "4",
+  depth2Color: "#6c71c4",
+  depth2Thickness: "1.5",
 
-  defaultColor: "#000",
-  defaultColorThickness: "2",
+  depth3Color: "#859900",
+  depth3Thickness: "1",
+
+  defaultColor: "#b58900",
+  defaultThickness: "1",
 
   initialExpandLevel: -1,
 

@@ -134,75 +134,75 @@ export class SettingsTab extends PluginSettingTab {
     );
 
     this.colorSettings[1] = new Setting(containerEl)
-      .setName("Color 1")
+      .setName("Depth 1 color")
       .setDesc("Color for the first level of the mind map")
       .addColorPicker((colPicker) =>
         colPicker
-          .setValue(this.plugin.settings.color1?.toString())
+          .setValue(this.plugin.settings.depth1Color?.toString())
           .onChange((value: string) => {
-            this.plugin.settings.color1 = value;
+            this.plugin.settings.depth1Color = value;
             save();
           })
       );
 
     new Setting(containerEl)
-      .setName("Color 1 thickness")
-      .setDesc("Color 1 thickess in points (px)")
+      .setName("Depth 1 thickness")
+      .setDesc("Depth 1 thickness in pixels")
       .addText((slider) =>
         slider
-          .setValue(this.plugin.settings.color1Thickness)
+          .setValue(this.plugin.settings.depth1Thickness)
           .onChange((value) => {
             if (Boolean(parseFloat(value.replace(/[^0-9\.]/g, "")))) {
-              this.plugin.settings.color1Thickness = value;
+              this.plugin.settings.depth1Thickness = value;
               save();
             }
           })
       );
 
     this.colorSettings[2] = new Setting(containerEl)
-      .setName("Color 2")
+      .setName("Depth 2 color")
       .setDesc("Color for the second level of the mind map")
       .addColorPicker((colPicker) =>
         colPicker
-          .setValue(this.plugin.settings.color2?.toString())
+          .setValue(this.plugin.settings.depth2Color?.toString())
           .onChange((value: string) => {
-            this.plugin.settings.color2 = value;
+            this.plugin.settings.depth2Color = value;
             save();
           })
       );
 
     new Setting(containerEl)
-      .setName("Color 2 thickness")
-      .setDesc("Color 2 thickess in points (px)")
+      .setName("Depth 2 thickness")
+      .setDesc("Depth 2 thickness in pixels")
       .addText((slider) =>
         slider
-          .setValue(this.plugin.settings.color2Thickness)
+          .setValue(this.plugin.settings.depth2Thickness)
           .onChange((value) => {
-            this.plugin.settings.color2Thickness = value;
+            this.plugin.settings.depth2Thickness = value;
             save();
           })
       );
 
     this.colorSettings[3] = new Setting(containerEl)
-      .setName("Color 3")
+      .setName("Depth 3 color")
       .setDesc("Color for the third level of the mind map")
       .addColorPicker((colPicker) =>
         colPicker
-          .setValue(this.plugin.settings.color3?.toString())
+          .setValue(this.plugin.settings.depth3Color?.toString())
           .onChange((value: string) => {
-            this.plugin.settings.color3 = value;
+            this.plugin.settings.depth3Color = value;
             save();
           })
       );
 
     new Setting(containerEl)
       .setName("Color 3 thickness")
-      .setDesc("Color 3 thickess in points (px)")
+      .setDesc("Color 3 thickness in pixels")
       .addText((text) =>
         text
-          .setValue(this.plugin.settings.color3Thickness)
+          .setValue(this.plugin.settings.depth3Thickness)
           .onChange((value) => {
-            this.plugin.settings.color3Thickness = value;
+            this.plugin.settings.depth3Thickness = value;
             save();
           })
       );
@@ -220,13 +220,13 @@ export class SettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Default color thickness")
-      .setDesc("Default color thickess in points (px)")
+      .setName("Default thickness")
+      .setDesc("Thickness for levels deeper than three, in pixels")
       .addText((slider) =>
         slider
-          .setValue(this.plugin.settings.defaultColorThickness)
+          .setValue(this.plugin.settings.defaultThickness)
           .onChange((value) => {
-            this.plugin.settings.defaultColorThickness = value;
+            this.plugin.settings.defaultThickness = value;
             save();
           })
       );
@@ -249,7 +249,7 @@ export class SettingsTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Color freeze level")
       .setDesc(
-        "Freeze color at the specified level of branches, i.e. all child branches will use the color of their ancestor node at the freeze level."
+        "All child branches will use the color of their ancestor node beyond the freeze level."
       )
       .addText((text) =>
         text
