@@ -275,18 +275,6 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Screenshot background color")
-      .setDesc("Background color for the screenshot")
-      .addColorPicker((colPicker) =>
-        colPicker
-          .setValue(this.plugin.settings.screenshotBgColor?.toString())
-          .onChange((value: string) => {
-            this.plugin.settings.screenshotBgColor = value;
-            save();
-          })
-      );
-
-    new Setting(containerEl)
       .setName("Screenshot text color")
       .setDesc(
         "Text color for the screenshot. Toggle the switch on and off to disable/enable this color on the screenshot."
@@ -307,6 +295,33 @@ export class MindMapSettingsTab extends PluginSettingTab {
             save();
           })
       );
+      
+      new Setting(containerEl)
+        .setName("Screenshot background style")
+        .setDesc(
+          "Select the background style for the screenshot, when using 'Color' the color picker value will be used."
+        )
+        .addDropdown((dropdown) =>
+          dropdown
+            .addOptions({
+              [ScreenshotBgStyle.Transparent]: "Transparent",
+              [ScreenshotBgStyle.Color]: "Color",
+              [ScreenshotBgStyle.Theme]: "Theme",
+            })
+            .setValue(this.plugin.settings.screenshotBgStyle)
+            .onChange((value: ScreenshotBgStyle) => {
+              this.plugin.settings.screenshotBgStyle = value;
+              save();
+            })
+        )
+        .addColorPicker((colPicker) =>
+          colPicker
+            .setValue(this.plugin.settings.screenshotBgColor?.toString())
+            .onChange((value: string) => {
+              this.plugin.settings.screenshotBgColor = value;
+              save();
+            })
+        );
 
     // animation duration
     new Setting(containerEl)
@@ -332,34 +347,6 @@ export class MindMapSettingsTab extends PluginSettingTab {
           .setPlaceholder("Example: 130")
           .onChange((value: string) => {
             this.plugin.settings.maxWidth = Number.parseInt(value);
-            save();
-          })
-      );
-    // add toggle to use transparent background for screenshot or not
-
-    new Setting(containerEl)
-      .setName("Screenshot background style")
-      .setDesc(
-        "Select the background style for the screenshot, when using 'Color' the color picker value will be used."
-      )
-      .addDropdown((dropdown) =>
-        dropdown
-          .addOptions({
-            [ScreenshotBgStyle.Transparent]: "Transparent",
-            [ScreenshotBgStyle.Color]: "Color",
-            [ScreenshotBgStyle.Theme]: "Theme",
-          })
-          .setValue(this.plugin.settings.screenshotBgStyle)
-          .onChange((value: ScreenshotBgStyle) => {
-            this.plugin.settings.screenshotBgStyle = value;
-            save();
-          })
-      )
-      .addColorPicker((colPicker) =>
-        colPicker
-          .setValue(this.plugin.settings.screenshotBgColor?.toString())
-          .onChange((value: string) => {
-            this.plugin.settings.screenshotBgColor = value;
             save();
           })
       );
