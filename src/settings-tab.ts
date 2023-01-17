@@ -1,6 +1,5 @@
 import { App, PluginSettingTab, Setting, SplitDirection } from "obsidian";
 import { ScreenshotBgStyle } from "./@types/settings";
-import * as obs from "obsidian";
 
 import Plugin from "./main";
 

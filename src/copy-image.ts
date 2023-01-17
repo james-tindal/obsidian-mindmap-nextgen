@@ -28,7 +28,6 @@ export async function takeScreenshot(
 }
 
 const getThemeColors = (currentMm: Markmap): ThemeColors => ({
-  // Could probably get these colours without depending on currentMm
   text: currentMm.svg.style("color"),
   background: getComputedStyle(currentMm.svg.node().parentElement).backgroundColor
 });
