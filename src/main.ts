@@ -5,7 +5,7 @@ import { MM_VIEW_TYPE } from "./constants";
 import { SettingsTab } from "./settings-tab";
 import { inlineRenderer } from "./inline-renderer";
 
-import { DEFAULT_SETTINGS, MindMapSettings, ScreenshotBgStyle } from "./@types/settings";
+import { DEFAULT_SETTINGS, MindMapSettings } from "./@types/settings";
 
 export default class Plugin extends ObsidianPlugin {
   vault: Vault;
