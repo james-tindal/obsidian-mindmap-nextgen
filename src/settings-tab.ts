@@ -1,9 +1,10 @@
 import { App, PluginSettingTab, Setting, SplitDirection } from "obsidian";
 import { ScreenshotBgStyle } from "./@types/settings";
+import * as obs from "obsidian";
 
 import Plugin from "./main";
 
-type ColorSettings = Record<number | 'default', Setting>
+type ColorSettings = Record<number | 'default' | 'freeze', Setting>
 
 export class SettingsTab extends PluginSettingTab {
   plugin: Plugin;
@@ -17,8 +18,9 @@ export class SettingsTab extends PluginSettingTab {
   decideDisplayColors() {
     const approach = this.plugin.settings.coloring;
     const colors = this.colorSettings;
+    const freeze = this.colorSettings.freeze;
     const options = {
-      branch: [] as Setting[],
+      branch: [freeze],
       depth: [colors[1], colors[2], colors[3], colors.default],
       single: [colors.default]
     };
@@ -116,122 +118,6 @@ export class SettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-    .setName("Coloring approach")
-    .setDesc(
-      "The 'depth' changes the color on each level, 'branch' changes the color on each new branch"
-    )
-    .addDropdown((dropDown) =>
-      dropDown
-        .addOption("depth", "Depth based coloring")
-        .addOption("branch", "Branch based coloring")
-        .addOption("single", "Single color")
-        .setValue(this.plugin.settings.coloring || "depth")
-        .onChange((value: "branch" | "depth" | "single") => {
-          this.plugin.settings.coloring = value;
-          save();
-          this.decideDisplayColors();
-        })
-    );
-
-    this.colorSettings[1] = new Setting(containerEl)
-      .setName("Depth 1 color")
-      .setDesc("Color for the first level of the mind map")
-      .addColorPicker((colPicker) =>
-        colPicker
-          .setValue(this.plugin.settings.depth1Color?.toString())
-          .onChange((value: string) => {
-            this.plugin.settings.depth1Color = value;
-            save();
-          })
-      );
-
-    new Setting(containerEl)
-      .setName("Depth 1 thickness")
-      .setDesc("Depth 1 thickness in pixels")
-      .addText((slider) =>
-        slider
-          .setValue(this.plugin.settings.depth1Thickness)
-          .onChange((value) => {
-            if (Boolean(parseFloat(value.replace(/[^0-9\.]/g, "")))) {
-              this.plugin.settings.depth1Thickness = value;
-              save();
-            }
-          })
-      );
-
-    this.colorSettings[2] = new Setting(containerEl)
-      .setName("Depth 2 color")
-      .setDesc("Color for the second level of the mind map")
-      .addColorPicker((colPicker) =>
-        colPicker
-          .setValue(this.plugin.settings.depth2Color?.toString())
-          .onChange((value: string) => {
-            this.plugin.settings.depth2Color = value;
-            save();
-          })
-      );
-
-    new Setting(containerEl)
-      .setName("Depth 2 thickness")
-      .setDesc("Depth 2 thickness in pixels")
-      .addText((slider) =>
-        slider
-          .setValue(this.plugin.settings.depth2Thickness)
-          .onChange((value) => {
-            this.plugin.settings.depth2Thickness = value;
-            save();
-          })
-      );
-
-    this.colorSettings[3] = new Setting(containerEl)
-      .setName("Depth 3 color")
-      .setDesc("Color for the third level of the mind map")
-      .addColorPicker((colPicker) =>
-        colPicker
-          .setValue(this.plugin.settings.depth3Color?.toString())
-          .onChange((value: string) => {
-            this.plugin.settings.depth3Color = value;
-            save();
-          })
-      );
-
-    new Setting(containerEl)
-      .setName("Color 3 thickness")
-      .setDesc("Color 3 thickness in pixels")
-      .addText((text) =>
-        text
-          .setValue(this.plugin.settings.depth3Thickness)
-          .onChange((value) => {
-            this.plugin.settings.depth3Thickness = value;
-            save();
-          })
-      );
-
-    this.colorSettings.default = new Setting(containerEl)
-      .setName("Default Color")
-      .setDesc("Color for fourth level and beyond")
-      .addColorPicker((colPicker) =>
-        colPicker
-          .setValue(this.plugin.settings.defaultColor?.toString())
-          .onChange((value: string) => {
-            this.plugin.settings.defaultColor = value;
-            save();
-          })
-      );
-
-    new Setting(containerEl)
-      .setName("Default thickness")
-      .setDesc("Thickness for levels deeper than three, in pixels")
-      .addText((slider) =>
-        slider
-          .setValue(this.plugin.settings.defaultThickness)
-          .onChange((value) => {
-            this.plugin.settings.defaultThickness = value;
-            save();
-          })
-      );
-
-    new Setting(containerEl)
       .setName("Initial expand level")
       .setDesc(
         "Sets the initial depth of the mind map. 0 means all nodes are collapsed, 1 means only the root node is expanded, etc.\nTo expand all nodes, set this to -1."
@@ -242,21 +128,6 @@ export class SettingsTab extends PluginSettingTab {
           .setPlaceholder("Example: 2")
           .onChange((value: string) => {
             this.plugin.settings.initialExpandLevel = Number.parseInt(value);
-            save();
-          })
-      );
-
-    new Setting(containerEl)
-      .setName("Color freeze level")
-      .setDesc(
-        "All child branches will use the color of their ancestor node beyond the freeze level."
-      )
-      .addText((text) =>
-        text
-          .setValue(this.plugin.settings.colorFreezeLevel?.toString())
-          .setPlaceholder("Example: 3")
-          .onChange((value: string) => {
-            this.plugin.settings.colorFreezeLevel = Number.parseInt(value);
             save();
           })
       );
@@ -349,6 +220,141 @@ export class SettingsTab extends PluginSettingTab {
           save();
         })
       );
+
+      new Setting(containerEl)
+        .setHeading()
+        .setName('Coloring approach')
+
+      new Setting(containerEl)
+      .setName("Coloring approach")
+      .setDesc(
+        "The 'depth' changes the color on each level, 'branch' changes the color on each new branch"
+      )
+      .addDropdown((dropDown) =>
+        dropDown
+          .addOption("depth", "Depth based coloring")
+          .addOption("branch", "Branch based coloring")
+          .addOption("single", "Single color")
+          .setValue(this.plugin.settings.coloring || "depth")
+          .onChange((value: "branch" | "depth" | "single") => {
+            this.plugin.settings.coloring = value;
+            save();
+            this.decideDisplayColors();
+          })
+      );
+  
+      this.colorSettings[1] = new Setting(containerEl)
+        .setName("Depth 1 color")
+        .setDesc("Color for the first level of the mind map")
+        .addColorPicker((colPicker) =>
+          colPicker
+            .setValue(this.plugin.settings.depth1Color?.toString())
+            .onChange((value: string) => {
+              this.plugin.settings.depth1Color = value;
+              save();
+            })
+        );
+  
+      new Setting(containerEl)
+        .setName("Depth 1 thickness")
+        .setDesc("Depth 1 thickness in pixels")
+        .addText((slider) =>
+          slider
+            .setValue(this.plugin.settings.depth1Thickness)
+            .onChange((value) => {
+              if (Boolean(parseFloat(value.replace(/[^0-9\.]/g, "")))) {
+                this.plugin.settings.depth1Thickness = value;
+                save();
+              }
+            })
+        );
+  
+      this.colorSettings[2] = new Setting(containerEl)
+        .setName("Depth 2 color")
+        .setDesc("Color for the second level of the mind map")
+        .addColorPicker((colPicker) =>
+          colPicker
+            .setValue(this.plugin.settings.depth2Color?.toString())
+            .onChange((value: string) => {
+              this.plugin.settings.depth2Color = value;
+              save();
+            })
+        );
+  
+      new Setting(containerEl)
+        .setName("Depth 2 thickness")
+        .setDesc("Depth 2 thickness in pixels")
+        .addText((slider) =>
+          slider
+            .setValue(this.plugin.settings.depth2Thickness)
+            .onChange((value) => {
+              this.plugin.settings.depth2Thickness = value;
+              save();
+            })
+        );
+  
+      this.colorSettings[3] = new Setting(containerEl)
+        .setName("Depth 3 color")
+        .setDesc("Color for the third level of the mind map")
+        .addColorPicker((colPicker) =>
+          colPicker
+            .setValue(this.plugin.settings.depth3Color?.toString())
+            .onChange((value: string) => {
+              this.plugin.settings.depth3Color = value;
+              save();
+            })
+        );
+  
+      new Setting(containerEl)
+        .setName("Color 3 thickness")
+        .setDesc("Color 3 thickness in pixels")
+        .addText((text) =>
+          text
+            .setValue(this.plugin.settings.depth3Thickness)
+            .onChange((value) => {
+              this.plugin.settings.depth3Thickness = value;
+              save();
+            })
+        );
+  
+      this.colorSettings.default = new Setting(containerEl)
+        .setName("Default Color")
+        .setDesc("Color for fourth level and beyond")
+        .addColorPicker((colPicker) =>
+          colPicker
+            .setValue(this.plugin.settings.defaultColor?.toString())
+            .onChange((value: string) => {
+              this.plugin.settings.defaultColor = value;
+              save();
+            })
+        );
+  
+      new Setting(containerEl)
+        .setName("Default thickness")
+        .setDesc("Thickness for levels deeper than three, in pixels")
+        .addText((slider) =>
+          slider
+            .setValue(this.plugin.settings.defaultThickness)
+            .onChange((value) => {
+              this.plugin.settings.defaultThickness = value;
+              save();
+            })
+        );
+  
+      this.colorSettings.freeze = new Setting(containerEl)
+        .setName("Color freeze level")
+        .setDesc(
+          "All child branches will use the color of their ancestor node beyond the freeze level."
+        )
+        .addText((text) =>
+          text
+            .setValue(this.plugin.settings.colorFreezeLevel?.toString())
+            .setPlaceholder("Example: 3")
+            .onChange((value: string) => {
+              this.plugin.settings.colorFreezeLevel = Number.parseInt(value);
+              save();
+            })
+        );
 
     this.decideDisplayColors();
   }
