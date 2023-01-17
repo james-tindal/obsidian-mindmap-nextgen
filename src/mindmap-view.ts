@@ -1,14 +1,4 @@
-import {
-  EventRef,
-  ItemView,
-  Menu,
-  TFile,
-  Workspace,
-  WorkspaceLeaf,
-  debounce,
-  MarkdownView,
-  Editor,
-} from "obsidian";
+import { EventRef, ItemView, Menu, TFile, Workspace, WorkspaceLeaf, debounce, MarkdownView, Editor } from "obsidian";
 import { Transformer, builtInPlugins } from "markmap-lib";
 import { Markmap, loadCSS, loadJS, deriveOptions } from "markmap-view";
 import { INode, IMarkmapOptions, IMarkmapJSONOptions } from "markmap-common";
@@ -40,6 +30,29 @@ export default class View extends ItemView {
   hasFit: boolean;
   toolbar: HTMLElement;
   pinned: boolean = false;
+
+  constructor(settings: MindMapSettings, leaf: WorkspaceLeaf) {
+    super(leaf);
+    this.settings = settings;
+    this.workspace = this.app.workspace;
+
+    this.transformer = new Transformer([
+      ...builtInPlugins,
+      htmlEscapePlugin,
+      checkBoxPlugin,
+    ]);
+    this.svg = createSVG(this.containerEl, this.settings.lineHeight);
+
+    this.hasFit = false;
+
+    this.createMarkmapSvg();
+
+    this.createToolbar();
+
+    this.setListenersUp();
+
+    this.leaf.on('pinned-change', (pinned) => this.pinned = pinned)
+  }
 
   getViewType(): string {
     return MM_VIEW_TYPE;
@@ -87,29 +100,6 @@ export default class View extends ItemView {
       );
 
     menu.showAtPosition({ x: 0, y: 0 });
-  }
-
-  constructor(settings: MindMapSettings, leaf: WorkspaceLeaf) {
-    super(leaf);
-    this.settings = settings;
-    this.workspace = this.app.workspace;
-
-    this.transformer = new Transformer([
-      ...builtInPlugins,
-      htmlEscapePlugin,
-      checkBoxPlugin,
-    ]);
-    this.svg = createSVG(this.containerEl, this.settings.lineHeight);
-
-    this.hasFit = false;
-
-    this.createMarkmapSvg();
-
-    this.createToolbar();
-
-    this.setListenersUp();
-
-    this.leaf.on('pinned-change', (pinned) => this.pinned = pinned)
   }
 
   createMarkmapSvg() {
@@ -341,7 +331,7 @@ export default class View extends ItemView {
       const { font, color: computedColor } = getComputedCss(this.containerEl);
 
       const colorFn =
-        this.settings.coloring === "depth"
+        this.settings.coloring !== "depth"
           ? this.applyColor(frontmatter?.color)
           : color;
 
@@ -357,11 +347,9 @@ export default class View extends ItemView {
         initialExpandLevel: this.settings.initialExpandLevel ?? -1,
         maxWidth: this.settings.maxWidth ?? 0,
         duration: this.settings.animationDuration ?? 500,
+        color: colorFn
       };
 
-      if (colorFn) {
-        this.options.color = colorFn;
-      }
 
       if (computedColor) {
         this.svg.setAttr(
