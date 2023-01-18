@@ -10,7 +10,7 @@ import ObsidianMarkmap from "./obsidian-markmap-plugin";
 import { createSVG, getComputedCss } from "./markmap-svg";
 import { takeScreenshot } from "./copy-image";
 import { htmlEscapePlugin, checkBoxPlugin } from "./plugins";
-import { MindMapSettings } from "./@types/settings";
+import { PluginSettings } from "./filesystem-data";
 
 export default class View extends ItemView {
   file: TFile;
@@ -21,7 +21,7 @@ export default class View extends ItemView {
   emptyDiv: HTMLDivElement;
   svg: SVGElement;
   obsMarkmap: ObsidianMarkmap;
-  settings: MindMapSettings;
+  settings: PluginSettings;
   currentTransform: ZoomTransform;
   markmapSVG: Markmap;
   transformer: Transformer;
@@ -31,7 +31,7 @@ export default class View extends ItemView {
   toolbar: HTMLElement;
   pinned: boolean = false;
 
-  constructor(settings: MindMapSettings, leaf: WorkspaceLeaf) {
+  constructor(settings: PluginSettings, leaf: WorkspaceLeaf) {
     super(leaf);
     this.settings = settings;
     this.workspace = this.app.workspace;
@@ -51,7 +51,7 @@ export default class View extends ItemView {
 
     this.setListenersUp();
 
-    this.leaf.on('pinned-change', (pinned) => this.pinned = pinned)
+    this.leaf.on("pinned-change", (pinned) => this.pinned = pinned)
   }
 
   getViewType(): string {
@@ -221,6 +221,7 @@ export default class View extends ItemView {
       const actualFrontmatter = frontmatter as CustomFrontmatter;
 
       const markmapOptions = deriveOptions(frontmatter?.markmap);
+
       this.frontmatterOptions = {
         ...markmapOptions,
         screenshotTextColor: actualFrontmatter?.markmap?.screenshotTextColor,
@@ -232,10 +233,7 @@ export default class View extends ItemView {
 
       this.renderMarkmap(root, markmapOptions, frontmatter?.markmap ?? {});
 
-      this.displayText =
-        this.file.name != undefined
-          ? `Mind Map of ${this.file.name}`
-          : "Mind Map";
+      this.displayText = this.file.basename || "Mind map";
 
       setTimeout(() => this.applyWidths(), 100);
     } catch (error) {
@@ -276,8 +274,6 @@ export default class View extends ItemView {
 
   applyColor(frontmatterColors: string[]) {
     return ({ depth }: INode) => {
-      if (this.settings.coloring == "single") return this.settings.defaultColor;
-
       const colors = frontmatterColors?.length
         ? frontmatterColors
         : [this.settings.depth1Color, this.settings.depth2Color, this.settings.depth3Color];
@@ -322,18 +318,20 @@ export default class View extends ItemView {
     });
   }
 
-  async renderMarkmap(
+  private renderMarkmap(
     root: INode,
-    { color, ...frontmatterOptions }: Partial<IMarkmapOptions>,
+    frontmatterOptions: Partial<IMarkmapOptions>,
     frontmatter: Partial<IMarkmapJSONOptions> = {}
   ) {
     try {
       const { font, color: computedColor } = getComputedCss(this.containerEl);
 
-      const colorFn =
-        this.settings.coloring !== "depth"
-          ? this.applyColor(frontmatter?.color)
-          : color;
+      if (computedColor) {
+        this.svg.setAttr(
+          "style",
+          `--mm-line-height: ${this.settings.lineHeight ?? "1em"};`
+        );
+      }
 
       this.options = {
         autoFit: false,
@@ -347,15 +345,17 @@ export default class View extends ItemView {
         initialExpandLevel: this.settings.initialExpandLevel ?? -1,
         maxWidth: this.settings.maxWidth ?? 0,
         duration: this.settings.animationDuration ?? 500,
-        color: colorFn
       };
 
+      const coloring = this.settings.coloring
 
-      if (computedColor) {
-        this.svg.setAttr(
-          "style",
-          `--mm-line-height: ${this.settings.lineHeight ?? "1em"};`
-        );
+      switch (coloring) {
+        case "depth":
+          this.options.color =
+            this.applyColor(frontmatter?.color)
+        case "single":
+          this.options.color =
+            () => this.settings.defaultColor
       }
 
       this.markmapSVG.setData(root, {
