@@ -2,7 +2,7 @@ import { Notice } from "obsidian";
 import { Markmap } from "markmap-view";
 import d3SvgToPng from "d3-svg-to-png";
 
-import { MindMapSettings, ScreenshotBgStyle } from "./@types/settings";
+import { PluginSettings, ScreenshotBgStyle } from "./filesystem-data";
 
 interface ScreenshotSettings {
   backgroundColor: string;
@@ -15,7 +15,7 @@ interface ThemeColors {
 }
 
 export async function takeScreenshot(
-  pluginSettings: MindMapSettings,
+  pluginSettings: PluginSettings,
   currentMm: Markmap,
   frontmatterOptions: FrontmatterOptions
 ) {
@@ -33,7 +33,7 @@ const getThemeColors = (currentMm: Markmap): ThemeColors => ({
 });
 
 function getScreenshotSettings(
-  pluginSettings: MindMapSettings,
+  pluginSettings: PluginSettings,
   frontmatterOptions: FrontmatterOptions,
   themeColors: ThemeColors
 ): ScreenshotSettings {
