@@ -1,6 +1,6 @@
 import { Plugin as ObsidianPlugin, Vault, Workspace, WorkspaceLeaf } from "obsidian";
 
-import View from "./mindmap-view";
+import View from "./view";
 import { MM_VIEW_TYPE } from "./constants";
 import { SettingsTab } from "./settings-tab";
 import { inlineRenderer, pickInlineRendererSettings } from "./inline-renderer";
@@ -8,15 +8,14 @@ import { inlineRenderer, pickInlineRendererSettings } from "./inline-renderer";
 import { FileSystemManager, PluginSettings } from "./filesystem-data";
 
 export default class Plugin extends ObsidianPlugin {
-  vault: Vault;
-  workspace: Workspace;
 
   async onload() {
     console.log("Loading Mind Map plugin");
-    this.vault = this.app.vault;
-    this.workspace = this.app.workspace;
 
-    const [settings] = await FileSystemManager(this.loadData.bind(this), this.saveData.bind(this));
+    const loadData = this.loadData.bind(this);
+    const saveData = this.saveData.bind(this);
+
+    const [settings] = await FileSystemManager(loadData, saveData);
 
     this.registerView(
       MM_VIEW_TYPE,
@@ -30,7 +29,7 @@ export default class Plugin extends ObsidianPlugin {
       hotkeys: [],
     });
 
-    this.addSettingTab(new SettingsTab(this.app, this, settings));
+    this.addSettingTab(new SettingsTab(this, settings));
 
     const rendererSettings = settings.pick(...pickInlineRendererSettings)
     this.registerMarkdownCodeBlockProcessor(
@@ -40,16 +39,15 @@ export default class Plugin extends ObsidianPlugin {
   }
 
   async initPreview(settings: PluginSettings) {
-    if (this.app.workspace.getLeavesOfType(MM_VIEW_TYPE).length > 0) {
+    if (app.workspace.getLeavesOfType(MM_VIEW_TYPE).length > 0) {
       return;
     }
-    const preview = this.app.workspace.getLeaf(
-      "split",
-      settings.splitDirection
-    );
-    const mmPreview = new View(settings, preview);
-
-    preview.open(mmPreview);
+    app.workspace
+      .getLeaf("split", settings.splitDirection)
+      .setViewState({
+        type: MM_VIEW_TYPE,
+        active: true
+      });
   }
 
   async onunload() {

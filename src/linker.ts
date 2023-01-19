@@ -1,13 +1,13 @@
 import { INode } from "markmap-common";
-import { getLinkpath, Vault } from "obsidian";
+import { getLinkpath } from "obsidian";
 
 import { INTERNAL_LINK_REGEX } from "./constants";
 
-export default class ObsidianMarkmap {
+export default class Linker {
   vaultName: string;
 
-  constructor(vault: Vault) {
-    this.vaultName = vault.getName();
+  constructor() {
+    this.vaultName = app.vault.getName();
   }
 
   updateInternalLinks(node: INode) {

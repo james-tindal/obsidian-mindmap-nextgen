@@ -1,4 +1,4 @@
-import { EventRef, ItemView, Menu, TFile, Workspace, WorkspaceLeaf, debounce, MarkdownView, Editor } from "obsidian";
+import { EventRef, ItemView, Menu, TFile, Workspace, WorkspaceLeaf, debounce, MarkdownView, Editor, stringifyYaml, Vault } from "obsidian";
 import { Transformer, builtInPlugins } from "markmap-lib";
 import { Markmap, loadCSS, loadJS, deriveOptions } from "markmap-view";
 import { INode, IMarkmapOptions, IMarkmapJSONOptions } from "markmap-common";
@@ -6,35 +6,39 @@ import { Toolbar } from "markmap-toolbar";
 import { ZoomTransform } from "d3-zoom";
 
 import { MM_VIEW_TYPE } from "./constants";
-import ObsidianMarkmap from "./obsidian-markmap-plugin";
+import Linker from "./linker";
 import { createSVG, getComputedCss } from "./markmap-svg";
 import { takeScreenshot } from "./copy-image";
 import { htmlEscapePlugin, checkBoxPlugin } from "./plugins";
 import { PluginSettings } from "./filesystem-data";
+import { assocPath, dissocPath, path, pipe } from "ramda";
 
 export default class View extends ItemView {
-  file: TFile;
-  linkedLeaf: WorkspaceLeaf;
-  displayText: string;
-  workspace: Workspace;
-  listeners: EventRef[];
-  emptyDiv: HTMLDivElement;
-  svg: SVGElement;
-  obsMarkmap: ObsidianMarkmap;
-  settings: PluginSettings;
-  currentTransform: ZoomTransform;
-  markmapSVG: Markmap;
-  transformer: Transformer;
-  options: Partial<IMarkmapOptions>;
-  frontmatterOptions: FrontmatterOptions;
-  hasFit: boolean;
-  toolbar: HTMLElement;
-  pinned: boolean = false;
+  private linkedLeaf: WorkspaceLeaf;
+  private displayText: string;
+  private workspace: Workspace;
+  private listeners: EventRef[];
+  private emptyDiv: HTMLDivElement;
+  private svg: SVGElement;
+  private linker: Linker;
+  private settings: PluginSettings;
+  private currentTransform: ZoomTransform;
+  private markmapSVG: Markmap;
+  private transformer: Transformer;
+  private options: Partial<IMarkmapOptions>;
+  private frontmatterOptions: FrontmatterOptions;
+  private hasFit: boolean;
+  private toolbar: HTMLElement;
+  private pinned: boolean = false;
+  private static instances: View[] = [];
+
+  public file: TFile;
 
   constructor(settings: PluginSettings, leaf: WorkspaceLeaf) {
     super(leaf);
+    View.instances.push(this);
     this.settings = settings;
-    this.workspace = this.app.workspace;
+    this.linker = new Linker();
 
     this.transformer = new Transformer([
       ...builtInPlugins,
@@ -49,9 +53,21 @@ export default class View extends ItemView {
 
     this.createToolbar();
 
-    this.setListenersUp();
+    this.registerListeners();
+    
+    this.file = app.workspace.getActiveFile();
+    app.workspace.onLayoutReady(async () => await this.update());
 
-    this.leaf.on("pinned-change", (pinned) => this.pinned = pinned)
+    leaf.on("pinned-change", (pinned) => this.pinned = pinned)
+  }
+
+  public async onClose() {
+    const index = View.instances.findIndex(instance => instance === this);
+    delete View.instances[index];
+  }
+
+  private modifyFile(data: string) {
+    app.vault.modify(this.file, data)
   }
 
   getViewType(): string {
@@ -66,62 +82,41 @@ export default class View extends ItemView {
     return "dot-network";
   }
 
-  onMoreOptionsMenu(menu: Menu) {
+  private onMoreOptionsMenu(menu: Menu) {
     menu
-      .addItem((item) =>
-        item
-          .setIcon("pin")
-          .setTitle(this.pinned ? "Unpin" : "Pin")
-          .onClick(() => this.pinned ? this.unPin() : this.pinCurrentLeaf())
+      .addItem((item) => item
+        .setIcon("pin")
+        .setTitle(this.pinned ? "Unpin" : "Pin")
+        .onClick(() => this.pinned ? this.unPin() : this.pinCurrentLeaf())
       )
-      .addItem((item) =>
-        item
-          .setIcon("image-file")
-          .setTitle("Copy screenshot")
-          .onClick(() =>
-            takeScreenshot(
-              this.settings,
-              this.markmapSVG,
-              this.frontmatterOptions
-            )
-          )
+      .addItem((item) => item
+        .setIcon("image-file")
+        .setTitle("Copy screenshot")
+        .onClick(() =>
+          takeScreenshot(
+            this.settings,
+            this.markmapSVG,
+            this.frontmatterOptions
+      )))
+      .addItem((item) => item
+        .setIcon("folder")
+        .setTitle("Collapse All")
+        .onClick(() => this.collapseAll())
       )
-      .addItem((item) =>
-        item
-          .setIcon("folder")
-          .setTitle("Collapse All")
-          .onClick(() => this.collapseAll())
-      )
-      .addItem((item) =>
-        item
-          .setIcon("view")
-          .setTitle("Toogle toolbar")
-          .onClick(() => this.toggleToolbar())
+      .addItem((item) => item
+        .setIcon("view")
+        .setTitle("Toogle toolbar")
+        .onClick(() => this.toggleToolbar())
       );
 
     menu.showAtPosition({ x: 0, y: 0 });
   }
 
-  createMarkmapSvg() {
-    const { font } = getComputedCss(this.containerEl);
-
-    this.options = {
-      autoFit: false,
-      color: this.applyColor.bind(this),
-      duration: 500,
-      style: (id) => `${id} * {font: ${font}}`,
-      nodeMinHeight: this.settings.nodeMinHeight ?? 16,
-      spacingVertical: this.settings.spacingVertical ?? 5,
-      spacingHorizontal: this.settings.spacingHorizontal ?? 80,
-      paddingX: this.settings.paddingX ?? 8,
-      embedGlobalCSS: true,
-      fitRatio: 1,
-    };
-
-    this.markmapSVG = Markmap.create(this.svg, this.options);
+  private createMarkmapSvg() {
+    this.markmapSVG = Markmap.create(this.svg, {});
   }
 
-  toggleToolbar() {
+  private toggleToolbar() {
     if (this.toolbar) {
       this.toolbar.remove();
       this.toolbar = undefined;
@@ -130,7 +125,7 @@ export default class View extends ItemView {
     }
   }
 
-  createToolbar() {
+  private createToolbar() {
     const container = document.createElement("div");
     container.className = "markmap-toolbar-container";
 
@@ -142,7 +137,7 @@ export default class View extends ItemView {
     this.toolbar = container;
   }
 
-  setListenersUp() {
+  private registerListeners() {
     const editorChange: (
       editor: Editor,
       markdownView: MarkdownView
@@ -153,10 +148,9 @@ export default class View extends ItemView {
     };
 
     const debouncedEditorChange = debounce(editorChange, 300, true);
-
-    this.listeners = [
-      this.workspace.on("editor-change", debouncedEditorChange),
-      this.workspace.on("file-open", (file) => {
+    const listeners = [
+      app.workspace.on("editor-change", debouncedEditorChange),
+      app.workspace.on("file-open", (file) => {
         this.file = file;
         const pinned = this.leaf.getViewState().pinned
         if (! pinned) this.update();
@@ -165,21 +159,11 @@ export default class View extends ItemView {
         if (! pinned) this.update();
       }),
     ];
+
+    listeners.forEach(listener => this.registerEvent(listener))
   }
 
-  async onOpen() {
-    this.obsMarkmap = new ObsidianMarkmap(this.app.vault);
-
-    this.file = this.app.workspace.getActiveFile();
-
-    this.workspace.onLayoutReady(async () => await this.update());
-  }
-
-  async onClose() {
-    this.listeners.forEach((listener) => this.workspace.offref(listener));
-  }
-
-  async updateLinkedLeaf(group: string, mmView: View) {
+  private updateLinkedLeaf(group: string, mmView: View) {
     if (group === null) {
       mmView.linkedLeaf = undefined;
       return;
@@ -189,25 +173,25 @@ export default class View extends ItemView {
       .filter((l) => l?.view?.getViewType() === MM_VIEW_TYPE)[0];
     mmView.linkedLeaf = mdLinkedLeaf;
 
-    await this.update();
+    this.update();
   }
 
-  pinCurrentLeaf() {
+  private pinCurrentLeaf() {
     this.leaf.setPinned(true);
   }
 
-  unPin() {
+  private unPin() {
     this.leaf.setPinned(false);
   }
 
-  collapseAll() {
+  private collapseAll() {
     this.markmapSVG.setData(this.markmapSVG.state.data, {
       ...this.options,
       initialExpandLevel: 0,
     });
   }
 
-  async update(content?: string) {
+  private async update(content?: string) {
     try {
       const markdown =
         typeof content === "string" ? content : await this.readMarkDown();
@@ -217,6 +201,8 @@ export default class View extends ItemView {
       let { root, scripts, styles, frontmatter } = await this.transformMarkdown(
         markdown
       );
+
+      this.upgradeFrontmatter(frontmatter, markdown);
 
       const actualFrontmatter = frontmatter as CustomFrontmatter;
 
@@ -231,7 +217,7 @@ export default class View extends ItemView {
       if (styles) loadCSS(styles);
       if (scripts) loadJS(scripts);
 
-      this.renderMarkmap(root, markmapOptions, frontmatter?.markmap ?? {});
+      this.renderMarkmap(root, markmapOptions, frontmatter?.markmap ?? {}, this.settings);
 
       this.displayText = this.file.basename || "Mind map";
 
@@ -241,15 +227,45 @@ export default class View extends ItemView {
     }
   }
 
-  async readMarkDown() {
+  private waitForSave() {
+    return new Promise((resolve) => {
+      const listener = app.vault.on('modify', file => {
+        resolve(file);
+        app.vault.offref(listener)
+      })
+    });
+  }
+
+  // Upgrade deprecated frontmatter keys to new ones.
+  private async upgradeFrontmatter(frontmatter: Object, markdown: string) {
+    await this.waitForSave()
+
+    const screenshotFgColor = path(['markmap', 'screenshotFgColor'], frontmatter);
+    if (!screenshotFgColor) return;
+
+    const upgrade = pipe(
+      dissocPath(['markmap', 'screenshotFgColor']),
+      assocPath(['markmap', 'screenshotTextColor'], screenshotFgColor),
+      stringifyYaml
+    );
+
+    const newFrontmatter = upgrade(frontmatter);
+    const markdownWithoutFrontmatter = markdown.match(/^---$(((?!^---$).)*)/mgs)[1]
+
+    const newFile = '---\n' + newFrontmatter + markdownWithoutFrontmatter
+
+    this.modifyFile(newFile)
+  }
+
+  private async readMarkDown() {
     try {
-      return await this.app.vault.cachedRead(this.file);
+      return await app.vault.cachedRead(this.file);
     } catch (error) {
       console.log(error);
     }
   }
 
-  sanitiseMarkdown(markdown: string) {
+  private sanitiseMarkdown(markdown: string) {
     // Remove info string from code fence unless it is "js" or "javascript"
     // transformer.transform can't handle other languages
     const allowedLanguages = ["js", "javascript", "css", "html"]
@@ -262,31 +278,30 @@ export default class View extends ItemView {
     })
   }
 
-  async transformMarkdown(markdown: string) {
+  private async transformMarkdown(markdown: string) {
     const sanitisedMarkdown = this.sanitiseMarkdown(markdown)
     let { root, features, frontmatter } = this.transformer.transform(sanitisedMarkdown);
 
     const { scripts, styles } = this.transformer.getUsedAssets(features);
 
-    this.obsMarkmap.updateInternalLinks(root);
+    this.linker.updateInternalLinks(root);
     return { root, scripts, styles, frontmatter };
   }
 
-  applyColor(frontmatterColors: string[]) {
+  private depthColoring(frontmatterColors?: string[]) {
     return ({ depth }: INode) => {
-      const colors = frontmatterColors?.length
-        ? frontmatterColors
-        : [this.settings.depth1Color, this.settings.depth2Color, this.settings.depth3Color];
+      if (frontmatterColors?.length)
+        return frontmatterColors[depth % frontmatterColors.length]
 
-      if (frontmatterColors?.length) return colors[depth % colors.length];
-      else
-        return depth < colors.length
-          ? colors[depth]
-          : this.settings.defaultColor;
+      const colors = [this.settings.depth1Color, this.settings.depth2Color, this.settings.depth3Color];
+
+      return depth < 3 ?
+        colors[depth] :
+        this.settings.defaultColor
     };
   }
 
-  applyWidths() {
+  private applyWidths() {
     if (!this.svg) return;
 
     const colors = [
@@ -321,7 +336,8 @@ export default class View extends ItemView {
   private renderMarkmap(
     root: INode,
     frontmatterOptions: Partial<IMarkmapOptions>,
-    frontmatter: Partial<IMarkmapJSONOptions> = {}
+    frontmatter: Partial<IMarkmapJSONOptions> = {},
+    settings: PluginSettings
   ) {
     try {
       const { font, color: computedColor } = getComputedCss(this.containerEl);
@@ -329,37 +345,37 @@ export default class View extends ItemView {
       if (computedColor) {
         this.svg.setAttr(
           "style",
-          `--mm-line-height: ${this.settings.lineHeight ?? "1em"};`
+          `--mm-line-height: ${settings.lineHeight ?? "1em"};`
         );
       }
 
-      this.options = {
+      const options: Partial<IMarkmapOptions> = {
         autoFit: false,
         style: (id) => `${id} * {font: ${font}}`,
-        nodeMinHeight: this.settings.nodeMinHeight ?? 16,
-        spacingVertical: this.settings.spacingVertical ?? 5,
-        spacingHorizontal: this.settings.spacingHorizontal ?? 80,
-        paddingX: this.settings.paddingX ?? 8,
+        nodeMinHeight: settings.nodeMinHeight ?? 16,
+        spacingVertical: settings.spacingVertical ?? 5,
+        spacingHorizontal: settings.spacingHorizontal ?? 80,
+        paddingX: settings.paddingX ?? 8,
         embedGlobalCSS: true,
         fitRatio: 1,
-        initialExpandLevel: this.settings.initialExpandLevel ?? -1,
-        maxWidth: this.settings.maxWidth ?? 0,
-        duration: this.settings.animationDuration ?? 500,
+        initialExpandLevel: settings.initialExpandLevel ?? -1,
+        maxWidth: settings.maxWidth ?? 0,
+        duration: settings.animationDuration ?? 500,
       };
 
-      const coloring = this.settings.coloring
+      const coloring = settings.coloring
 
-      switch (coloring) {
-        case "depth":
-          this.options.color =
-            this.applyColor(frontmatter?.color)
-        case "single":
-          this.options.color =
-            () => this.settings.defaultColor
-      }
+      if (coloring === "depth")
+        options.color =
+          this.depthColoring(frontmatter?.color);
+      if (coloring === "single")
+        options.color =
+          () => settings.defaultColor;
+
+      this.options = options;
 
       this.markmapSVG.setData(root, {
-        ...this.options,
+        ...options,
         ...frontmatterOptions,
       });
 
@@ -367,6 +383,7 @@ export default class View extends ItemView {
         this.markmapSVG.fit();
         this.hasFit = true;
       }
+
     } catch (error) {
       console.error(error);
     }
