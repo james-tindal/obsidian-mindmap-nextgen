@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting, SplitDirection } from "obsidian";
+import { PluginSettingTab, Setting, SplitDirection } from "obsidian";
 import { ScreenshotBgStyle, SettingsManager } from "./filesystem-data";
 
 import Plugin from "./main";
@@ -9,7 +9,7 @@ export class SettingsTab extends PluginSettingTab {
   settings: SettingsManager;
   colorSettings: ColorSettings;
 
-  constructor(app: App, plugin: Plugin, settings: SettingsManager) {
+  constructor(plugin: Plugin, settings: SettingsManager) {
     super(app, plugin);
     this.settings = settings;
     this.colorSettings = {} as ColorSettings;

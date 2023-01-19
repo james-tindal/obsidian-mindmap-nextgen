@@ -1,5 +1,4 @@
 import type { Plugin_2, SplitDirection } from "obsidian";
-import { applySpec, prop } from "ramda";
 
 export enum ScreenshotBgStyle {
   Transparent = "transparent",
