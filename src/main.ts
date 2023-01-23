@@ -5,7 +5,7 @@ import { MM_VIEW_TYPE } from "./constants";
 import { SettingsTab } from "./settings-tab";
 import { inlineRenderer, pickInlineRendererSettings } from "./inline-renderer";
 
-import { FileSystemManager, PluginSettings } from "./filesystem-data";
+import { getFilesystemData, PluginSettings } from "./filesystem-data";
 
 export default class Plugin extends ObsidianPlugin {
 
@@ -15,7 +15,7 @@ export default class Plugin extends ObsidianPlugin {
     const loadData = this.loadData.bind(this);
     const saveData = this.saveData.bind(this);
 
-    const [settings] = await FileSystemManager(loadData, saveData);
+    const [settings] = await getFilesystemData(loadData, saveData);
 
     this.registerView(
       MM_VIEW_TYPE,
