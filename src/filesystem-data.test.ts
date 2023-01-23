@@ -71,6 +71,7 @@ describe("Filesystem Data Manager", () => {
         highlight: true,
         screenshotBgColor: '#002b36',
         screenshotBgStyle: ScreenshotBgStyle.Color,
+        titleAsRootNode: true
       }
     }
 
@@ -144,6 +145,7 @@ describe("Filesystem Data Manager", () => {
         highlight: false,
         screenshotBgColor: 'r6t7y',
         screenshotBgStyle: ScreenshotBgStyle.Theme,
+        titleAsRootNode: true
       }
     }
 
@@ -210,6 +212,7 @@ describe("Filesystem Data Manager", () => {
         highlight: false,
         screenshotBgColor: 'r6t7y',
         screenshotBgStyle: ScreenshotBgStyle.Theme,
+        titleAsRootNode: true
       }
     }
 
