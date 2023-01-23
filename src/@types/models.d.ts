@@ -5,6 +5,7 @@ type FrontmatterOptions = Partial<IMarkmapOptions> & {
   screenshotTextColor?: string;
   screenshotBgColor: string;
   highlight?: boolean;
+  titleAsRootNode: boolean;
 };
 
 type TokenWithChildren = Remarkable.Remarkable.Token & {
@@ -17,5 +18,6 @@ type CustomFrontmatter = {
     screenshotTextColor: string;
     screenshotBgColor: string;
     highlight?: boolean;
+    titleAsRootNode: boolean;
   };
 };

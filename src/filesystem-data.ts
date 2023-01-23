@@ -55,6 +55,7 @@ export const defaults: v2['settings'] = {
   screenshotBgStyle: ScreenshotBgStyle.Color,
   screenshotTextColor: "#fdf6e3",
   screenshotTextColorEnabled: false,
+  titleAsRootNode: true
 }
 
 const defaultsV1: v1_1 = {
@@ -163,6 +164,7 @@ type Settings2_0 = {
   screenshotTextColorEnabled: boolean
 
   coloring: Coloring
+  titleAsRootNode: boolean
 }
 
 export type v2 = {

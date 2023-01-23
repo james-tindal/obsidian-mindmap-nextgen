@@ -1,22 +1,26 @@
 import { PluginSettingTab, Setting, SplitDirection } from "obsidian";
+import { LocalEvents } from "./events"
 import { ScreenshotBgStyle, SettingsManager } from "./filesystem-data";
 
 import Plugin from "./main";
 
-type ColorSettings = Record<number | 'default' | 'freeze', Setting>
+type ColorSettings = Record<number | "default" | "freeze", Setting>
+
+type Events = | "setting-changed:titleAsRootNode"
 
 export class SettingsTab extends PluginSettingTab {
-  settings: SettingsManager;
-  colorSettings: ColorSettings;
+  private settings: SettingsManager;
+  private colorSettings: ColorSettings = {} as ColorSettings;
+
+  public static events = new LocalEvents<Events>();
 
   constructor(plugin: Plugin, settings: SettingsManager) {
     super(app, plugin);
     this.settings = settings;
-    this.colorSettings = {} as ColorSettings;
   }
 
   decideDisplayColors() {
-    const approach = this.settings.get('coloring');
+    const approach = this.settings.get("coloring");
     const colors = this.colorSettings;
     const freeze = this.colorSettings.freeze;
     const options = {
@@ -39,9 +43,9 @@ export class SettingsTab extends PluginSettingTab {
       .addDropdown((dropDown) => dropDown
         .addOption("horizontal", "Horizontal")
         .addOption("vertical", "Vertical")
-        .setValue(this.settings.get('splitDirection'))
+        .setValue(this.settings.get("splitDirection"))
         .onChange((value: SplitDirection) =>
-          this.settings.set('splitDirection', value))
+          this.settings.set("splitDirection", value))
       );
 
     new Setting(containerEl)
@@ -125,7 +129,7 @@ export class SettingsTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("Screenshot background style")
         .setDesc(
-          "Select the background style for the screenshot, when using 'Color' the color picker value will be used."
+          `Select the background style for the screenshot, when using "Color" the color picker value will be used.`
         )
         .addDropdown((dropdown) => dropdown
           .addOptions({
@@ -177,13 +181,28 @@ export class SettingsTab extends PluginSettingTab {
       );
 
       new Setting(containerEl)
+        .setName("Use title as root node")
+        .setDesc(
+          "When on, the root node of the mindmap will be the title of the document."
+        )
+        .addToggle((toggle) => toggle
+          .setValue(this.settings.get("titleAsRootNode"))
+          .onChange((value) => {
+            this.settings.set("titleAsRootNode", value);
+            SettingsTab.events.emit("setting-changed:titleAsRootNode", value)
+          })
+        );
+
+      // Mind map coloring settings
+
+      new Setting(containerEl)
         .setHeading()
-        .setName('Coloring approach')
+        .setName("Coloring")
 
       new Setting(containerEl)
       .setName("Coloring approach")
       .setDesc(
-        "The 'depth' changes the color on each level, 'branch' changes the color on each new branch"
+        `The "depth" changes the color on each level, "branch" changes the color on each new branch`
       )
       .addDropdown((dropDown) => dropDown
         .addOption("depth", "Depth based coloring")
