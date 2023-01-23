@@ -1,4 +1,4 @@
-import { Coloring, defaults, FileSystemManager, ScreenshotBgStyle, v1_0, v1_1, v2_0 } from "./filesystem-data"
+import { defaults, getFilesystemData, ScreenshotBgStyle, v1_0, v1_1, v2 } from "./filesystem-data"
 
 
 const loader = (data: any) => async () => data
@@ -44,7 +44,7 @@ describe("Filesystem Data Manager", () => {
       onlyUseDefaultColor: true
     }
 
-    const expected: v2_0 = {
+    const expected: v2 = {
       version: '2.0',
       settings: {
         defaultColor: 'wrew',
@@ -70,7 +70,7 @@ describe("Filesystem Data Manager", () => {
         maxWidth: 0,
         highlight: true,
         screenshotBgColor: '#002b36',
-        screenshotBgStyle: ScreenshotBgStyle.Transparent
+        screenshotBgStyle: ScreenshotBgStyle.Color,
       }
     }
 
@@ -80,7 +80,7 @@ describe("Filesystem Data Manager", () => {
 
     const loadData = loader(input);
     const saveData = saver(testCb);
-    await FileSystemManager(loadData, saveData);
+    await getFilesystemData(loadData, saveData);
   });
 
   test("Upgrade v1.1 to v2.0", async () => {
@@ -117,7 +117,7 @@ describe("Filesystem Data Manager", () => {
       screenshotFgColorEnabled: true,
     }
 
-    const expected: v2_0 = {
+    const expected: v2 = {
       version: '2.0',
       settings: {
         defaultColor: 'wrew',
@@ -143,7 +143,7 @@ describe("Filesystem Data Manager", () => {
         maxWidth: 99,
         highlight: false,
         screenshotBgColor: 'r6t7y',
-        screenshotBgStyle: ScreenshotBgStyle.Theme
+        screenshotBgStyle: ScreenshotBgStyle.Theme,
       }
     }
 
@@ -153,58 +153,81 @@ describe("Filesystem Data Manager", () => {
 
     const loadData = loader(input);
     const saveData = saver(testCb);
-    await FileSystemManager(loadData, saveData);
+    await getFilesystemData(loadData, saveData);
   })
 
-  test("Use defaults", async () => {
+  test("Use defaults for missing keys", async () => {
+    const input = {
+      version: '2.0',
+      settings: {
+        defaultColor: 'wrew',
+        nodeMinHeight: 30,
+        lineHeight: '27',
+        spacingHorizontal: 6,
+        paddingX: 0,
+        initialExpandLevel: 234,
+        depth1Color: 'blarg',
+        depth1Thickness: 'yad',
+        depth2Color: 'opo',
+        depth2Thickness: 'qwe',
+        depth3Color: 'oi',
+        depth3Thickness: 'asd',
+        defaultThickness: 'iuoi',
+        screenshotTextColorEnabled: true,
+        colorFreezeLevel: 50,
+        animationDuration: 9000,
+        maxWidth: 99,
+        highlight: false,
+        screenshotBgColor: 'r6t7y',
+        screenshotBgStyle: ScreenshotBgStyle.Theme,
+      }
+    }
+
+    const expected: v2 = {
+      version: '2.0',
+      settings: {
+        defaultColor: 'wrew',
+        splitDirection: 'horizontal',
+        nodeMinHeight: 30,
+        lineHeight: '27',
+        spacingVertical: 5,
+        spacingHorizontal: 6,
+        paddingX: 0,
+        initialExpandLevel: 234,
+        depth1Color: 'blarg',
+        depth1Thickness: 'yad',
+        depth2Color: 'opo',
+        depth2Thickness: 'qwe',
+        depth3Color: 'oi',
+        depth3Thickness: 'asd',
+        defaultThickness: 'iuoi',
+        screenshotTextColor: "#fdf6e3",
+        screenshotTextColorEnabled: true,
+        coloring: 'depth',
+        colorFreezeLevel: 50,
+        animationDuration: 9000,
+        maxWidth: 99,
+        highlight: false,
+        screenshotBgColor: 'r6t7y',
+        screenshotBgStyle: ScreenshotBgStyle.Theme,
+      }
+    }
+
+    const testCb = (actual: any) => {
+      expect(actual).toStrictEqual(expected);
+    }
+
+    const loadData = loader(input);
+    const saveData = saver(testCb);
+    await getFilesystemData(loadData, saveData);
+  })
+
+  test("Use defaults if no data", async () => {
     const testFn = (actual: any) =>
       expect(actual).toStrictEqual(defaults2_0);
 
     const loadData = loader(undefined);
     const saveData = saver(testFn);
-    await FileSystemManager(loadData, saveData);
+    await getFilesystemData(loadData, saveData);
   })
 });
-
-// There is only one SettingsManager.
-// The methods that are shared with SettingsGetter should be a class
-// SettingsManager is a SettingsGetter with one additional method: set
-
-describe("SettingsManager", () => {
-
-  async function setup (saveCb: Function) {
-    const loadData = loader(undefined);
-    const saveData = saver(saveCb);
-    const [settingsManager] = await FileSystemManager(loadData, saveData);
-    return settingsManager;
-  }
-
-  test("Can get what you set. Saves to filesystem", async () => {
-    const [resolve, wait] = waitFor();
-    let first = true;
-    function saveFn(data: any) {
-      if (first)
-        first = false
-      else
-        resolve(data)
-    }
-
-    const settingsManager = await setup(saveFn);
-
-    settingsManager.set("maxWidth", 5000);
-    const maxWidth = settingsManager.get("maxWidth");
-    expect(maxWidth).toBe(5000);
-
-    const savedData = await wait;
-
-    const expected: v2_0 = {
-      version: '2.0',
-      settings: {
-        ...defaults,
-        maxWidth
-      }
-    }
-    
-    expect(savedData).toStrictEqual(expected);
-  })
-})

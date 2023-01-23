@@ -9,7 +9,7 @@ export enum ScreenshotBgStyle {
 /**
  * Given a version number MAJOR.MINOR, increment the:
  * 1. MAJOR version when previously valid keys are removed or have a different function
- * 2. MINOR version when only new keys have been added
+ * 2. MINOR version - Deprecated. If you are adding a key, just add it to the type and the defaults.
  */
 
 const omit = <T, U extends keyof T>(keys: readonly U[], obj: T): Omit<T, U> =>
@@ -28,7 +28,7 @@ function pick<T, K extends keyof T>(obj: T, ...keys: K[]): Pick<T, K> {
 
 
 // Default settings
-export const defaults: v2_0['settings'] = {
+export const defaults: v2['settings'] = {
   splitDirection: "horizontal",
   nodeMinHeight: 16,
   lineHeight: "1em",
@@ -52,11 +52,41 @@ export const defaults: v2_0['settings'] = {
   defaultThickness: "1",
 
   screenshotBgColor: "#002b36",
-  screenshotBgStyle: ScreenshotBgStyle.Transparent,
+  screenshotBgStyle: ScreenshotBgStyle.Color,
   screenshotTextColor: "#fdf6e3",
-  screenshotTextColorEnabled: false
+  screenshotTextColorEnabled: false,
 }
 
+const defaultsV1: v1_1 = {
+  splitDirection:     defaults.splitDirection,
+  nodeMinHeight:      defaults.nodeMinHeight,
+  lineHeight:         defaults.lineHeight,
+  spacingVertical:    defaults.spacingVertical,
+  spacingHorizontal:  defaults.spacingHorizontal,
+  paddingX:           defaults.paddingX,
+  initialExpandLevel: defaults.initialExpandLevel,
+  defaultColor:       defaults.defaultColor,
+  colorFreezeLevel:   defaults.colorFreezeLevel,
+  animationDuration:  defaults.animationDuration,
+  maxWidth:           defaults.maxWidth,
+  highlight:          defaults.highlight,
+  screenshotBgColor:  defaults.screenshotBgColor,
+  screenshotBgStyle:  defaults.screenshotBgStyle,
+
+  color1:                   defaults.depth1Color,
+  color1Thickness:          defaults.depth1Thickness,
+  color2:                   defaults.depth2Color,
+  color2Thickness:          defaults.depth2Thickness,
+  color3:                   defaults.depth3Color,
+  color3Thickness:          defaults.depth3Thickness,
+  defaultColorThickness:    defaults.defaultThickness,
+  screenshotFgColor:        defaults.screenshotTextColor,
+  screenshotFgColorEnabled: defaults.screenshotTextColorEnabled,
+
+  coloring: "depth",
+  onlyUseDefaultColor: false,
+  screenshotTransparentBg: false
+}
 
 
 //  Version 1.0
@@ -96,44 +126,10 @@ export type v1_1 = v1_0 & {
 }
 
 // Upgrade from v1.0 to v1.1
-const upgrade1_1 = (data: v1_0): v1_1 => {
-  const unchanged = {
-    splitDirection:        data.splitDirection,
-    nodeMinHeight:         data.nodeMinHeight,
-    lineHeight:            data.lineHeight,
-    spacingVertical:       data.spacingVertical,
-    spacingHorizontal:     data.spacingHorizontal,
-    paddingX:              data.paddingX,
-    initialExpandLevel:    data.initialExpandLevel,
-    color1:                data.color1,
-    color1Thickness:       data.color1Thickness,
-    color2:                data.color2,
-    color2Thickness:       data.color2Thickness,
-    color3:                data.color3,
-    color3Thickness:       data.color3Thickness,
-    defaultColor:          data.defaultColor,
-    defaultColorThickness: data.defaultColorThickness,
-    onlyUseDefaultColor:   data.onlyUseDefaultColor,
-  }
-
-  const added = {
-    coloring:                 "depth" as v1_1['coloring'],
-    colorFreezeLevel:         defaults.colorFreezeLevel,
-    animationDuration:        defaults.animationDuration,
-    maxWidth:                 defaults.maxWidth,
-    highlight:                defaults.highlight,
-    screenshotBgColor:        defaults.screenshotBgColor,
-    screenshotBgStyle:        defaults.screenshotBgStyle,
-    screenshotTransparentBg:  false,
-    screenshotFgColor:        defaults.screenshotTextColor,
-    screenshotFgColorEnabled: defaults.screenshotTextColorEnabled,
-  }
-
-  return {
-    ...unchanged,
-    ...added
-  }
-}
+const upgrade1_1 = (data: v1_0): v1_1 => ({
+  ...defaultsV1,
+  ...data
+})
 
 
 //  Version 2.0
@@ -141,40 +137,40 @@ const upgrade1_1 = (data: v1_0): v1_1 => {
 export type Coloring = "depth" | "branch" | "single"
 
 type Settings2_0 = {
-  splitDirection: SplitDirection,
-  nodeMinHeight: number,
-  lineHeight: string,
-  spacingVertical: number,
-  spacingHorizontal: number,
-  paddingX: number,
-  initialExpandLevel: number,
-  defaultColor: string,
-  colorFreezeLevel: number,
-  animationDuration: number,
-  maxWidth: number,
-  highlight: boolean,
-  screenshotBgColor: string,
-  screenshotBgStyle: ScreenshotBgStyle,
+  splitDirection: SplitDirection
+  nodeMinHeight: number
+  lineHeight: string
+  spacingVertical: number
+  spacingHorizontal: number
+  paddingX: number
+  initialExpandLevel: number
+  defaultColor: string
+  colorFreezeLevel: number
+  animationDuration: number
+  maxWidth: number
+  highlight: boolean
+  screenshotBgColor: string
+  screenshotBgStyle: ScreenshotBgStyle
 
-  depth1Color: string,
-  depth1Thickness: string,
-  depth2Color: string,
-  depth2Thickness: string,
-  depth3Color: string,
-  depth3Thickness: string,
-  defaultThickness: string,
-  screenshotTextColor: string,
-  screenshotTextColorEnabled: boolean,
+  depth1Color: string
+  depth1Thickness: string
+  depth2Color: string
+  depth2Thickness: string
+  depth3Color: string
+  depth3Thickness: string
+  defaultThickness: string
+  screenshotTextColor: string
+  screenshotTextColorEnabled: boolean
 
   coloring: Coloring
 }
 
-export type v2_0 = {
-  version: "2.0",
+export type v2 = {
+  version: "2.0"
   settings: Settings2_0
 }
 
-const upgrade2_0 = (data: v1_1): v2_0 => {
+const upgrade2_0 = (data: v1_1): v2 => {
   const removed = ["onlyUseDefaultColor", "screenshotTransparentBg"];
 
   const unchanged = {
@@ -214,6 +210,7 @@ const upgrade2_0 = (data: v1_1): v2_0 => {
   return {
     version: '2.0',
     settings: {
+      ...defaults,
       ...unchanged,
       ...renamed,
       ...transformed
@@ -221,13 +218,22 @@ const upgrade2_0 = (data: v1_1): v2_0 => {
   }
 }
 
-const defaults2_0 = (): v2_0 => ({
+const defaultsV2 = (): v2 => ({
   version: '2.0',
   settings: defaults
 })
 
-export type PluginSettings = v2_0["settings"];
-type FileSystemData = v2_0;
+const useDefaultsForMissingKeys =
+(data: any): v2 => ({
+  version: '2.0',
+  settings: {
+    ...defaults,
+    ...data.settings
+  }
+})
+
+export type PluginSettings = v2["settings"];
+type FileSystemData = v2;
 const latestVersion = "2.0";
 
 const isObject = (x: any) => typeof x === "object" && x !== null;
@@ -244,7 +250,8 @@ const detectVersion = (data: any) =>
 const upgrades = {
   "1.0": upgrade1_1,
   "1.1": upgrade2_0,
-  ""   : defaults2_0,
+  "2.0": useDefaultsForMissingKeys,
+  ""   : defaultsV2,
 }
 
 function upgrade(data: any): FileSystemData {
@@ -255,7 +262,7 @@ function upgrade(data: any): FileSystemData {
     if (version !== latestVersion)
       accumulator = upgrades[version](accumulator)
     else
-      return accumulator;
+      return upgrades[latestVersion](accumulator);
   }
 }
 
@@ -267,7 +274,7 @@ type SettingsManager = {
   getAll: () => PluginSettings // avoid
 }
 
-export async function FileSystemManager (
+export async function getFilesystemData (
   loadData: Plugin_2['loadData'],
   saveData: Plugin_2['saveData']
 ): Promise<[SettingsManager]>
