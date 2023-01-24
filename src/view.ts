@@ -11,6 +11,7 @@ import { takeScreenshot } from "./copy-image";
 import { htmlEscapePlugin, checkBoxPlugin } from "./plugins";
 import { PluginSettings, settingChanges } from "./filesystem-data";
 import { assocPath, dissocPath, path, pipe } from "ramda";
+import { dontPanic } from "./utilities";
 
 
 export default class View extends ItemView {
@@ -184,97 +185,95 @@ export default class View extends ItemView {
     });
   }
 
-  private async render(content?: string) {
-    try {
-      const markdown =
-        typeof content === "string" ? content : await app.vault.cachedRead(this.file);
+  private render: typeof this._render =
+    dontPanic(this._render.bind(this), "Error in render");
 
-      if (!markdown) return;
+  private async _render(content?: string) {
+    const markdown =
+      typeof content === "string" ? content : await app.vault.cachedRead(this.file);
 
-      const sanitisedMarkdown = this.sanitiseMarkdown(markdown);
-      
-      const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin, ]);
+    if (!markdown) return;
 
-      let { root: root_, features, frontmatter } = transformer.transform(sanitisedMarkdown);
+    const sanitisedMarkdown = this.sanitiseMarkdown(markdown);
+    
+    const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin, ]);
 
-      const { scripts, styles } = transformer.getUsedAssets(features);
+    let { root: root_, features, frontmatter } = transformer.transform(sanitisedMarkdown);
 
-      this.upgradeFrontmatter(frontmatter, markdown);
+    const { scripts, styles } = transformer.getUsedAssets(features);
 
-      const actualFrontmatter = frontmatter as CustomFrontmatter;
+    this.upgradeFrontmatter(frontmatter, markdown);
 
-      const markmapOptions = deriveOptions(frontmatter?.markmap);
+    const actualFrontmatter = frontmatter as CustomFrontmatter;
 
-      const frontmatterOptions = this.frontmatterOptions = {
-        ...markmapOptions,
-        screenshotTextColor: actualFrontmatter?.markmap?.screenshotTextColor,
-        screenshotBgColor: actualFrontmatter?.markmap?.screenshotBgColor,
-        titleAsRootNode: actualFrontmatter?.markmap?.titleAsRootNode
-      };
+    const markmapOptions = deriveOptions(frontmatter?.markmap);
 
-      const titleAsRootNode =
-        typeof frontmatterOptions.titleAsRootNode === 'boolean'
-        ? frontmatterOptions.titleAsRootNode
-        : this.settings.titleAsRootNode;
+    const frontmatterOptions = this.frontmatterOptions = {
+      ...markmapOptions,
+      screenshotTextColor: actualFrontmatter?.markmap?.screenshotTextColor,
+      screenshotBgColor: actualFrontmatter?.markmap?.screenshotBgColor,
+      titleAsRootNode: actualFrontmatter?.markmap?.titleAsRootNode
+    };
 
-      const root = titleAsRootNode ? this.titleAsRootNode(root_) : root_;
-      this.linker.updateInternalLinks(root);
+    const titleAsRootNode =
+      typeof frontmatterOptions.titleAsRootNode === 'boolean'
+      ? frontmatterOptions.titleAsRootNode
+      : this.settings.titleAsRootNode;
 
-      if (styles) loadCSS(styles);
-      if (scripts) loadJS(scripts);
+    const root = titleAsRootNode ? this.titleAsRootNode(root_) : root_;
+    this.linker.updateInternalLinks(root);
 
-      const settings = this.settings;
+    if (styles) loadCSS(styles);
+    if (scripts) loadJS(scripts);
 
-      this.displayText = this.file.basename || "Mind map";
+    const settings = this.settings;
 
-      setTimeout(() => this.applyWidths(), 100);
-      
-      const { font, color: computedColor } = getComputedCss(this.containerEl);
+    this.displayText = this.file.basename || "Mind map";
 
-      if (computedColor) {
-        this.svg.setAttr(
-          "style",
-          `--mm-line-height: ${settings.lineHeight ?? "1em"};`
-        );
-      }
+    setTimeout(() => this.applyWidths(), 100);
+    
+    const { font, color: computedColor } = getComputedCss(this.containerEl);
 
-      const options: Partial<IMarkmapOptions> = {
-        autoFit: false,
-        style: (id) => `${id} * {font: ${font}}`,
-        nodeMinHeight: settings.nodeMinHeight ?? 16,
-        spacingVertical: settings.spacingVertical ?? 5,
-        spacingHorizontal: settings.spacingHorizontal ?? 80,
-        paddingX: settings.paddingX ?? 8,
-        embedGlobalCSS: true,
-        fitRatio: 1,
-        initialExpandLevel: settings.initialExpandLevel ?? -1,
-        maxWidth: settings.maxWidth ?? 0,
-        duration: settings.animationDuration ?? 500,
-      };
-
-      const coloring = settings.coloring
-
-      if (coloring === "depth")
-        options.color =
-          this.depthColoring(frontmatter?.markmap?.color);
-      if (coloring === "single")
-        options.color =
-          () => settings.defaultColor;
-
-      this.options = options;
-
-      this.markmapSVG.setData(root, {
-        ...options,
-        ...markmapOptions,
-      });
-
-      if (!this.hasFit) {
-        this.markmapSVG.fit();
-        this.hasFit = true;
-      }
+    if (computedColor) {
+      this.svg.setAttr(
+        "style",
+        `--mm-line-height: ${settings.lineHeight ?? "1em"};`
+      );
     }
-    catch(e) {
-      console.error("Render error", e)
+
+    const options: Partial<IMarkmapOptions> = {
+      autoFit: false,
+      style: (id) => `${id} * {font: ${font}}`,
+      nodeMinHeight: settings.nodeMinHeight ?? 16,
+      spacingVertical: settings.spacingVertical ?? 5,
+      spacingHorizontal: settings.spacingHorizontal ?? 80,
+      paddingX: settings.paddingX ?? 8,
+      embedGlobalCSS: true,
+      fitRatio: 1,
+      initialExpandLevel: settings.initialExpandLevel ?? -1,
+      maxWidth: settings.maxWidth ?? 0,
+      duration: settings.animationDuration ?? 500,
+    };
+
+    const coloring = settings.coloring
+
+    if (coloring === "depth")
+      options.color =
+        this.depthColoring(frontmatter?.markmap?.color);
+    if (coloring === "single")
+      options.color =
+        () => settings.defaultColor;
+
+    this.options = options;
+
+    this.markmapSVG.setData(root, {
+      ...options,
+      ...markmapOptions,
+    });
+
+    if (!this.hasFit) {
+      this.markmapSVG.fit();
+      this.hasFit = true;
     }
   }
 
