@@ -1,5 +1,4 @@
-import { defaults, getFilesystemData, ScreenshotBgStyle, v1_0, v1_1, v2 } from "./filesystem-data"
-
+import { defaults, manageFilesystemData, ScreenshotBgStyle, v1_0, v1_1, v2 } from "./filesystem-data"
 
 const loader = (data: any) => async () => data
 const saver = (callback?: Function) =>
@@ -81,7 +80,7 @@ describe("Filesystem Data Manager", () => {
 
     const loadData = loader(input);
     const saveData = saver(testCb);
-    await getFilesystemData(loadData, saveData);
+    await manageFilesystemData(loadData, saveData);
   });
 
   test("Upgrade v1.1 to v2.0", async () => {
@@ -155,7 +154,7 @@ describe("Filesystem Data Manager", () => {
 
     const loadData = loader(input);
     const saveData = saver(testCb);
-    await getFilesystemData(loadData, saveData);
+    await manageFilesystemData(loadData, saveData);
   })
 
   test("Use defaults for missing keys", async () => {
@@ -222,7 +221,7 @@ describe("Filesystem Data Manager", () => {
 
     const loadData = loader(input);
     const saveData = saver(testCb);
-    await getFilesystemData(loadData, saveData);
+    await manageFilesystemData(loadData, saveData);
   })
 
   test("Use defaults if no data", async () => {
@@ -231,6 +230,6 @@ describe("Filesystem Data Manager", () => {
 
     const loadData = loader(undefined);
     const saveData = saver(testFn);
-    await getFilesystemData(loadData, saveData);
+    await manageFilesystemData(loadData, saveData);
   })
 });

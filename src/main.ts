@@ -1,41 +1,40 @@
-import { Plugin as ObsidianPlugin, Vault, Workspace, WorkspaceLeaf } from "obsidian";
+import { App, Plugin as ObsidianPlugin, PluginManifest, Workspace, WorkspaceLeaf } from "obsidian";
 
 import View from "./view";
 import { MM_VIEW_TYPE } from "./constants";
-import { SettingsTab } from "./settings-tab";
-import { inlineRenderer, pickInlineRendererSettings } from "./inline-renderer";
+import { inlineRenderer } from "./inline-renderer";
 
-import { getFilesystemData, PluginSettings } from "./filesystem-data";
+import { manageFilesystemData, PluginSettings } from "./filesystem-data";
+import { SettingsTab } from "./settings-tab"
 
 export default class Plugin extends ObsidianPlugin {
+  public static instance: Plugin;
 
-  async onload() {
-    console.log("Loading Mind Map plugin");
+  constructor(_: App, manifest: PluginManifest) {
+    super(app, manifest);
+    Plugin.instance = this;
+    console.info("Loading Mind Map plugin");
 
+    this.setup();
+  }
+
+  private async setup() {
     const loadData = this.loadData.bind(this);
     const saveData = this.saveData.bind(this);
 
-    const [settings] = await getFilesystemData(loadData, saveData);
+    const { settings, createSettingsTab } = await manageFilesystemData(loadData, saveData);
+    this.addSettingTab(createSettingsTab(SettingsTab));
 
-    this.registerView(
-      MM_VIEW_TYPE,
-      (leaf: WorkspaceLeaf) => new View(settings.getAll(), leaf)
-    );
+    this.registerView( MM_VIEW_TYPE, (leaf: WorkspaceLeaf) => new View(settings, leaf));
+    this.registerMarkdownCodeBlockProcessor("markmap", inlineRenderer(settings));
 
     this.addCommand({
       id: "app:markmap-preview",
-      name: "Preview the current note as a Mind Map",
-      callback: () => this.initPreview(settings.getAll()),
+      name: "View the current note as a Mind Map",
+      callback: () => this.initPreview(settings),
       hotkeys: [],
     });
 
-    this.addSettingTab(new SettingsTab(this, settings));
-
-    const rendererSettings = settings.pick(...pickInlineRendererSettings)
-    this.registerMarkdownCodeBlockProcessor(
-      "markmap",
-      inlineRenderer(rendererSettings)
-    );
   }
 
   async initPreview(settings: PluginSettings) {
@@ -51,7 +50,7 @@ export default class Plugin extends ObsidianPlugin {
   }
 
   async onunload() {
-    console.log("Unloading Mind Map plugin");
+    console.info("Unloading Mind Map plugin");
   }
 
   activeLeafName(workspace: Workspace) {
