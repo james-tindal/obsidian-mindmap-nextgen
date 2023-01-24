@@ -1,18 +1,13 @@
 import { PluginSettingTab, Setting, SplitDirection } from "obsidian";
-import { LocalEvents } from "./events"
 import { Coloring, PluginSettings, ScreenshotBgStyle } from "./filesystem-data";
 
 import Plugin from "./main";
 
 type ColorSettings = Record<number | "default" | "freeze", Setting>
 
-type Events = | "setting-changed:titleAsRootNode"
-
 export class SettingsTab extends PluginSettingTab {
   private settings: PluginSettings;
   private colorSettings: ColorSettings = {} as ColorSettings;
-
-  public static events = new LocalEvents<Events>();
 
   constructor(settings: PluginSettings) {
     super(app, Plugin.instance);
@@ -178,7 +173,7 @@ export class SettingsTab extends PluginSettingTab {
         .setValue(this.settings.highlight)
         .onChange((value) =>
           this.settings.highlight = value
-      ));
+        ));
 
       new Setting(containerEl)
         .setName("Use title as root node")
@@ -187,17 +182,15 @@ export class SettingsTab extends PluginSettingTab {
         )
         .addToggle((toggle) => toggle
           .setValue(this.settings.titleAsRootNode)
-          .onChange((value) => {
-            this.settings.titleAsRootNode = value;
-            SettingsTab.events.emit("setting-changed:titleAsRootNode", value);
-          })
-        );
+          .onChange((value) =>
+            this.settings.titleAsRootNode = value
+          ));
 
       // Mind map coloring settings
 
       new Setting(containerEl)
         .setHeading()
-        .setName("Coloring")
+        .setName("Coloring");
 
       new Setting(containerEl)
       .setName("Coloring approach")

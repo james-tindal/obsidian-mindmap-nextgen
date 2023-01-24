@@ -4,7 +4,7 @@ import View from "./view";
 import { MM_VIEW_TYPE } from "./constants";
 import { inlineRenderer } from "./inline-renderer";
 
-import { manageFilesystemData, PluginSettings } from "./filesystem-data";
+import { manageFilesystemData, PluginSettings, settingChanges } from "./filesystem-data";
 import { SettingsTab } from "./settings-tab"
 
 export default class Plugin extends ObsidianPlugin {
@@ -27,6 +27,7 @@ export default class Plugin extends ObsidianPlugin {
 
     this.registerView( MM_VIEW_TYPE, (leaf: WorkspaceLeaf) => new View(settings, leaf));
     this.registerMarkdownCodeBlockProcessor("markmap", inlineRenderer(settings));
+    settingChanges.listen("highlight", () => {})
 
     this.addCommand({
       id: "app:markmap-preview",

@@ -9,9 +9,9 @@ import Linker from "./linker";
 import { createSVG, getComputedCss } from "./markmap-svg";
 import { takeScreenshot } from "./copy-image";
 import { htmlEscapePlugin, checkBoxPlugin } from "./plugins";
-import { PluginSettings } from "./filesystem-data";
+import { PluginSettings, settingChanges } from "./filesystem-data";
 import { assocPath, dissocPath, path, pipe } from "ramda";
-import { SettingsTab } from "./settings-tab";
+
 
 export default class View extends ItemView {
   private linkedLeaf: WorkspaceLeaf;
@@ -51,7 +51,7 @@ export default class View extends ItemView {
 
     leaf.on("pinned-change", (pinned) => this.pinned = pinned)
 
-    SettingsTab.events.listen("setting-changed:titleAsRootNode", () => this.render());
+    settingChanges.listen("titleAsRootNode", () => this.render());
   }
 
   public async onClose() {
