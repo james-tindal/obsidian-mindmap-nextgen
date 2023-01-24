@@ -1,4 +1,5 @@
 import type { Plugin_2, SplitDirection } from "obsidian";
+import { LocalEvents } from "./events"
 import type { SettingsTab } from "./settings-tab"
 
 export enum ScreenshotBgStyle {
@@ -262,6 +263,11 @@ type Get = {
   get: <K extends keyof PluginSettings>(_: any, key: K) => PluginSettings[K];
 }
 
+const events = new LocalEvents<keyof PluginSettings>();
+export const settingChanges
+ : { listen: typeof events.listen }
+ = { listen: events.listen.bind(events) }
+
 export async function manageFilesystemData (
   loadData: Plugin_2['loadData'],
   saveData: Plugin_2['saveData']
@@ -275,6 +281,7 @@ export async function manageFilesystemData (
   const set: Set = {
     set(_, key, value) {
       fsd.settings[key] = value;
+      events.emit(key, value)
       saveData(fsd);
       return true;
     }
