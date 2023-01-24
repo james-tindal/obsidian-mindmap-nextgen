@@ -5,13 +5,13 @@ import { INode, IMarkmapOptions } from "markmap-common";
 import { Toolbar } from "markmap-toolbar";
 
 import { MM_VIEW_TYPE } from "./constants";
-import Linker from "./linker";
 import { createSVG, getComputedCss } from "./markmap-svg";
 import { takeScreenshot } from "./copy-image";
 import { htmlEscapePlugin, checkBoxPlugin } from "./plugins";
 import { PluginSettings, settingChanges } from "./filesystem-data";
 import { assocPath, dissocPath, path, pipe } from "ramda";
 import { dontPanic } from "./utilities";
+import { updateInternalLinks } from "./linker"
 
 
 export default class View extends ItemView {
@@ -19,7 +19,6 @@ export default class View extends ItemView {
   private displayText: string;
   private workspace: Workspace;
   private svg: SVGElement;
-  private linker: Linker;
   private settings: PluginSettings;
   private markmapSVG: Markmap;
   private options: Partial<IMarkmapOptions>;
@@ -35,7 +34,6 @@ export default class View extends ItemView {
     super(leaf);
     View.instances.push(this);
     this.settings = settings;
-    this.linker = new Linker();
 
     this.svg = createSVG(this.containerEl, this.settings.lineHeight);
 
@@ -221,7 +219,7 @@ export default class View extends ItemView {
       : this.settings.titleAsRootNode;
 
     const root = titleAsRootNode ? this.titleAsRootNode(root_) : root_;
-    this.linker.updateInternalLinks(root);
+    updateInternalLinks(root);
 
     if (styles) loadCSS(styles);
     if (scripts) loadJS(scripts);
