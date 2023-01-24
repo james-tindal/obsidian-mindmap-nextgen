@@ -1,7 +1,7 @@
 
 export const dontPanic =
 <F extends (...args: any) => any>(f: F, message?: string) =>
-(...args: Parameters<F>) =>
+(...args: Parameters<F>): ReturnType<F> =>
 {
   try { return f(...args) }
   catch (error) {

@@ -7,7 +7,7 @@ import { IMarkmapJSONOptions, IMarkmapOptions, INode } from "markmap-common";
 
 import { getComputedCss } from "./markmap-svg";
 import { PluginSettings, settingChanges } from "./filesystem-data";
-import { dontPanic } from "./utilities"
+import { dontPanic } from "./utilities";
 
 
 type Handler = (
