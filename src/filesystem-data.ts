@@ -1,4 +1,5 @@
 import type { Plugin_2, SplitDirection } from "obsidian";
+import type { SettingsTab } from "./settings-tab"
 
 export enum ScreenshotBgStyle {
   Transparent = "transparent",
@@ -11,21 +12,6 @@ export enum ScreenshotBgStyle {
  * 1. MAJOR version when previously valid keys are removed or have a different function
  * 2. MINOR version - Deprecated. If you are adding a key, just add it to the type and the defaults.
  */
-
-const omit = <T, U extends keyof T>(keys: readonly U[], obj: T): Omit<T, U> =>
-  (Object.keys(obj) as U[]).reduce(
-    (acc, curr) => (keys.includes(curr) ? acc : { ...acc, [curr]: obj[curr] }),
-    {} as Omit<T, U>
-  );
-
-function pick<T, K extends keyof T>(obj: T, ...keys: K[]): Pick<T, K> {
-  const ret: any = {};
-  keys.forEach(key => {
-    ret[key] = obj[key];
-  })
-  return ret;
-}
-
 
 // Default settings
 export const defaults: v2['settings'] = {
@@ -137,7 +123,7 @@ const upgrade1_1 = (data: v1_0): v1_1 => ({
 
 export type Coloring = "depth" | "branch" | "single"
 
-type Settings2_0 = {
+type SettingsV2 = {
   splitDirection: SplitDirection
   nodeMinHeight: number
   lineHeight: string
@@ -169,7 +155,7 @@ type Settings2_0 = {
 
 export type v2 = {
   version: "2.0"
-  settings: Settings2_0
+  settings: SettingsV2
 }
 
 const upgrade2_0 = (data: v1_1): v2 => {
@@ -268,34 +254,38 @@ function upgrade(data: any): FileSystemData {
   }
 }
 
-type SettingsManager = {
-  get: <K extends keyof PluginSettings>(key: K) => PluginSettings[K]
-  set: <K extends keyof PluginSettings>(key: K, value: PluginSettings[K]) => void
-  pick: <K extends keyof PluginSettings>(...keys: K[]) => Pick<PluginSettings, K>
-  omit: <K extends keyof PluginSettings>(...keys: K[]) => Omit<PluginSettings, K>
-  getAll: () => PluginSettings // avoid
+type Set = {
+  set: <K extends keyof PluginSettings>(_: any, key: K, value: PluginSettings[K]) => boolean;
 }
 
-export async function getFilesystemData (
+type Get = {
+  get: <K extends keyof PluginSettings>(_: any, key: K) => PluginSettings[K];
+}
+
+export async function manageFilesystemData (
   loadData: Plugin_2['loadData'],
   saveData: Plugin_2['saveData']
-): Promise<[SettingsManager]>
-{
+) {
   const d = await loadData();
   const fsd: FileSystemData = upgrade(d);
   saveData(fsd);
 
-  const settings: SettingsManager = {
-    get: key => fsd.settings[key],
-    set(key, value) {
+  const get: Get = { get: (_, key) => fsd.settings[key] }
+  const cantSet: Set = { set: () => false }
+  const set: Set = {
+    set(_, key, value) {
       fsd.settings[key] = value;
       saveData(fsd);
-    },
-    pick: (...keys) => pick(fsd.settings, ...keys),
-    omit: (...keys) => omit(keys, fsd.settings),
-    getAll: () => fsd.settings
+      return true;
+    }
   }
-  return [settings];
+
+  const getterSetter = new Proxy<PluginSettings>(fsd.settings, { ...get, ...set })
+  const getter       = new Proxy<PluginSettings>(fsd.settings, { ...get, ...cantSet })
+
+  return {
+    settings: getter,
+    createSettingsTab: (Constructor: typeof SettingsTab) => new Constructor(getterSetter)
+  };
 }
 
-export type { SettingsManager }

@@ -1,6 +1,6 @@
 import { PluginSettingTab, Setting, SplitDirection } from "obsidian";
 import { LocalEvents } from "./events"
-import { ScreenshotBgStyle, SettingsManager } from "./filesystem-data";
+import { Coloring, PluginSettings, ScreenshotBgStyle } from "./filesystem-data";
 
 import Plugin from "./main";
 
@@ -9,18 +9,18 @@ type ColorSettings = Record<number | "default" | "freeze", Setting>
 type Events = | "setting-changed:titleAsRootNode"
 
 export class SettingsTab extends PluginSettingTab {
-  private settings: SettingsManager;
+  private settings: PluginSettings;
   private colorSettings: ColorSettings = {} as ColorSettings;
 
   public static events = new LocalEvents<Events>();
 
-  constructor(plugin: Plugin, settings: SettingsManager) {
-    super(app, plugin);
+  constructor(settings: PluginSettings) {
+    super(app, Plugin.instance);
     this.settings = settings;
   }
 
   decideDisplayColors() {
-    const approach = this.settings.get("coloring");
+    const approach = this.settings.coloring;
     const colors = this.colorSettings;
     const freeze = this.colorSettings.freeze;
     const options = {
@@ -43,59 +43,59 @@ export class SettingsTab extends PluginSettingTab {
       .addDropdown((dropDown) => dropDown
         .addOption("horizontal", "Horizontal")
         .addOption("vertical", "Vertical")
-        .setValue(this.settings.get("splitDirection"))
+        .setValue(this.settings.splitDirection)
         .onChange((value: SplitDirection) =>
-          this.settings.set("splitDirection", value))
-      );
+          this.settings.splitDirection = value
+      ));
 
     new Setting(containerEl)
       .setName("Node Min Height")
       .setDesc("Minimum height for the mind map nodes")
       .addText((text) => text
-        .setValue(this.settings.get("nodeMinHeight").toString())
+        .setValue(this.settings.nodeMinHeight.toString())
         .setPlaceholder("Example: 16")
         .onChange((value: string) =>
-          this.settings.set("nodeMinHeight", Number.parseInt(value)))
-      );
+          this.settings.nodeMinHeight = Number.parseInt(value)
+      ));
 
     new Setting(containerEl)
       .setName("Node Text Line Height")
       .setDesc("Line height for content in mind map nodes")
       .addText((text) => text
-        .setValue(this.settings.get("lineHeight"))
+        .setValue(this.settings.lineHeight)
         .setPlaceholder("Example: 1em")
         .onChange((value: string) =>
-          this.settings.set("lineHeight", value))
+          this.settings.lineHeight = value)
       );
 
     new Setting(containerEl)
       .setName("Vertical Spacing")
       .setDesc("Vertical spacing of the mind map nodes")
       .addText((text) => text
-        .setValue(this.settings.get("spacingVertical").toString())
+        .setValue(this.settings.spacingVertical.toString())
         .setPlaceholder("Example: 5")
         .onChange((value: string) =>
-          this.settings.set("spacingVertical", Number.parseInt(value)))
+          this.settings.spacingVertical = Number.parseInt(value))
       );
 
     new Setting(containerEl)
       .setName("Horizontal Spacing")
       .setDesc("Horizontal spacing of the mind map nodes")
       .addText((text) => text
-        .setValue(this.settings.get("spacingHorizontal").toString())
+        .setValue(this.settings.spacingHorizontal.toString())
         .setPlaceholder("Example: 80")
         .onChange((value: string) =>
-          this.settings.set("spacingHorizontal", Number.parseInt(value)))
+          this.settings.spacingHorizontal = Number.parseInt(value))
       );
 
     new Setting(containerEl)
       .setName("Horizontal padding")
       .setDesc("Leading space before the content of mind map nodes")
       .addText((text) => text
-        .setValue(this.settings.get("paddingX").toString())
+        .setValue(this.settings.paddingX.toString())
         .setPlaceholder("Example: 8")
         .onChange((value: string) =>
-          this.settings.set("paddingX", Number.parseInt(value)))
+          this.settings.paddingX = Number.parseInt(value))
       );
 
     new Setting(containerEl)
@@ -104,10 +104,10 @@ export class SettingsTab extends PluginSettingTab {
         "Sets the initial depth of the mind map. 0 means all nodes are collapsed, 1 means only the root node is expanded, etc.\nTo expand all nodes, set this to -1."
       )
       .addText((text) => text
-        .setValue(this.settings.get("initialExpandLevel").toString())
+        .setValue(this.settings.initialExpandLevel.toString())
         .setPlaceholder("Example: 2")
         .onChange((value: string) =>
-          this.settings.set("initialExpandLevel", Number.parseInt(value)))
+          this.settings.initialExpandLevel = Number.parseInt(value))
       );
 
     new Setting(containerEl)
@@ -116,14 +116,14 @@ export class SettingsTab extends PluginSettingTab {
         "Text color for the screenshot. Toggle the switch on and off to disable/enable this color on the screenshot."
       )
       .addColorPicker((colPicker) => colPicker
-        .setValue(this.settings.get("screenshotTextColor"))
+        .setValue(this.settings.screenshotTextColor)
         .onChange((value: string) =>
-          this.settings.set("screenshotTextColor", value))
+          this.settings.screenshotTextColor = value)
       )
       .addToggle((toggle) => toggle
-        .setValue(this.settings.get("screenshotTextColorEnabled"))
+        .setValue(this.settings.screenshotTextColorEnabled)
         .onChange((value) =>
-          this.settings.set("screenshotTextColorEnabled", value))
+          this.settings.screenshotTextColorEnabled = value)
       );
       
       new Setting(containerEl)
@@ -137,14 +137,14 @@ export class SettingsTab extends PluginSettingTab {
             [ScreenshotBgStyle.Color]: "Color",
             [ScreenshotBgStyle.Theme]: "Theme",
           })
-          .setValue(this.settings.get("screenshotBgStyle"))
+          .setValue(this.settings.screenshotBgStyle)
           .onChange((value: ScreenshotBgStyle) =>
-            this.settings.set("screenshotBgStyle", value))
+            this.settings.screenshotBgStyle = value)
         )
         .addColorPicker((colPicker) => colPicker
-          .setValue(this.settings.get("screenshotBgColor"))
+          .setValue(this.settings.screenshotBgColor)
           .onChange((value: string) =>
-            this.settings.set("screenshotBgColor", value))
+            this.settings.screenshotBgColor = value)
         );
 
     // animation duration
@@ -152,10 +152,10 @@ export class SettingsTab extends PluginSettingTab {
       .setName("Animation duration")
       .setDesc("The animation duration when folding/unfolding a node.")
       .addText((text) => text
-        .setValue(this.settings.get("animationDuration").toString())
+        .setValue(this.settings.animationDuration.toString())
         .setPlaceholder("Example: 500")
         .onChange((value: string) =>
-          this.settings.set("animationDuration", Number.parseInt(value)))
+          this.settings.animationDuration = Number.parseInt(value))
       );
 
     // max width
@@ -163,10 +163,10 @@ export class SettingsTab extends PluginSettingTab {
       .setName("Max width")
       .setDesc("The max width of each node content. 0 for no limit.")
       .addText((text) => text
-        .setValue(this.settings.get("maxWidth").toString())
+        .setValue(this.settings.maxWidth.toString())
         .setPlaceholder("Example: 130")
         .onChange((value: string) =>
-          this.settings.set("maxWidth", Number.parseInt(value)))
+          this.settings.maxWidth = Number.parseInt(value))
       );
 
     new Setting(containerEl)
@@ -175,10 +175,10 @@ export class SettingsTab extends PluginSettingTab {
         "When on, the inline markmap will be highlighted. Which means having a border and a different background color"
       )
       .addToggle((toggle) => toggle
-        .setValue(this.settings.get("highlight"))
+        .setValue(this.settings.highlight)
         .onChange((value) =>
-          this.settings.set("highlight", value))
-      );
+          this.settings.highlight = value
+      ));
 
       new Setting(containerEl)
         .setName("Use title as root node")
@@ -186,10 +186,10 @@ export class SettingsTab extends PluginSettingTab {
           "When on, the root node of the mindmap will be the title of the document."
         )
         .addToggle((toggle) => toggle
-          .setValue(this.settings.get("titleAsRootNode"))
+          .setValue(this.settings.titleAsRootNode)
           .onChange((value) => {
-            this.settings.set("titleAsRootNode", value);
-            SettingsTab.events.emit("setting-changed:titleAsRootNode", value)
+            this.settings.titleAsRootNode = value;
+            SettingsTab.events.emit("setting-changed:titleAsRootNode", value);
           })
         );
 
@@ -208,9 +208,9 @@ export class SettingsTab extends PluginSettingTab {
         .addOption("depth", "Depth based coloring")
         .addOption("branch", "Branch based coloring")
         .addOption("single", "Single color")
-        .setValue(this.settings.get("coloring") || "depth")
-        .onChange((value: "branch" | "depth" | "single") => {
-          this.settings.set("coloring", value);
+        .setValue(this.settings.coloring)
+        .onChange((value: Coloring) => {
+          this.settings.coloring = value;
           this.decideDisplayColors();
         })
       );
@@ -219,19 +219,19 @@ export class SettingsTab extends PluginSettingTab {
         .setName("Depth 1 color")
         .setDesc("Color for the first level of the mind map")
         .addColorPicker((colPicker) => colPicker
-          .setValue(this.settings.get("depth1Color"))
+          .setValue(this.settings.depth1Color)
           .onChange((value: string) =>
-            this.settings.set("depth1Color", value))
+            this.settings.depth1Color = value)
         );
   
       new Setting(containerEl)
         .setName("Depth 1 thickness")
         .setDesc("Depth 1 thickness in pixels")
         .addText((slider) => slider
-          .setValue(this.settings.get("depth1Thickness"))
+          .setValue(this.settings.depth1Thickness)
           .onChange((value) => {
             if (Boolean(parseFloat(value.replace(/[^0-9\.]/g, ""))))
-              this.settings.set("depth1Thickness", value)
+              this.settings.depth1Thickness = value
           })
         );
   
@@ -239,54 +239,54 @@ export class SettingsTab extends PluginSettingTab {
         .setName("Depth 2 color")
         .setDesc("Color for the second level of the mind map")
         .addColorPicker((colPicker) => colPicker
-          .setValue(this.settings.get("depth2Color"))
+          .setValue(this.settings.depth2Color)
           .onChange((value: string) =>
-            this.settings.set("depth2Color", value))
+            this.settings.depth2Color = value)
         );
   
       new Setting(containerEl)
         .setName("Depth 2 thickness")
         .setDesc("Depth 2 thickness in pixels")
         .addText((slider) => slider
-          .setValue(this.settings.get("depth2Thickness"))
+          .setValue(this.settings.depth2Thickness)
           .onChange((value) =>
-            this.settings.set("depth2Thickness", value))
+            this.settings.depth2Thickness = value)
         );
   
       this.colorSettings[3] = new Setting(containerEl)
         .setName("Depth 3 color")
         .setDesc("Color for the third level of the mind map")
         .addColorPicker((colPicker) => colPicker
-          .setValue(this.settings.get("depth3Color"))
+          .setValue(this.settings.depth3Color)
           .onChange((value: string) =>
-            this.settings.set("depth3Color", value))
+            this.settings.depth3Color = value)
         );
   
       new Setting(containerEl)
         .setName("Color 3 thickness")
         .setDesc("Color 3 thickness in pixels")
         .addText((text) => text
-          .setValue(this.settings.get("depth3Thickness"))
+          .setValue(this.settings.depth3Thickness)
           .onChange((value) =>
-            this.settings.set("depth3Thickness", value))
+            this.settings.depth3Thickness = value)
         );
   
       this.colorSettings.default = new Setting(containerEl)
         .setName("Default Color")
         .setDesc("Color for fourth level and beyond")
         .addColorPicker((colPicker) => colPicker
-          .setValue(this.settings.get("defaultColor"))
+          .setValue(this.settings.defaultColor)
           .onChange((value: string) =>
-            this.settings.set("defaultColor", value))
+            this.settings.defaultColor = value)
         );
   
       new Setting(containerEl)
         .setName("Default thickness")
         .setDesc("Thickness for levels deeper than three, in pixels")
         .addText((slider) => slider
-          .setValue(this.settings.get("defaultThickness"))
+          .setValue(this.settings.defaultThickness)
           .onChange((value) =>
-            this.settings.set("defaultThickness", value))
+            this.settings.defaultThickness = value)
         );
   
       this.colorSettings.freeze = new Setting(containerEl)
@@ -295,10 +295,10 @@ export class SettingsTab extends PluginSettingTab {
           "All child branches will use the color of their ancestor node beyond the freeze level."
         )
         .addText((text) => text
-          .setValue(this.settings.get("colorFreezeLevel").toString())
+          .setValue(this.settings.colorFreezeLevel.toString())
           .setPlaceholder("Example: 3")
           .onChange((value: string) =>
-            this.settings.set("colorFreezeLevel", Number.parseInt(value)))
+            this.settings.colorFreezeLevel = Number.parseInt(value))
         );
 
     this.decideDisplayColors();

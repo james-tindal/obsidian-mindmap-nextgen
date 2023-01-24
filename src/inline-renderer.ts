@@ -6,35 +6,10 @@ import { IMarkmapJSONOptions, IMarkmapOptions, INode } from "markmap-common";
 
 import { getComputedCss } from "./markmap-svg";
 import { PluginSettings } from "./filesystem-data";
-import { pick } from "ramda";
-
-const pickACSettings = [
-  "defaultColor",
-  "coloring",
-  "depth1Color",
-  "depth2Color",
-  "depth3Color"
-] as const;
-type pickACSettings = typeof pickACSettings[number];
-
-type ACSettings = Pick<PluginSettings, pickACSettings>;
-
-export const pickInlineRendererSettings = [
-  ...pickACSettings,
-  "lineHeight",
-  "highlight",
-  "nodeMinHeight",
-  "spacingVertical",
-  "spacingHorizontal",
-  "paddingX"
-] as const;
-type pickInlineRendererSettings = typeof pickInlineRendererSettings[number];
-
-type InlineRendererSettings = Pick<PluginSettings, pickInlineRendererSettings>
 
 
 type Renderer = (
-  settings: InlineRendererSettings
+  settings: PluginSettings
 ) => (
   source: string,
   el: HTMLElement,
@@ -100,11 +75,10 @@ export const inlineRenderer: Renderer =
 
       const { font } = getComputedCss(container);
 
-      const aCSettings = pick(pickACSettings, settings);
 
       const options: Partial<IMarkmapOptions> = {
         autoFit: false,
-        color: applyColor(frontmatter?.markmap?.color, aCSettings),
+        color: applyColor(frontmatter?.markmap?.color, settings),
         duration: 500,
         style: (id) => `${id} * {font: ${font}}`,
         nodeMinHeight: settings.nodeMinHeight ?? 16,
@@ -120,11 +94,11 @@ export const inlineRenderer: Renderer =
       mm.setData(root);
       setTimeout(() => mm.fit(), 10);
     } catch (e) {
-      console.log("error");
+      console.error("Error in inline renderer", e);
     }
   };
 
-function applyColor(frontmatterColors: string[], settings: ACSettings) {
+function applyColor(frontmatterColors: string[], settings: PluginSettings) {
   return ({ depth }: INode) => {
     if (settings.coloring == "single") return settings.defaultColor;
 

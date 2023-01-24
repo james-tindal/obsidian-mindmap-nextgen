@@ -3,7 +3,7 @@ import { Transformer, builtInPlugins } from "markmap-lib";
 import { Markmap, loadCSS, loadJS, deriveOptions } from "markmap-view";
 import { INode, IMarkmapOptions } from "markmap-common";
 import { Toolbar } from "markmap-toolbar";
-console.log('livddde')
+
 import { MM_VIEW_TYPE } from "./constants";
 import Linker from "./linker";
 import { createSVG, getComputedCss } from "./markmap-svg";
