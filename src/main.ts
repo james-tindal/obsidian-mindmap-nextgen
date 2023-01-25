@@ -1,10 +1,10 @@
 import { App, Plugin as ObsidianPlugin, PluginManifest, Workspace, WorkspaceLeaf } from "obsidian";
 
-import View from "./view";
+import View from "./views/view";
 import { MM_VIEW_TYPE } from "./constants";
 import { inlineRenderer } from "./inline-renderer";
 
-import { manageFilesystemData, PluginSettings, settingChanges } from "./filesystem-data";
+import { manageFilesystemData, PluginSettings, settingChanges } from "./filesystem";
 import { SettingsTab } from "./settings-tab"
 
 export default class Plugin extends ObsidianPlugin {

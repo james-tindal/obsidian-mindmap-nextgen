@@ -2,7 +2,8 @@ import { Notice } from "obsidian";
 import { Markmap } from "markmap-view";
 import d3SvgToPng from "d3-svg-to-png";
 
-import { PluginSettings, ScreenshotBgStyle } from "./filesystem-data";
+import { PluginSettings, ScreenshotBgStyle } from "./filesystem";
+import { FrontmatterOptions } from "./types/models"
 
 interface ScreenshotSettings {
   backgroundColor: string;
