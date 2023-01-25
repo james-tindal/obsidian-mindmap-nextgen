@@ -1,19 +1,19 @@
 type IMarkmapOptions = import("markmap-common").IMarkmapOptions;
 type IMarkmapJSONOptions = import("markmap-common").IMarkmapJSONOptions;
 
-type FrontmatterOptions = Partial<IMarkmapOptions> & {
+export type FrontmatterOptions = Partial<IMarkmapOptions> & {
   screenshotTextColor?: string;
   screenshotBgColor: string;
   highlight?: boolean;
   titleAsRootNode: boolean;
 };
 
-type TokenWithChildren = Remarkable.Remarkable.Token & {
+export type TokenWithChildren = Remarkable.Remarkable.Token & {
   content?: string;
   children?: TokenWithChildren[];
 };
 
-type CustomFrontmatter = {
+export type CustomFrontmatter = {
   markmap: IMarkmapJSONOptions & {
     screenshotTextColor: string;
     screenshotBgColor: string;

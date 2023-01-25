@@ -1,4 +1,4 @@
-import { defaults, manageFilesystemData, ScreenshotBgStyle, v1_0, v1_1, v2 } from "./filesystem-data"
+import { defaults, manageFilesystemData, ScreenshotBgStyle, v1_0, v1_1, v2 } from "./filesystem"
 
 const loader = (data: any) => async () => data
 const saver = (callback?: Function) =>

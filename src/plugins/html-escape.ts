@@ -1,5 +1,6 @@
 import { wrapFunction } from "markmap-common";
 import { ITransformPlugin } from "markmap-lib";
+import { TokenWithChildren } from "src/types/models"
 
 export const htmlEscapePlugin: ITransformPlugin = {
   name: "htmlescape",

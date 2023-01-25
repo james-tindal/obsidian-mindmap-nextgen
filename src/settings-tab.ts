@@ -1,5 +1,5 @@
 import { PluginSettingTab, Setting, SplitDirection } from "obsidian";
-import { Coloring, PluginSettings, ScreenshotBgStyle } from "./filesystem-data";
+import { Coloring, PluginSettings, ScreenshotBgStyle } from "./filesystem";
 
 import Plugin from "./main";
 

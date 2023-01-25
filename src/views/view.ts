@@ -4,14 +4,15 @@ import { Markmap, loadCSS, loadJS, deriveOptions } from "markmap-view";
 import { INode, IMarkmapOptions } from "markmap-common";
 import { Toolbar } from "markmap-toolbar";
 
-import { MM_VIEW_TYPE } from "./constants";
-import { createSVG, getComputedCss } from "./markmap-svg";
-import { takeScreenshot } from "./copy-image";
-import { htmlEscapePlugin, checkBoxPlugin } from "./plugins";
-import { PluginSettings, settingChanges } from "./filesystem-data";
+import { MM_VIEW_TYPE } from "src/constants";
+import { createSVG, getComputedCss } from "src/markmap-svg";
+import { takeScreenshot } from "src/screenshot";
+import { htmlEscapePlugin, checkBoxPlugin } from "src/plugins";
+import { PluginSettings, settingChanges } from "src/filesystem";
 import { assocPath, dissocPath, path, pipe } from "ramda";
-import { dontPanic } from "./utilities";
-import { updateInternalLinks } from "./linker"
+import { dontPanic } from "src/utilities";
+import { updateInternalLinks } from "src/linker"
+import { CustomFrontmatter, FrontmatterOptions } from "src/types/models"
 
 
 export default class View extends ItemView {

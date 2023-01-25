@@ -6,7 +6,7 @@ import { Markmap, loadCSS, loadJS, deriveOptions } from "markmap-view";
 import { IMarkmapJSONOptions, IMarkmapOptions, INode } from "markmap-common";
 
 import { getComputedCss } from "./markmap-svg";
-import { PluginSettings, settingChanges } from "./filesystem-data";
+import { PluginSettings, settingChanges } from "./filesystem";
 import { dontPanic } from "./utilities";
 
 
