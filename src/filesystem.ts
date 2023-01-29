@@ -1,5 +1,6 @@
 import type { Plugin_2, SplitDirection } from "obsidian";
 import { LocalEvents } from "./events"
+import { Layout } from "./views/layout-manager"
 import type { SettingsTab } from "./settings-tab"
 
 export enum ScreenshotBgStyle {
@@ -15,7 +16,7 @@ export enum ScreenshotBgStyle {
  */
 
 // Default settings
-export const defaults: v2['settings'] = {
+export const defaults: v2["settings"] = {
   splitDirection: "horizontal",
   nodeMinHeight: 16,
   lineHeight: "1em",
@@ -156,7 +157,8 @@ type SettingsV2 = {
 
 export type v2 = {
   version: "2.0"
-  settings: SettingsV2
+  settings: SettingsV2,
+  layout: Layout
 }
 
 const upgrade2_0 = (data: v1_1): v2 => {
@@ -197,7 +199,8 @@ const upgrade2_0 = (data: v1_1): v2 => {
   };
 
   return {
-    version: '2.0',
+    version: "2.0",
+    layout: [],
     settings: {
       ...defaults,
       ...unchanged,
@@ -208,13 +211,15 @@ const upgrade2_0 = (data: v1_1): v2 => {
 }
 
 const defaultsV2 = (): v2 => ({
-  version: '2.0',
+  version: "2.0",
+  layout: [],
   settings: defaults
 })
 
 const useDefaultsForMissingKeys =
 (data: any): v2 => ({
-  version: '2.0',
+  version: "2.0",
+  layout: data.layout || [],
   settings: {
     ...defaults,
     ...data.settings
@@ -268,12 +273,12 @@ export const settingChanges
  : { listen: typeof events.listen }
  = { listen: events.listen.bind(events) }
 
-export async function manageFilesystemData (
-  loadData: Plugin_2['loadData'],
-  saveData: Plugin_2['saveData']
+export type FilesystemManager = Awaited<ReturnType<typeof FilesystemManager>>;
+export async function FilesystemManager (
+  loadData: Plugin_2["loadData"],
+  saveData: Plugin_2["saveData"]
 ) {
-  const d = await loadData();
-  const fsd: FileSystemData = upgrade(d);
+  const fsd: FileSystemData = upgrade(await loadData());
   saveData(fsd);
 
   const get: Get = { get: (_, key) => fsd.settings[key] }
@@ -287,12 +292,16 @@ export async function manageFilesystemData (
     }
   }
 
-  const getterSetter = new Proxy<PluginSettings>(fsd.settings, { ...get, ...set })
-  const getter       = new Proxy<PluginSettings>(fsd.settings, { ...get, ...cantSet })
+  const getterSetter = new Proxy<PluginSettings>(fsd.settings, { ...get, ...set });
+  const getter       = new Proxy<PluginSettings>(fsd.settings, { ...get, ...cantSet });
+
+  const saveLayout = (layout: Layout) => { fsd.layout = layout; saveData(fsd) };
+  const loadLayout = () => fsd.layout;
 
   return {
     settings: getter,
-    createSettingsTab: (Constructor: typeof SettingsTab) => new Constructor(getterSetter)
+    createSettingsTab: (Constructor: typeof SettingsTab) => new Constructor(getterSetter),
+    saveLayout,
+    loadLayout
   };
 }
-

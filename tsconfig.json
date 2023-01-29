@@ -12,12 +12,16 @@
     "importHelpers": true,
     "esModuleInterop": true,
     "strictNullChecks": true,
+    "downlevelIteration": true,
     "lib": [
       "dom",
       "es5",
       "scripthost",
       "es2020"
     ],
+    "paths": {
+      "obsidian": ["src/types/obsidian.d.ts"]
+    }
   },
   "include": [
     "**/*.ts",
