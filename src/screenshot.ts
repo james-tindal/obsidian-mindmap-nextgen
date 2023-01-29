@@ -30,7 +30,7 @@ export async function takeScreenshot(
 
 const getThemeColors = (currentMm: Markmap): ThemeColors => ({
   text: currentMm.svg.style("color"),
-  background: getComputedStyle(currentMm.svg.node().parentElement).backgroundColor
+  background: getComputedStyle(currentMm.svg.node()!.parentElement!).backgroundColor
 });
 
 function getScreenshotSettings(
@@ -67,7 +67,7 @@ function setTextColor(textColor: string, currentMm: Markmap) {
   svg.style("color", textColor);
 
   svg
-    .node()
+    .node()!
     .querySelectorAll("div")
     .forEach((div) => {
       div.style.color = textColor;

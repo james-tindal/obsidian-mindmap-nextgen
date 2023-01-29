@@ -24,9 +24,9 @@ type CustomFrontmatter = {
 
 export function inlineRenderer(settings: PluginSettings): Handler {
   let containerDiv: HTMLDivElement;
-  let frontmatterHighlight: boolean;
+  let frontmatterHighlight: boolean | undefined;
   
-  function setupHighlight(_containerDiv: HTMLDivElement, _frontmatterHighlight: boolean) {
+  function setupHighlight(_containerDiv: HTMLDivElement, _frontmatterHighlight: boolean | undefined) {
     containerDiv = _containerDiv;
     frontmatterHighlight = _frontmatterHighlight;
   }
@@ -81,8 +81,9 @@ export function inlineRenderer(settings: PluginSettings): Handler {
   return dontPanic(handler, 'Error in inline renderer');
 }
 
-function applyColor(frontmatterColors: string[], settings: PluginSettings) {
+function applyColor(frontmatterColors: string[] | undefined, settings: PluginSettings) {
   return ({ depth }: INode) => {
+    depth = depth!;
     if (settings.coloring == "single")
       return settings.defaultColor;
 
