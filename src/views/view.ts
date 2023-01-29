@@ -16,7 +16,7 @@ import { CustomFrontmatter, FrontmatterOptions } from "src/types/models"
 
 
 export default class View extends ItemView {
-  private linkedLeaf: WorkspaceLeaf;
+  private linkedLeaf?: WorkspaceLeaf;
   private displayText: string;
   private workspace: Workspace;
   private svg: SVGElement;
@@ -25,11 +25,11 @@ export default class View extends ItemView {
   private options: Partial<IMarkmapOptions>;
   private frontmatterOptions: FrontmatterOptions;
   private hasFit: boolean;
-  private toolbar: HTMLElement;
+  private toolbar?: HTMLElement;
   private pinned: boolean = false;
   private static instances: View[] = [];
   
-  public file: TFile;
+  public file: TFile | null;
 
   constructor(settings: PluginSettings, leaf: WorkspaceLeaf) {
     super(leaf);
@@ -60,7 +60,7 @@ export default class View extends ItemView {
   }
 
   private modifyFile(data: string) {
-    app.vault.modify(this.file, data)
+    app.vault.modify(this.file!, data)
   }
 
   getViewType(): string {
@@ -189,7 +189,7 @@ export default class View extends ItemView {
 
   private async _render(content?: string) {
     const markdown =
-      typeof content === "string" ? content : await app.vault.cachedRead(this.file);
+      typeof content === "string" ? content : await app.vault.cachedRead(this.file!);
 
     if (!markdown) return;
 
@@ -201,7 +201,7 @@ export default class View extends ItemView {
 
     const { scripts, styles } = transformer.getUsedAssets(features);
 
-    this.upgradeFrontmatter(frontmatter, markdown);
+    this.upgradeFrontmatter(frontmatter!, markdown);
 
     const actualFrontmatter = frontmatter as CustomFrontmatter;
 
@@ -227,7 +227,7 @@ export default class View extends ItemView {
 
     const settings = this.settings;
 
-    this.displayText = this.file.basename || "Mind map";
+    this.displayText = this.file?.basename || "Mind map";
 
     setTimeout(() => this.applyWidths(), 100);
     
@@ -299,7 +299,7 @@ export default class View extends ItemView {
     );
 
     const newFrontmatter = upgrade(frontmatter);
-    const markdownWithoutFrontmatter = markdown.match(/^---$(((?!^---$).)*)/mgs)[1]
+    const markdownWithoutFrontmatter = markdown.match(/^---$(((?!^---$).)*)/mgs)?.[1]
 
     const newFile = '---\n' + newFrontmatter + markdownWithoutFrontmatter
 
@@ -319,13 +319,14 @@ export default class View extends ItemView {
     })
   }
 
-  private titleAsRootNode(root: INode) {
-    if (root.content == "") return { ...root, content: this.file.basename }
-    return { content: this.file.basename, children: [root], type: 'heading', depth: 0 }
+  private titleAsRootNode(root: INode): INode {
+    if (root.content == "") return { ...root, content: this.file!.basename }
+    return { content: this.file!.basename, children: [root], type: 'heading', depth: 0 }
   }
 
   private depthColoring(frontmatterColors?: string[]) {
     return ({ depth }: INode) => {
+      depth = depth!;
       if (frontmatterColors?.length)
         return frontmatterColors[depth % frontmatterColors.length]
 
@@ -350,7 +351,7 @@ export default class View extends ItemView {
     this.svg
       .querySelectorAll("path.markmap-link")
       .forEach((el: SVGPathElement) => {
-        const colorIndex = Math.min(3, parseInt(el.dataset.depth));
+        const colorIndex = Math.min(3, parseInt(el.dataset.depth!));
 
         el.style.strokeWidth = `${colors[colorIndex]}`;
       });
@@ -358,8 +359,8 @@ export default class View extends ItemView {
     this.svg.querySelectorAll("g.markmap-node").forEach((el: SVGGElement) => {
       const line = el.querySelector("line");
 
-      const colorIndex = Math.min(3, parseInt(el.dataset.depth));
-      line.style.strokeWidth = `${colors[colorIndex]}`;
+      const colorIndex = Math.min(3, parseInt(el.dataset.depth!));
+      line!.style.strokeWidth = `${colors[colorIndex]}`;
     });
 
     this.svg.querySelectorAll("circle").forEach((el) => {

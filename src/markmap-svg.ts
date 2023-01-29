@@ -17,7 +17,7 @@ export function createSVG(
 export function removeExistingSVG() {
   const existing = document.getElementById("markmap");
   if (existing) {
-    existing.parentElement.removeChild(existing);
+    existing.parentElement!.removeChild(existing);
   }
 }
 

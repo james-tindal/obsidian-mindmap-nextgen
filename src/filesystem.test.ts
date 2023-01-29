@@ -5,14 +5,6 @@ const saver = (callback?: Function) =>
   async (data: any) =>
     { callback && callback(data) }
 
-// Promise will resolve when the function is called.
-function waitFor<T>(): [(data: any) => void, Promise<T>] {
-  let resolve;
-  const promise = new Promise<T>(res => resolve = res);
-
-  return [resolve, promise];
-}
-
 const defaults2_0 = {
   version: "2.0",
   settings: defaults

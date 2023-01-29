@@ -27,7 +27,7 @@ export const htmlEscapePlugin: ITransformPlugin = {
             return token;
           };
 
-          ctx.result = ctx.result.map(escapeAll);
+          ctx.result = ctx.result!.map(escapeAll);
         },
       });
     });

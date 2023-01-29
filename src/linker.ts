@@ -14,11 +14,11 @@ function replaceInternalLinks(node: INode) {
   const matches = parseValue(node.content);
   for (let i = 0; i < matches.length; i++) {
     const match = matches[i];
-    const isWikiLink = match.groups["wikitext"];
+    const isWikiLink = match.groups!["wikitext"];
     const linkText = isWikiLink
-      ? match.groups["wikitext"]
-      : match.groups["mdtext"];
-    const linkPath = isWikiLink ? linkText : match.groups["mdpath"];
+      ? match.groups!["wikitext"]
+      : match.groups!["mdtext"];
+    const linkPath = isWikiLink ? linkText : match.groups!["mdpath"];
     if (linkPath.startsWith("http")) {
       continue;
     }
