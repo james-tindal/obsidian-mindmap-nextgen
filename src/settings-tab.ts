@@ -256,8 +256,8 @@ export class SettingsTab extends PluginSettingTab {
         );
   
       new Setting(containerEl)
-        .setName("Color 3 thickness")
-        .setDesc("Color 3 thickness in pixels")
+        .setName("Depth 3 thickness")
+        .setDesc("Depth 3 thickness in pixels")
         .addText((text) => text
           .setValue(this.settings.depth3Thickness)
           .onChange((value) =>

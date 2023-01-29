@@ -1,4 +1,4 @@
-import { defaults, manageFilesystemData, ScreenshotBgStyle, v1_0, v1_1, v2 } from "./filesystem"
+import { defaults, FilesystemManager, ScreenshotBgStyle, v1_0, v1_1, v2 } from "./filesystem"
 
 const loader = (data: any) => async () => data
 const saver = (callback?: Function) =>
@@ -7,11 +7,12 @@ const saver = (callback?: Function) =>
 
 const defaults2_0 = {
   version: "2.0",
+  layout: [],
   settings: defaults
 }
 
 
-describe("Filesystem Data Manager", () => {
+describe("Filesystem Settings Manager", () => {
   test("Upgrade v1.0 to v2.0", async () => {
 
     const input: v1_0 = {
@@ -37,6 +38,7 @@ describe("Filesystem Data Manager", () => {
 
     const expected: v2 = {
       version: '2.0',
+      layout: [],
       settings: {
         defaultColor: 'wrew',
         splitDirection: 'vertical',
@@ -72,7 +74,7 @@ describe("Filesystem Data Manager", () => {
 
     const loadData = loader(input);
     const saveData = saver(testCb);
-    await manageFilesystemData(loadData, saveData);
+    await FilesystemManager(loadData, saveData);
   });
 
   test("Upgrade v1.1 to v2.0", async () => {
@@ -111,6 +113,7 @@ describe("Filesystem Data Manager", () => {
 
     const expected: v2 = {
       version: '2.0',
+      layout: [],
       settings: {
         defaultColor: 'wrew',
         splitDirection: 'vertical',
@@ -146,7 +149,7 @@ describe("Filesystem Data Manager", () => {
 
     const loadData = loader(input);
     const saveData = saver(testCb);
-    await manageFilesystemData(loadData, saveData);
+    await FilesystemManager(loadData, saveData);
   })
 
   test("Use defaults for missing keys", async () => {
@@ -178,6 +181,7 @@ describe("Filesystem Data Manager", () => {
 
     const expected: v2 = {
       version: '2.0',
+      layout: [],
       settings: {
         defaultColor: 'wrew',
         splitDirection: 'horizontal',
@@ -213,7 +217,7 @@ describe("Filesystem Data Manager", () => {
 
     const loadData = loader(input);
     const saveData = saver(testCb);
-    await manageFilesystemData(loadData, saveData);
+    await FilesystemManager(loadData, saveData);
   })
 
   test("Use defaults if no data", async () => {
@@ -222,6 +226,6 @@ describe("Filesystem Data Manager", () => {
 
     const loadData = loader(undefined);
     const saveData = saver(testFn);
-    await manageFilesystemData(loadData, saveData);
+    await FilesystemManager(loadData, saveData);
   })
 });

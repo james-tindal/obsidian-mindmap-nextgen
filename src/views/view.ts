@@ -1,78 +1,61 @@
-import { ItemView, Menu, TFile, Workspace, WorkspaceLeaf, debounce, MarkdownView, Editor, stringifyYaml } from "obsidian";
+import { ItemView, Menu, TFile, WorkspaceLeaf, stringifyYaml } from "obsidian";
 import { Transformer, builtInPlugins } from "markmap-lib";
-import { Markmap, loadCSS, loadJS, deriveOptions } from "markmap-view";
+import { Markmap, deriveOptions } from "markmap-view";
 import { INode, IMarkmapOptions } from "markmap-common";
 import { Toolbar } from "markmap-toolbar";
+import { assocPath, dissocPath, path, pipe } from "ramda";
 
 import { MM_VIEW_TYPE } from "src/constants";
 import { createSVG, getComputedCss } from "src/markmap-svg";
 import { takeScreenshot } from "src/screenshot";
 import { htmlEscapePlugin, checkBoxPlugin } from "src/plugins";
-import { PluginSettings, settingChanges } from "src/filesystem";
-import { assocPath, dissocPath, path, pipe } from "ramda";
-import { dontPanic } from "src/utilities";
+import { PluginSettings } from "src/filesystem";
 import { updateInternalLinks } from "src/linker"
 import { CustomFrontmatter, FrontmatterOptions } from "src/types/models"
 
 
 export default class View extends ItemView {
-  private linkedLeaf?: WorkspaceLeaf;
-  private displayText: string;
-  private workspace: Workspace;
   private svg: SVGElement;
   private settings: PluginSettings;
-  private markmapSVG: Markmap;
+  private markmap: Markmap;
   private options: Partial<IMarkmapOptions>;
   private frontmatterOptions: FrontmatterOptions;
-  private hasFit: boolean;
   private toolbar?: HTMLElement;
-  private pinned: boolean = false;
-  private static instances: View[] = [];
+  private hasRendered: boolean = false;
+  private displayText: string;
+  private pinned: boolean;
   
-  public file: TFile | null;
+  public isView = true;
 
-  constructor(settings: PluginSettings, leaf: WorkspaceLeaf) {
+  constructor(settings: PluginSettings, leaf: WorkspaceLeaf, displayText: string, pinned: boolean) {
     super(leaf);
-    View.instances.push(this);
     this.settings = settings;
+    this.displayText = displayText;
 
-    this.svg = createSVG(this.containerEl, this.settings.lineHeight);
-
-    this.hasFit = false;
-
-    this.createMarkmapSvg();
-
+    this.svg = createSVG(this.containerEl);
+    this.markmap = Markmap.create(this.svg, {});
     this.createToolbar();
 
-    this.registerListeners();
-    
-    this.file = app.workspace.getActiveFile();
-    app.workspace.onLayoutReady(() => this.render());
-
-    leaf.on("pinned-change", (pinned) => this.pinned = pinned)
-
-    settingChanges.listen("titleAsRootNode", () => this.render());
+    this.pinned = pinned;
   }
 
-  public async onClose() {
-    const index = View.instances.findIndex(instance => instance === this);
-    delete View.instances[index];
+  // Need to account for users clicking the tab pin icon too
+  private static pinToggleListener: (view: View) => void;
+  public static onPinToggle(listener: (view: View) => void) {
+    View.pinToggleListener = listener;
+  }
+  private togglePinned() {
+    View.pinToggleListener(this)
   }
 
-  private modifyFile(data: string) {
-    app.vault.modify(this.file!, data)
-  }
+  public getViewType() { return MM_VIEW_TYPE };
+  public getDisplayText() { return this.displayText };
+  public getIcon() { return "dot-network" };
 
-  getViewType(): string {
-    return MM_VIEW_TYPE;
-  }
-
-  getDisplayText(): string {
-    return this.displayText ?? "Mind Map";
-  }
-
-  getIcon() {
-    return "dot-network";
+  public static isView(x: any): x is View {
+    return typeof x === "object"
+        && "isView" in x
+        && x.isView === true;
   }
 
   private onMoreOptionsMenu(menu: Menu) {
@@ -80,7 +63,7 @@ export default class View extends ItemView {
       .addItem((item) => item
         .setIcon("pin")
         .setTitle(this.pinned ? "Unpin" : "Pin")
-        .onClick(() => this.pinned ? this.unPin() : this.pinCurrentLeaf())
+        .onClick(() => this.togglePinned())
       )
       .addItem((item) => item
         .setIcon("image-file")
@@ -88,7 +71,7 @@ export default class View extends ItemView {
         .onClick(() =>
           takeScreenshot(
             this.settings,
-            this.markmapSVG,
+            this.markmap,
             this.frontmatterOptions
       )))
       .addItem((item) => item
@@ -105,10 +88,6 @@ export default class View extends ItemView {
     menu.showAtPosition({ x: 0, y: 0 });
   }
 
-  private createMarkmapSvg() {
-    this.markmapSVG = Markmap.create(this.svg, {});
-  }
-
   private toggleToolbar() {
     if (this.toolbar) {
       this.toolbar.remove();
@@ -122,7 +101,7 @@ export default class View extends ItemView {
     const container = document.createElement("div");
     container.className = "markmap-toolbar-container";
 
-    const el = Toolbar.create(this.markmapSVG) as HTMLElement;
+    const el = Toolbar.create(this.markmap) as HTMLElement;
 
     container.append(el);
     this.containerEl.append(container);
@@ -130,66 +109,24 @@ export default class View extends ItemView {
     this.toolbar = container;
   }
 
-  private registerListeners() {
-    const editorChange: (
-      editor: Editor,
-      markdownView: MarkdownView
-    ) => any = (editor) => {
-      const content = editor.getValue();
-      const pinned = this.leaf.getViewState().pinned
-      if (! pinned) this.render(content);
-    };
-
-    const debouncedEditorChange = debounce(editorChange, 300, true);
-    const listeners = [
-      app.workspace.on("editor-change", debouncedEditorChange),
-      app.workspace.on("file-open", (file) => {
-        this.file = file;
-        const pinned = this.leaf.getViewState().pinned
-        if (! pinned) this.render();
-      }),
-      this.leaf.on("pinned-change", (pinned) => {
-        if (! pinned) this.render();
-      }),
-    ];
-
-    listeners.forEach(listener => this.registerEvent(listener))
-  }
-
-  private updateLinkedLeaf(group: string, mmView: View) {
-    if (group === null) {
-      mmView.linkedLeaf = undefined;
-      return;
-    }
-    const mdLinkedLeaf = mmView.workspace
-      .getGroupLeaves(group)
-      .filter((l) => l?.view?.getViewType() === MM_VIEW_TYPE)[0];
-    mmView.linkedLeaf = mdLinkedLeaf;
-
-    this.render();
-  }
-
-  private pinCurrentLeaf() {
-    this.leaf.setPinned(true);
-  }
-
-  private unPin() {
-    this.leaf.setPinned(false);
-  }
-
   private collapseAll() {
-    this.markmapSVG.setData(this.markmapSVG.state.data, {
+    this.markmap.setData(this.markmap.state.data, {
       ...this.options,
       initialExpandLevel: 0,
     });
   }
 
-  private render: typeof this._render =
-    dontPanic(this._render.bind(this), "Error in render");
+  public async firstRender(file: TFile) {
+    if (this.hasRendered) return;
+    this.hasRendered = true;
+    await this.render(file);
+    this.markmap.fit();
+  }
 
-  private async _render(content?: string) {
-    const markdown =
-      typeof content === "string" ? content : await app.vault.cachedRead(this.file!);
+  public async render(file: TFile, content?: string) {
+    if (!this.hasRendered) return;
+
+    const markdown = content ? content : await app.vault.cachedRead(file);
 
     if (!markdown) return;
 
@@ -197,11 +134,9 @@ export default class View extends ItemView {
     
     const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin, ]);
 
-    let { root: root_, features, frontmatter } = transformer.transform(sanitisedMarkdown);
+    let { root: root_, frontmatter } = transformer.transform(sanitisedMarkdown);
 
-    const { scripts, styles } = transformer.getUsedAssets(features);
-
-    this.upgradeFrontmatter(frontmatter!, markdown);
+    if (frontmatter) this.upgradeFrontmatter(frontmatter, markdown, file);
 
     const actualFrontmatter = frontmatter as CustomFrontmatter;
 
@@ -219,15 +154,10 @@ export default class View extends ItemView {
       ? frontmatterOptions.titleAsRootNode
       : this.settings.titleAsRootNode;
 
-    const root = titleAsRootNode ? this.titleAsRootNode(root_) : root_;
+    const root = titleAsRootNode ? this.titleAsRootNode(root_, file.basename) : root_;
     updateInternalLinks(root);
 
-    if (styles) loadCSS(styles);
-    if (scripts) loadJS(scripts);
-
     const settings = this.settings;
-
-    this.displayText = this.file?.basename || "Mind map";
 
     setTimeout(() => this.applyWidths(), 100);
     
@@ -265,15 +195,10 @@ export default class View extends ItemView {
 
     this.options = options;
 
-    this.markmapSVG.setData(root, {
+    this.markmap.setData(root, {
       ...options,
       ...markmapOptions,
     });
-
-    if (!this.hasFit) {
-      this.markmapSVG.fit();
-      this.hasFit = true;
-    }
   }
 
   private waitForSave() {
@@ -286,7 +211,9 @@ export default class View extends ItemView {
   }
 
   // Upgrade deprecated frontmatter keys to new ones.
-  private async upgradeFrontmatter(frontmatter: Object, markdown: string) {
+  private async upgradeFrontmatter(frontmatter: Object, markdown: string, file: TFile) {
+    if (frontmatter === undefined) return;
+
     await this.waitForSave()
 
     const screenshotFgColor = path(['markmap', 'screenshotFgColor'], frontmatter);
@@ -301,9 +228,9 @@ export default class View extends ItemView {
     const newFrontmatter = upgrade(frontmatter);
     const markdownWithoutFrontmatter = markdown.match(/^---$(((?!^---$).)*)/mgs)?.[1]
 
-    const newFile = '---\n' + newFrontmatter + markdownWithoutFrontmatter
+    const newFileContents = '---\n' + newFrontmatter + markdownWithoutFrontmatter
 
-    this.modifyFile(newFile)
+    app.vault.modify(file, newFileContents)
   }
 
   private sanitiseMarkdown(markdown: string) {
@@ -319,9 +246,9 @@ export default class View extends ItemView {
     })
   }
 
-  private titleAsRootNode(root: INode): INode {
-    if (root.content == "") return { ...root, content: this.file!.basename }
-    return { content: this.file!.basename, children: [root], type: 'heading', depth: 0 }
+  private titleAsRootNode(root: INode, title: string) {
+    if (root.content == "") return { ...root, content: title }
+    return { content: title, children: [root], type: 'heading', depth: 0 }
   }
 
   private depthColoring(frontmatterColors?: string[]) {
@@ -357,7 +284,7 @@ export default class View extends ItemView {
       });
 
     this.svg.querySelectorAll("g.markmap-node").forEach((el: SVGGElement) => {
-      const line = el.querySelector("line");
+      const line = el.querySelector("line")!;
 
       const colorIndex = Math.min(3, parseInt(el.dataset.depth!));
       line!.style.strokeWidth = `${colors[colorIndex]}`;

@@ -7,7 +7,6 @@ import { IMarkmapJSONOptions, IMarkmapOptions, INode } from "markmap-common";
 
 import { getComputedCss } from "./markmap-svg";
 import { PluginSettings, settingChanges } from "./filesystem";
-import { dontPanic } from "./utilities";
 
 
 type Handler = (
@@ -42,7 +41,7 @@ export function inlineRenderer(settings: PluginSettings): Handler {
     }
   }
 
-  function handler(markdownContent: string, containerDiv: HTMLDivElement, ctx: MarkdownPostProcessorContext) {
+  return function handler(markdownContent: string, containerDiv: HTMLDivElement, ctx: MarkdownPostProcessorContext) {
     const child = new MarkdownRenderChild(containerDiv);
     ctx.addChild(child);
     const unlisten = settingChanges.listen("highlight", renderHighlight);
@@ -78,7 +77,6 @@ export function inlineRenderer(settings: PluginSettings): Handler {
     const svg = appendSvg(containerDiv, settings.lineHeight);
     renderMarkmap(svg, root, options);
   }
-  return dontPanic(handler, 'Error in inline renderer');
 }
 
 function applyColor(frontmatterColors: string[] | undefined, settings: PluginSettings) {

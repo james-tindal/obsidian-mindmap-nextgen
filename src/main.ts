@@ -1,10 +1,10 @@
-import { App, Plugin as ObsidianPlugin, PluginManifest, Workspace, WorkspaceLeaf } from "obsidian";
-
-import View from "./views/view";
-import { MM_VIEW_TYPE } from "./constants";
+import { App, Plugin as ObsidianPlugin, PluginManifest } from "obsidian";
 import { inlineRenderer } from "./inline-renderer";
-import { manageFilesystemData, PluginSettings, settingChanges } from "./filesystem";
+import { FilesystemManager } from "./filesystem";
 import { SettingsTab } from "./settings-tab"
+import { ViewManager } from "./views/view-manager"
+import { LayoutManager } from "./views/layout-manager"
+
 
 export default class Plugin extends ObsidianPlugin {
   public static instance: Plugin;
@@ -21,39 +21,17 @@ export default class Plugin extends ObsidianPlugin {
     const loadData = this.loadData.bind(this);
     const saveData = this.saveData.bind(this);
 
-    const { settings, createSettingsTab } = await manageFilesystemData(loadData, saveData);
+    const { settings, createSettingsTab, saveLayout, loadLayout } = await FilesystemManager(loadData, saveData);
     this.addSettingTab(createSettingsTab(SettingsTab));
 
-    this.registerView( MM_VIEW_TYPE, (leaf: WorkspaceLeaf) => new View(settings, leaf));
+    const layoutManager = LayoutManager(saveLayout, loadLayout);
+
+    ViewManager(this, settings, layoutManager);
+
     this.registerMarkdownCodeBlockProcessor("markmap", inlineRenderer(settings));
-    settingChanges.listen("highlight", () => {})
-
-    this.addCommand({
-      id: "app:markmap-preview",
-      name: "View the current note as a Mind Map",
-      callback: () => this.initPreview(settings),
-      hotkeys: [],
-    });
-
   }
 
-  async initPreview(settings: PluginSettings) {
-    if (app.workspace.getLeavesOfType(MM_VIEW_TYPE).length > 0) {
-      return;
-    }
-    app.workspace
-      .getLeaf("split", settings.splitDirection)
-      .setViewState({
-        type: MM_VIEW_TYPE,
-        active: true
-      });
-  }
-
-  async onunload() {
+  public async onunload() {
     console.info("Unloading Mind Map plugin");
-  }
-
-  activeLeafName(workspace: Workspace) {
-    return workspace.activeLeaf?.getDisplayText();
   }
 }

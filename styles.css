@@ -3,12 +3,12 @@
     --mm-line-height: 1em;
 }
 
-#markmap {
+.markmap {
     width: 100%;
     height: 100%;
 }
 
-#markmap div {
+.markmap div {
     line-height: var(--mm-line-height, 1em);
 }
 
