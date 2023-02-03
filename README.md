@@ -44,9 +44,11 @@ A similar plugin is available for [Visual Studio Code](https://marketplace.visua
 
 ## Usage
 
-You can open the Mind Map preview for the current note with a command.
+Open the command palette (cmd/ctrl-p) and begin typing the name of one of the 2 commands.
 
-![Mind Map Preview Command](https://user-images.githubusercontent.com/21978588/206906548-8eb630fc-1b27-4842-8208-c1cd24030194.png)
+<img width="720" alt="Command palette commands" src="https://user-images.githubusercontent.com/10291002/216599311-75ec8e62-3e99-4e09-abc3-86ff125ab308.png">
+
+What's the difference between a pinned and an unpinned mindmap? A pinned mindmap is linked to a single Markdown document. An unpinned mindmap will update based on whichever document is the last one you clicked on.
 
 ### Frontmatter
 
