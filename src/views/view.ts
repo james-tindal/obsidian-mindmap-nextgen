@@ -241,7 +241,7 @@ export default class View extends ItemView {
     // Remove info string from code fence unless it in the list of default languages from
     // https://prismjs.com/#supported-languages
     const allowedLanguages = ["markup", "html", "xml", "svg", "mathml", "ssml", "atom", "rss", "js", "javascript", "css", "clike"]
-    return markdown.replace(/```(.+)/, (_, capture) => {
+    return markdown.replace(/```(.+)/g, (_, capture) => {
       const backticks = capture.match(/(`*).*/)?.[1]
       const infoString = capture.match(/`*(.*)/)?.[1]
       const t = infoString?.trim()
