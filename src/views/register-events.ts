@@ -1,4 +1,5 @@
 import { debounce } from "obsidian"
+import { settingChanges } from "src/filesystem"
 import Plugin from "src/main"
 import { EventListeners } from "./event-listeners"
 import View from "./view"
@@ -8,9 +9,9 @@ import { Views } from "./view-manager"
 export async function registerEvents(plugin: Plugin, listeners: EventListeners, views: Views, setViewCreator: ViewCreatorManager['setViewCreator']) {
   listeners.appLoading(setViewCreator);
   const mindmapLayoutReady = new Promise(resolve =>
-    app.workspace.onLayoutReady(() => {
-      listeners.layoutReady().then(resolve);
-    }));
+    app.workspace.onLayoutReady(() =>
+      listeners.layoutReady().then(resolve)
+    ));
 
   await mindmapLayoutReady;
 
@@ -43,4 +44,17 @@ export async function registerEvents(plugin: Plugin, listeners: EventListeners, 
     callback: listeners.viewRequest["hotkey-open-pinned"],
     hotkeys: [],
   });
+
+  // Color setting updates
+
+  settingChanges.listen("coloring", views.renderAll);
+  settingChanges.listen("defaultColor", views.renderAll);
+  settingChanges.listen("defaultThickness", views.renderAll);
+  settingChanges.listen("depth1Color", views.renderAll);
+  settingChanges.listen("depth1Thickness", views.renderAll);
+  settingChanges.listen("depth2Color", views.renderAll);
+  settingChanges.listen("depth2Thickness", views.renderAll);
+  settingChanges.listen("depth3Color", views.renderAll);
+  settingChanges.listen("depth3Thickness", views.renderAll);
+  settingChanges.listen("colorFreezeLevel", views.renderAll);
 }

@@ -53,6 +53,13 @@ function Views() {
         view2subject.delete(view);
         subject2view.delete(subject);
       }
+    },
+    renderAll() {
+      subject2view.forEach((view, subject) => {
+        const pinned = subject !== "unpinned";
+        const file = pinned ? subject : getActiveFile();
+        if (file) view.render(file);
+      })
     }
   }
 
