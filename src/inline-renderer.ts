@@ -2,10 +2,9 @@ import { MarkdownPostProcessorContext, MarkdownRenderChild } from "obsidian";
 
 import { Transformer } from "markmap-lib";
 const transformer = new Transformer();
-import { Markmap, loadCSS, loadJS, deriveOptions } from "markmap-view";
+import { Markmap, deriveOptions } from "markmap-view";
 import { IMarkmapJSONOptions, IMarkmapOptions, INode } from "markmap-common";
 
-import { getComputedCss } from "./markmap-svg";
 import { PluginSettings, settingChanges } from "./filesystem";
 
 
@@ -47,24 +46,17 @@ export function inlineRenderer(settings: PluginSettings): Handler {
     const unlisten = settingChanges.listen("highlight", renderHighlight);
     child.register(unlisten);
 
-    const { root, features, frontmatter: frontmatter_ } = transformer.transform(markdownContent);
+    const { root, frontmatter: frontmatter_ } = transformer.transform(markdownContent);
     const frontmatter = frontmatter_ as CustomFrontmatter;
     setupHighlight(containerDiv, frontmatter?.markmap?.highlight);
     renderHighlight();
 
-    const { scripts, styles } = transformer.getUsedAssets(features);
-
-    if (scripts) loadJS(scripts);
-    if (styles) loadCSS(styles);
-
-    const { font } = getComputedCss(containerDiv);
     const markmapOptions = deriveOptions(frontmatter?.markmap ?? {});
 
     const options: Partial<IMarkmapOptions> = {
       autoFit: false,
       color: applyColor(frontmatter?.markmap?.color, settings),
       duration: 500,
-      style: (id) => `${id} * {font: ${font}}`,
       nodeMinHeight: settings.nodeMinHeight ?? 16,
       spacingVertical: settings.spacingVertical ?? 5,
       spacingHorizontal: settings.spacingHorizontal ?? 80,
@@ -113,11 +105,8 @@ function appendSvg(
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.classList.add("markmap-inline-svg");
 
-  const style = document.createElement("style");
-
   svg.setAttr("style", `--mm-line-height: ${lineHeight ?? "1em"}; width: 100%; height: 100%;`);
 
-  svg.appendChild(style);
   containerDiv.appendChild(svg);
 
   return svg

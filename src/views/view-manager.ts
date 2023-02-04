@@ -18,7 +18,7 @@ export function ViewManager(plugin: Plugin, settings: PluginSettings, layoutMana
   const leafManager = LeafManager(views, createLeafIn, viewCreatorManager.constructView);
   const eventListeners = EventListeners(views, settings, layoutManager, leafManager)
 
-  registerEvents(plugin, eventListeners, views, viewCreatorManager.setViewCreator);
+  registerEvents(plugin, eventListeners, views, viewCreatorManager.setViewCreator, settings);
 }
 
 type Get<MSV extends MindmapSubject | View> = MSV extends View ? MindmapSubject : View;
