@@ -16,7 +16,7 @@ export function LeafManager(views: Views, createLeafIn: CreateLeafIn, constructV
   }
 
   async function replace(remove: MindmapSubject | WorkspaceLeaf, add: MindmapSubject) {
-    const leafToRemove = isLeaf(remove) ? remove : views.get(remove).leaf;
+    const leafToRemove = isLeaf(remove) ? remove : views.get(remove)!.leaf;
     const tabGroup = leafToRemove.parent;
     const index = tabGroup.children.indexOf(leafToRemove);
 
@@ -31,12 +31,12 @@ export function LeafManager(views: Views, createLeafIn: CreateLeafIn, constructV
   }
 
   function close(subject: MindmapSubject) {
-    const view = views.get(subject);
+    const view = views.get(subject)!;
     view.leaf.detach();
   }
 
   function reveal(subject: MindmapSubject) {
-    const view = views.get(subject);
+    const view = views.get(subject)!;
     app.workspace.setActiveLeaf(view.leaf);
   }
 

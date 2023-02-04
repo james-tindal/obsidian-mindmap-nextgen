@@ -14,17 +14,20 @@ export async function registerEvents(plugin: Plugin, listeners: EventListeners, 
     ));
 
   await mindmapLayoutReady;
+  listeners.layoutChange();
 
   plugin.registerEvent(app.workspace.on('layout-change', listeners.layoutChange));
 
   ;[
     app.workspace.on("editor-change", debounce(listeners.editorChange, 300, true)),
     app.workspace.on("file-open", listeners.fileOpen),
+    app.vault.on("rename", listeners.renameFile)
+
   ]
   .forEach(listener => plugin.registerEvent(listener));
 
   View.onPinToggle(view => {
-    const subject = views.get(view);
+    const subject = views.get(view)!;
     if (subject === "unpinned")
       listeners.viewRequest["menu-pin"]()
     else
@@ -46,7 +49,6 @@ export async function registerEvents(plugin: Plugin, listeners: EventListeners, 
   });
 
   // Color setting updates
-
   settingChanges.listen("coloring", views.renderAll);
   settingChanges.listen("defaultColor", views.renderAll);
   settingChanges.listen("defaultThickness", views.renderAll);
@@ -57,4 +59,7 @@ export async function registerEvents(plugin: Plugin, listeners: EventListeners, 
   settingChanges.listen("depth3Color", views.renderAll);
   settingChanges.listen("depth3Thickness", views.renderAll);
   settingChanges.listen("colorFreezeLevel", views.renderAll);
+
+  // Update title as root node
+  settingChanges.listen("titleAsRootNode", views.renderAll);
 }
