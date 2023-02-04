@@ -234,9 +234,9 @@ export default class View extends ItemView {
   }
 
   private sanitiseMarkdown(markdown: string) {
-    // Remove info string from code fence unless it is "js" or "javascript"
-    // transformer.transform can't handle other languages
-    const allowedLanguages = ["js", "javascript", "css", "html"]
+    // Remove info string from code fence unless it in the list of default languages from
+    // https://prismjs.com/#supported-languages
+    const allowedLanguages = ["markup", "html", "xml", "svg", "mathml", "ssml", "atom", "rss", "js", "javascript", "css", "clike"]
     return markdown.replace(/```(.+)/, (_, capture) => {
       const backticks = capture.match(/(`*).*/)?.[1]
       const infoString = capture.match(/`*(.*)/)?.[1]
