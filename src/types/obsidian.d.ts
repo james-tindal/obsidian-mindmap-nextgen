@@ -4396,17 +4396,20 @@ export abstract class WorkspaceItem extends Events {
     parent?: WorkspaceParent;
     type: WorkspaceParent['type'] | 'leaf'
 
-    /**
-     * @public
-     */
-    getRoot(): WorkspaceItem;
+    constructor(t,n);
+    detach();
     /**
      * Get the root container parent item, which can be one of:
      * - {@link WorkspaceRoot}
      * - {@link WorkspaceWindow}
-     * @public
      */
     getContainer(): WorkspaceContainer;
+    getIcon();
+    getRoot(): WorkspaceItem;
+    onResizeStart(e);
+    serialize();
+    setDimension(e);
+    setParent(e);
 
 }
 
@@ -4432,6 +4435,7 @@ export class WorkspaceLeaf extends WorkspaceItem {
     tabHeaderStatusLinkEl?: HTMLElement;
     tabHeaderStatusPinEl?: HTMLElement;
     type: 'leaf';
+    view: View;
     width: number;
     working: boolean;
     workspace: Workspace;
@@ -4444,85 +4448,43 @@ export class WorkspaceLeaf extends WorkspaceItem {
 
     constructor(app: App);
 
-    /**
-     * @public
-     */
-    view: View;
-
+    canNavigate(): boolean;
+    constructort(t,n);
+    detach(): void;
+    getDisplayText(): string;
+    getEphemeralState();
+    getHistoryState();
+    getIcon(): IconName;
+    getViewState(): ViewState;
+    handleDrop(e,t,n);
+    highlight();
+    onOpenTabHeaderMenu(e);
+    onResize(): void;
+    open(view: View): Promise<View>;
     /**
      * By default, `openFile` will also make the leaf active.
      * Pass in `{ active: false }` to override.
-     *
-     * @public
      */
     openFile(file: TFile, openState?: OpenViewState): Promise<void>;
-
-    /**
-     * @public
-     */
-    open(view: View): Promise<View>;
-
-    /**
-     * @public
-     */
-    getViewState(): ViewState;
-    /**
-     * @public
-     */
-    setViewState(viewState: ViewState, eState?: any): Promise<void>;
-
-    /**
-     * @public
-     */
-    getEphemeralState(): any;
-    /**
-     * @public
-     */
+    openLinkText(e,t,n);
+    rebuildView();
+    recordHistory(e);
+    serialize();
     setEphemeralState(state: any): void;
-    /**
-     * @public
-     */
-    togglePinned(): void;
-    /**
-     * @public
-     */
-    setPinned(pinned: boolean): void;
-    /**
-     * @public
-     */
-    setGroupMember(other: WorkspaceLeaf): void;
-    /**
-     * @public
-     */
     setGroup(group: string): void;
+    setGroupMember(other: WorkspaceLeaf): void;
+    setPinned(pinned: boolean): void;
+    setViewState(viewState: ViewState, eState?: any): Promise<void>;
+    togglePinned(): void;
+    trigger(t);
+    unhighlight();
     /**
-     * @public
+     * Calls setDisplayText() and updates the tab title.
      */
-    detach(): void;
+    updateHeader(): void;
 
-    /**
-     * @public
-     */
-    getIcon(): IconName;
-    /**
-     * @public
-     */
-    getDisplayText(): string;
-
-    /**
-     * @public
-     */
-    onResize(): void;
-
-    /**
-     * @public
-     */
     on(name: 'pinned-change', callback: (pinned: boolean) => any, ctx?: any): EventRef;
-    /**
-     * @public
-     */
     on(name: 'group-change', callback: (group: string) => any, ctx?: any): EventRef;
-
 }
 
 /**
@@ -4541,7 +4503,6 @@ export class WorkspaceMobileDrawer extends WorkspaceParent {
 
     /** @public */
     toggle(): void;
-
 }
 
 /**

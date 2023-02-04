@@ -32,7 +32,7 @@ function replaceInternalLinks(node: INode) {
 }
 
 function parseValue(v: string) {
-  const matches = [];
+  const matches: any[] = [];
   let match;
   while ((match = INTERNAL_LINK_REGEX.exec(v))) {
     matches.push(match);

@@ -1,4 +1,4 @@
-import { TFile, MarkdownView, MarkdownFileInfo, WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs, Editor } from "obsidian"
+import { TFile, MarkdownView, MarkdownFileInfo, WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs, Editor, TAbstractFile } from "obsidian"
 import { PluginSettings } from "src/filesystem"
 import { LayoutManager } from "./layout-manager"
 import { LeafManager } from "./leaf-manager"
@@ -19,6 +19,7 @@ export type EventListeners = {
   }
   editorChange(editor: Editor, info: MarkdownView | MarkdownFileInfo): any;
   fileOpen(file: TFile | null): void;
+  renameFile(file: TAbstractFile, oldPath: string): void;
 }
 export function EventListeners(views: Views, settings: PluginSettings, layoutManager: LayoutManager, leafManager: LeafManager): EventListeners { return {
   appLoading(setViewCreator: ViewCreatorManager['setViewCreator']) {
@@ -98,12 +99,12 @@ export function EventListeners(views: Views, settings: PluginSettings, layoutMan
     const content = editor.getValue();
 
     if (views.has(file)) {
-      const view = views.get(file);
+      const view = views.get(file)!;
       view.render(file, content);
     }
 
     if (views.has("unpinned")) {
-      const view = views.get("unpinned");
+      const view = views.get("unpinned")!;
       view.render(file, content);
     }
   },
@@ -113,13 +114,27 @@ export function EventListeners(views: Views, settings: PluginSettings, layoutMan
     if (file.extension !== "md") return;
 
     if (views.has(file)) {
-      const view = views.get(file)
-      view.render(file)
+      const view = views.get(file)!;
+      view.render(file);
     }
 
     if (views.has("unpinned")) {
-      const view = views.get("unpinned")
-      view.render(file)
+      const view = views.get("unpinned")!;
+      view.render(file);
+    }
+  },
+
+  renameFile({ path }) {
+    const activeFile = getActiveFile();
+    const unpinned = views.get("unpinned");
+    if (unpinned && activeFile?.path === path && settings.titleAsRootNode)
+      unpinned.render(activeFile);
+
+    const result = views.getByPath(path);
+    if (result) {
+      const { view, file } = result
+      view.setDisplayText(file.basename);
+      view.render(file);
     }
   }
 }}

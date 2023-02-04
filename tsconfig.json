@@ -6,7 +6,7 @@
     "module": "ESNext",
     "target": "es5",
     "allowJs": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "importHelpers": true,

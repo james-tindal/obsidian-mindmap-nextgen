@@ -39,7 +39,6 @@ export default class View extends ItemView {
     this.pinned = pinned;
   }
 
-  // Need to account for users clicking the tab pin icon too
   private static pinToggleListener: (view: View) => void;
   public static onPinToggle(listener: (view: View) => void) {
     View.pinToggleListener = listener;
@@ -51,6 +50,11 @@ export default class View extends ItemView {
   public getViewType() { return MM_VIEW_TYPE };
   public getDisplayText() { return this.displayText };
   public getIcon() { return "dot-network" };
+
+  public setDisplayText(displayText: string) {
+    this.displayText = displayText;
+    this.leaf.updateHeader();
+  }
 
   public static isView(x: any): x is View {
     return typeof x === "object"
