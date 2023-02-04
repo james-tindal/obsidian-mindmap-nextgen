@@ -64,7 +64,8 @@ describe("Filesystem Settings Manager", () => {
         highlight: true,
         screenshotBgColor: '#002b36',
         screenshotBgStyle: ScreenshotBgStyle.Color,
-        titleAsRootNode: true
+        titleAsRootNode: true,
+        useThemeFont: false
       }
     }
 
@@ -139,7 +140,8 @@ describe("Filesystem Settings Manager", () => {
         highlight: false,
         screenshotBgColor: 'r6t7y',
         screenshotBgStyle: ScreenshotBgStyle.Theme,
-        titleAsRootNode: true
+        titleAsRootNode: true,
+        useThemeFont: false
       }
     }
 
@@ -207,7 +209,8 @@ describe("Filesystem Settings Manager", () => {
         highlight: false,
         screenshotBgColor: 'r6t7y',
         screenshotBgStyle: ScreenshotBgStyle.Theme,
-        titleAsRootNode: true
+        titleAsRootNode: true,
+        useThemeFont: false
       }
     }
 

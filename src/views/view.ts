@@ -3,10 +3,10 @@ import { Transformer, builtInPlugins } from "markmap-lib";
 import { Markmap, deriveOptions } from "markmap-view";
 import { INode, IMarkmapOptions } from "markmap-common";
 import { Toolbar } from "markmap-toolbar";
-import { assocPath, dissocPath, path, pipe } from "ramda";
+import { assocPath, dissocPath, path, pipe, range } from "ramda";
 
 import { MM_VIEW_TYPE } from "src/constants";
-import { createSVG, getComputedCss } from "src/markmap-svg";
+import { createSVG } from "src/markmap-svg";
 import { takeScreenshot } from "src/screenshot";
 import { htmlEscapePlugin, checkBoxPlugin } from "src/plugins";
 import { PluginSettings } from "src/filesystem";
@@ -32,8 +32,9 @@ export default class View extends ItemView {
     this.settings = settings;
     this.displayText = displayText;
 
-    this.svg = createSVG(this.containerEl);
-    this.markmap = Markmap.create(this.svg, {});
+    const { svg, markmap } = createSVG(this.containerEl);
+    this.svg = svg;
+    this.markmap = markmap;
     this.createToolbar();
 
     this.pinned = pinned;
@@ -165,7 +166,7 @@ export default class View extends ItemView {
 
     setTimeout(() => this.applyWidths(), 100);
     
-    const { font, color: computedColor } = getComputedCss(this.containerEl);
+    const computedColor = getComputedStyle(this.containerEl).getPropertyValue("--text-normal");
 
     if (computedColor) {
       this.svg.setAttr(
@@ -176,7 +177,6 @@ export default class View extends ItemView {
 
     const options: Partial<IMarkmapOptions> = {
       autoFit: false,
-      style: (id) => `${id} * {font: ${font}}`,
       nodeMinHeight: settings.nodeMinHeight ?? 16,
       spacingVertical: settings.spacingVertical ?? 5,
       spacingHorizontal: settings.spacingHorizontal ?? 80,

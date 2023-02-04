@@ -186,6 +186,17 @@ export class SettingsTab extends PluginSettingTab {
             this.settings.titleAsRootNode = value
           ));
 
+      new Setting(containerEl)
+        .setName("Use theme font")
+        .setDesc(
+          "Should mindmaps use the same font as your Obsidian theme, or the default?"
+        )
+        .addToggle((toggle) => toggle
+          .setValue(this.settings.useThemeFont)
+          .onChange((value) =>
+            this.settings.useThemeFont = value
+          ));
+
       // Mind map coloring settings
 
       new Setting(containerEl)
