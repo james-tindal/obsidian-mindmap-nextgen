@@ -1,7 +1,17 @@
+
+/* General */
+
 :root {
     --mm-color-text: #fff;
     --mm-line-height: 1em;
 }
+
+[hidden] {
+    display: none;
+}
+
+
+/* Mindmaps */
 
 .markmap {
     width: 100%;
@@ -11,6 +21,9 @@
 .markmap div {
     line-height: var(--mm-line-height, 1em);
 }
+
+
+/* Checkboxes */
 
 .mm-ng-checkbox {
     font-weight: bold;
@@ -23,6 +36,9 @@
 .mm-ng-checkbox-unchecked {
     color: red;
 }
+
+
+/* Inline mindmaps */
 
 .markmap-inline-container_boxed {
     background-color: rgba(0, 0, 0, 0.1);
@@ -52,36 +68,34 @@
 }
 
 
+/* Toolbars */
+
 .markmap-toolbar-container .mm-toolbar {
-position: absolute;
-bottom: 2rem;
-right: 1rem;
-background-color: white;
-border-radius: 0.5rem;
-padding: 0.2rem;
-box-shadow: 0 0 0.4rem 0 white;
-z-index: 1;
-border: 1px solid #ccc;
-display: flex;
-flex-direction: row;
-align-items: center;
-justify-content: space-between;
+    position: absolute;
+    bottom: 2rem;
+    right: 1rem;
+    background-color: white;
+    border-radius: 0.5rem;
+    padding: 0.2rem;
+    box-shadow: 0 0 0.4rem 0 white;
+    z-index: 1;
+    border: 1px solid #ccc;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .markmap-toolbar-container .mm-toolbar .mm-toolbar-brand {
-display: none;
+    display: none;
 }
 
 .markmap-toolbar-container .mm-toolbar .mm-toolbar-item {
-height: 20px;
-color: black;
+    height: 20px;
+    color: black;
 }
 
 .markmap-toolbar-container .mm-toolbar .mm-toolbar-item.active,
 .markmap-toolbar-container .mm-toolbar .mm-toolbar-item:hover {
-color: brown;
-}
-
-[hidden] {
-    display: none;
+    color: brown;
 }
