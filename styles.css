@@ -45,12 +45,12 @@
 .block-language-markmap svg { border-radius: 5px }
 .block-language-markmap div { line-height: var(--mm-line-height, 1em) }
 
-.markmap-inline-container_boxed {
+.mmng-highlight-inline .block-language-markmap {
     background-color: var(--code-background);
     padding: 3px;
 }
 
-.markmap-inline-container_unboxed {
+.mmng-highlight-inline-off .block-language-markmap {
     background-color: inherit;
 }
 
