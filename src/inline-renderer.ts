@@ -1,12 +1,46 @@
-import { MarkdownPostProcessorContext, MarkdownRenderChild } from "obsidian";
+import { MarkdownPostProcessorContext } from "obsidian";
 
 import { Transformer } from "markmap-lib";
 const transformer = new Transformer();
 import { Markmap, deriveOptions } from "markmap-view";
 import { IMarkmapJSONOptions, IMarkmapOptions, INode } from "markmap-common";
 
-import { PluginSettings, settingChanges } from "./filesystem";
+import { PluginSettings, toggleBodyClass } from "./filesystem";
+import { cssClasses } from "./constants"
 
+
+toggleBodyClass("highlight", cssClasses.highlight)
+app.workspace.on("file-open", async file => {
+  file = file!;
+  if (file.extension !== "md") return;
+  const content = await app.vault.cachedRead(file);
+
+  updateFrontmatterHighlight(content);
+})
+app.workspace.on("editor-change", (editor, { file }) => {
+  file = file!;
+  if (file.extension !== "md") return;
+  const content = editor.getValue();
+
+  updateFrontmatterHighlight(content);
+})
+
+function updateFrontmatterHighlight(content: string) {
+  const frontmatter = transformer.transform(content).frontmatter as CustomFrontmatter | undefined;
+  const highlight = frontmatter?.markmap?.highlight;
+
+  const classList = app.workspace.activeLeaf!.containerEl.parentElement!.classList;
+
+  if (typeof highlight !== 'boolean') {
+    classList.remove(cssClasses.highlight)
+    classList.remove(cssClasses.highlightOff) }
+  if (highlight === true) {
+    classList.add(cssClasses.highlight)
+    classList.remove(cssClasses.highlightOff) }
+  if (highlight === false) {
+    classList.add(cssClasses.highlightOff)
+    classList.remove(cssClasses.highlight) }
+}
 
 type Handler = (
   markdownContent: string,
@@ -21,35 +55,10 @@ type CustomFrontmatter = {
 };
 
 export function inlineRenderer(settings: PluginSettings): Handler {
-  let containerDiv: HTMLDivElement;
-  let frontmatterHighlight: boolean | undefined;
-  
-  function setupHighlight(_containerDiv: HTMLDivElement, _frontmatterHighlight: boolean | undefined) {
-    containerDiv = _containerDiv;
-    frontmatterHighlight = _frontmatterHighlight;
-  }
-
-  function renderHighlight() {
-    const shouldHighlight = frontmatterHighlight ?? settings.highlight;
-    if (shouldHighlight) {
-      containerDiv.classList.remove("markmap-inline-container_unboxed");
-      containerDiv.classList.add("markmap-inline-container_boxed");
-    } else {
-      containerDiv.classList.remove("markmap-inline-container_boxed");
-      containerDiv.classList.add("markmap-inline-container_unboxed");
-    }
-  }
-
   return function handler(markdownContent: string, containerDiv: HTMLDivElement, ctx: MarkdownPostProcessorContext) {
-    const child = new MarkdownRenderChild(containerDiv);
-    ctx.addChild(child);
-    const unlisten = settingChanges.listen("highlight", renderHighlight);
-    child.register(unlisten);
 
     const { root, frontmatter: frontmatter_ } = transformer.transform(markdownContent);
     const frontmatter = frontmatter_ as CustomFrontmatter;
-    setupHighlight(containerDiv, frontmatter?.markmap?.highlight);
-    renderHighlight();
 
     const markmapOptions = deriveOptions(frontmatter?.markmap ?? {});
 
@@ -103,9 +112,8 @@ function appendSvg(
   lineHeight: string
 ) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.classList.add("markmap-inline-svg");
 
-  svg.setAttr("style", `--mm-line-height: ${lineHeight ?? "1em"}; width: 100%; height: 100%;`);
+  svg.setAttr("style", `--mm-line-height: ${lineHeight ?? "1em"}`);
 
   containerDiv.appendChild(svg);
 
