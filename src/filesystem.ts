@@ -1,5 +1,5 @@
 import type { Plugin_2, SplitDirection } from "obsidian";
-import { LocalEvents } from "./events"
+import { LocalEvents } from "./utilities"
 import { Layout } from "./views/layout-manager"
 import type { SettingsTab } from "./settings-tab"
 
