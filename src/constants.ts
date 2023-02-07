@@ -6,3 +6,9 @@ export const INTERNAL_LINK_REGEX = /\[\[(?<wikitext>.*)\]\]|<a href="(?<mdpath>.
 
 // https://regex101.com/r/Yg7HuO/2
 export const FRONT_MATTER_REGEX = /^(---)$.+?^(---)$.+?/ims;
+
+export const cssClasses = {
+  highlight: "mmng-highlight-inline",
+  highlightOff: "mmng-highlight-inline-off",
+  useThemeFont: "mmng-use-theme-font",
+}

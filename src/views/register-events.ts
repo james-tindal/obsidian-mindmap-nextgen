@@ -1,5 +1,6 @@
 import { debounce } from "obsidian"
-import { PluginSettings, settingChanges } from "src/filesystem"
+import { cssClasses } from "src/constants"
+import { PluginSettings, toggleBodyClass, settingChanges } from "src/filesystem"
 import Plugin from "src/main"
 import { EventListeners } from "./event-listeners"
 import View from "./view"
@@ -22,7 +23,6 @@ export async function registerEvents(plugin: Plugin, listeners: EventListeners, 
     app.workspace.on("editor-change", debounce(listeners.editorChange, 300, true)),
     app.workspace.on("file-open", listeners.fileOpen),
     app.vault.on("rename", listeners.renameFile)
-
   ]
   .forEach(listener => plugin.registerEvent(listener));
 
@@ -75,16 +75,6 @@ export async function registerEvents(plugin: Plugin, listeners: EventListeners, 
     plugin.register(() => app.customCss.setTheme = originalSetTheme);
   }
 
-  const useThemeFont = () => {
-    if (settings.useThemeFont)
-      document.body.classList.add("mmng-use-theme-font")
-    else
-      document.body.classList.remove("mmng-use-theme-font")
-    views.renderAll();
-  }
-  useThemeFont();
-  settingChanges.listen("useThemeFont", useThemeFont);
-
   const styleText = () => {
     const { font } = getComputedStyle(document.body);
     return `body.mmng-use-theme-font .markmap {font: ${font}}`;
@@ -95,5 +85,7 @@ export async function registerEvents(plugin: Plugin, listeners: EventListeners, 
   onThemeChange(() => {
     if (settings.useThemeFont) views.renderAll();
   })
+  toggleBodyClass("useThemeFont", cssClasses.useThemeFont)
   settingChanges.listen("useThemeFont", updateFont);
+  settingChanges.listen("useThemeFont", views.renderAll);
 }
