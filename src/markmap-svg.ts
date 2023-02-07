@@ -1,5 +1,4 @@
 import { Markmap } from "markmap-view"
-import { range } from "ramda"
 
 export function createSVG(
   containerEl: HTMLElement,

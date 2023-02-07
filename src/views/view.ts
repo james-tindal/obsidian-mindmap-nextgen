@@ -3,7 +3,6 @@ import { Transformer, builtInPlugins } from "markmap-lib";
 import { Markmap, deriveOptions } from "markmap-view";
 import { INode, IMarkmapOptions } from "markmap-common";
 import { Toolbar } from "markmap-toolbar";
-import { assocPath, dissocPath, path, pipe, range } from "ramda";
 
 import { MM_VIEW_TYPE } from "src/constants";
 import { createSVG } from "src/markmap-svg";
@@ -141,8 +140,6 @@ export default class View extends ItemView {
 
     let { root: root_, frontmatter } = transformer.transform(sanitisedMarkdown);
 
-    if (frontmatter) this.upgradeFrontmatter(frontmatter, markdown, file);
-
     const actualFrontmatter = frontmatter as CustomFrontmatter;
 
     const markmapOptions = deriveOptions(frontmatter?.markmap);
@@ -212,29 +209,6 @@ export default class View extends ItemView {
         app.vault.offref(listener)
       })
     });
-  }
-
-  // Upgrade deprecated frontmatter keys to new ones.
-  private async upgradeFrontmatter(frontmatter: Object, markdown: string, file: TFile) {
-    if (frontmatter === undefined) return;
-
-    await this.waitForSave()
-
-    const screenshotFgColor = path(['markmap', 'screenshotFgColor'], frontmatter);
-    if (!screenshotFgColor) return;
-
-    const upgrade = pipe(
-      dissocPath(['markmap', 'screenshotFgColor']),
-      assocPath(['markmap', 'screenshotTextColor'], screenshotFgColor),
-      stringifyYaml
-    );
-
-    const newFrontmatter = upgrade(frontmatter);
-    const markdownWithoutFrontmatter = markdown.match(/^---$(((?!^---$).)*)/mgs)?.[1]
-
-    const newFileContents = '---\n' + newFrontmatter + markdownWithoutFrontmatter
-
-    app.vault.modify(file, newFileContents)
   }
 
   private sanitiseMarkdown(markdown: string) {
