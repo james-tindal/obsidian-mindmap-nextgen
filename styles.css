@@ -23,6 +23,17 @@
     line-height: var(--mm-line-height, 1em);
 }
 
+/* Remove markmap's code block style */
+.markmap-foreign.markmap-foreign code {
+    color: inherit;
+    background-color: inherit;
+}
+
+/* Hide language tag shown by some themes */
+.markmap-foreign pre[class*='language-']::after {
+    display: none;
+}
+
 
 /* Checkboxes */
 
