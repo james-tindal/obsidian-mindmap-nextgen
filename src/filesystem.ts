@@ -1,5 +1,5 @@
 import type { Plugin_2, SplitDirection } from "obsidian";
-import { LocalEvents } from "./utilities"
+import { LocalEvents, PromiseSubject } from "./utilities"
 import { Layout } from "./views/layout-manager"
 import type { SettingsTab } from "./settings-tab"
 
@@ -270,6 +270,8 @@ type Get = {
   get: <K extends keyof PluginSettings>(_: any, key: K) => PluginSettings[K];
 }
 
+const [ resolveSettingsReady, settingsReady ] = PromiseSubject<PluginSettings>();
+
 const events = new LocalEvents<keyof PluginSettings>();
 export const settingChanges
  : { listen: typeof events.listen }
@@ -282,6 +284,7 @@ export async function FilesystemManager (
 ) {
   const fsd: FileSystemData = upgrade(await loadData());
   saveData(fsd);
+  resolveSettingsReady(fsd.settings);
 
   const get: Get = { get: (_, key) => fsd.settings[key] }
   const cantSet: Set = { set: () => false }
@@ -306,4 +309,12 @@ export async function FilesystemManager (
     saveLayout,
     loadLayout
   };
+}
+
+export function toggleBodyClass(setting: keyof PluginSettings, className: string) {
+  const fn = yes => yes
+    ? document.body.classList.add(className)
+    : document.body.classList.remove(className)
+  settingChanges.listen(setting, fn);
+  settingsReady.then(settings => fn(settings[setting]));
 }

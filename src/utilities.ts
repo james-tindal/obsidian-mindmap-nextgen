@@ -25,3 +25,9 @@ export class LocalEvents<EventName extends string> {
     return () => { delete this.listeners[name][index] }
   }
 }
+
+export function PromiseSubject<T>(): [(value: T | PromiseLike<T>) => void, Promise<T>] {
+  let resolver;
+  const promise = new Promise<T>(resolve => resolver = resolve)
+  return [ resolver, promise ]
+}
