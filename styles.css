@@ -16,6 +16,7 @@
 .markmap {
     width: 100%;
     height: 100%;
+    display: block;
 }
 
 .markmap div {
@@ -40,31 +41,21 @@
 
 /* Inline mindmaps */
 
-.markmap-inline-container_boxed {
-    background-color: rgba(0, 0, 0, 0.1);
-    border-color: rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
-    border-width: 2px;
-    border-style: solid;
-    padding: 7px;
-}
+.block-language-markmap { border-radius: 5px }
+.block-language-markmap svg { border-radius: 5px }
+.block-language-markmap div { line-height: var(--mm-line-height, 1em) }
 
+.markmap-inline-container_boxed {
+    background-color: var(--code-background);
+    padding: 3px;
+}
 
 .markmap-inline-container_unboxed {
-    background-color: transparent;
-    border-color: transparent;
-    border-radius: 0px;
-    border-width: 0px;
-    border-style: none;
-    padding: 0px;
+    background-color: inherit;
 }
 
-.markmap-inline-svg {
-    width: 100%;
-}
-
-.markmap-inline-svg div {
-    line-height: var(--mm-line-height, 1em);
+.markdown-source-view.mod-cm6 .cm-embed-block:has(.block-language-markmap):hover {
+    box-shadow: none;
 }
 
 
