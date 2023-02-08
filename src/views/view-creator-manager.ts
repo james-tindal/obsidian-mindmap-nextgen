@@ -30,7 +30,7 @@ export class ViewCreatorManager {
     return ViewCreatorManager.enqueue(async () => {
       const { views, settings } = ViewCreatorManager;
       const pinned = subject !== "unpinned";
-      const displayText = pinned ? subject.basename : "Mind Map";
+      const displayText = pinned ? subject.basename : "Mindmap";
   
       ViewCreatorManager.viewCreator = () => {
         const view = new View(settings, leaf, displayText, pinned);

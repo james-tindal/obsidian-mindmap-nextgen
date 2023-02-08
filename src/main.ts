@@ -12,7 +12,7 @@ export default class Plugin extends ObsidianPlugin {
   constructor(_: App, manifest: PluginManifest) {
     super(app, manifest);
     Plugin.instance = this;
-    console.info("Loading Mind Map plugin");
+    console.info("Loading Mindmap plugin");
 
     this.setup();
   }
@@ -32,6 +32,6 @@ export default class Plugin extends ObsidianPlugin {
   }
 
   public async onunload() {
-    console.info("Unloading Mind Map plugin");
+    console.info("Unloading Mindmap plugin");
   }
 }
