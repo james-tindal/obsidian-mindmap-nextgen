@@ -46,9 +46,9 @@
     "@codemirror/view": "^6.7.3",
     "d3-svg-to-png": "^0.2.1",
     "markmap-common": "^0.14.2",
-    "markmap-lib": "^0.14.3",
-    "markmap-toolbar": "^0.14.3",
-    "markmap-view": "^0.14.3",
+    "markmap-lib": "^0.14.4",
+    "markmap-toolbar": "^0.14.4",
+    "markmap-view": "^0.14.4",
     "ramda": "^0.28.0"
   }
 }
