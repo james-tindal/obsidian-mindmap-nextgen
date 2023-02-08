@@ -21,6 +21,7 @@ A similar plugin is available for [Visual Studio Code](https://marketplace.visua
   + [Use title as root node](#use-title-as-root-node)
 + [Other features](#other-features)
   + [Checkboxes](#checkboxes)
+  + [LaTeX](#latex)
 + [Installing](#installing)
 + [Contributing](#contributing)
 
@@ -84,6 +85,18 @@ Checkboxes will be displayed in the mindmap like so:
 ## [x] Also works on titles
 ```
 ![Mindmap checkbox example](images/mind-map-checkboxes.png)
+
+### LaTeX
+LaTex expressions will be rendered in your mindmaps. Surround an inline expression with a dollar sign on either side.
+
+`$\frac{\partial f}{\partial t}$`
+
+Or use two dollar signs for a multiline expression.
+```
+$$
+\frac{\partial f}{\partial t}
+$$
+```
 
 
 ## Frontmatter
