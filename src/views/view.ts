@@ -1,7 +1,7 @@
 import { ItemView, Menu, TFile, WorkspaceLeaf, stringifyYaml } from "obsidian";
 import { Transformer, builtInPlugins } from "markmap-lib";
 import { Markmap, deriveOptions } from "markmap-view";
-import { INode, IMarkmapOptions } from "markmap-common";
+import { INode, IMarkmapOptions, loadJS, loadCSS } from "markmap-common";
 import { Toolbar } from "markmap-toolbar";
 
 import { MM_VIEW_TYPE } from "src/constants";
@@ -138,7 +138,10 @@ export default class View extends ItemView {
     
     const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin, ]);
 
-    let { root: root_, frontmatter } = transformer.transform(sanitisedMarkdown);
+    let { root: root_, frontmatter, features } = transformer.transform(sanitisedMarkdown);
+    const { styles, scripts } = transformer.getUsedAssets(features);
+    if (scripts) loadJS(scripts);
+    if (styles) loadCSS(styles);
 
     const actualFrontmatter = frontmatter as CustomFrontmatter;
 

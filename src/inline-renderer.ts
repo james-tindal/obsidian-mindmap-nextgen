@@ -3,7 +3,7 @@ import { MarkdownPostProcessorContext } from "obsidian";
 import { Transformer } from "markmap-lib";
 const transformer = new Transformer();
 import { Markmap, deriveOptions } from "markmap-view";
-import { IMarkmapJSONOptions, IMarkmapOptions, INode } from "markmap-common";
+import { IMarkmapJSONOptions, IMarkmapOptions, INode, loadCSS, loadJS } from "markmap-common";
 
 import { PluginSettings, toggleBodyClass } from "./filesystem";
 import { cssClasses } from "./constants"
@@ -57,7 +57,11 @@ type CustomFrontmatter = {
 export function inlineRenderer(settings: PluginSettings): Handler {
   return function handler(markdownContent: string, containerDiv: HTMLDivElement, ctx: MarkdownPostProcessorContext) {
 
-    const { root, frontmatter: frontmatter_ } = transformer.transform(markdownContent);
+    const { root, frontmatter: frontmatter_, features } = transformer.transform(markdownContent);
+    const { styles, scripts } = transformer.getUsedAssets(features);
+    if (scripts) loadJS(scripts);
+    if (styles) loadCSS(styles);
+
     const frontmatter = frontmatter_ as CustomFrontmatter;
 
     const markmapOptions = deriveOptions(frontmatter?.markmap ?? {});
