@@ -34,7 +34,7 @@ export class SettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Preview Split")
-      .setDesc("Split direction for the Mind Map Preview")
+      .setDesc("Split direction for the mindmap Preview")
       .addDropdown((dropDown) => dropDown
         .addOption("horizontal", "Horizontal")
         .addOption("vertical", "Vertical")
@@ -45,7 +45,7 @@ export class SettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Node Min Height")
-      .setDesc("Minimum height for the mind map nodes")
+      .setDesc("Minimum height for the mindmap nodes")
       .addText((text) => text
         .setValue(this.settings.nodeMinHeight.toString())
         .setPlaceholder("Example: 16")
@@ -55,7 +55,7 @@ export class SettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Node Text Line Height")
-      .setDesc("Line height for content in mind map nodes")
+      .setDesc("Line height for content in mindmap nodes")
       .addText((text) => text
         .setValue(this.settings.lineHeight)
         .setPlaceholder("Example: 1em")
@@ -65,7 +65,7 @@ export class SettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Vertical Spacing")
-      .setDesc("Vertical spacing of the mind map nodes")
+      .setDesc("Vertical spacing of the mindmap nodes")
       .addText((text) => text
         .setValue(this.settings.spacingVertical.toString())
         .setPlaceholder("Example: 5")
@@ -75,7 +75,7 @@ export class SettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Horizontal Spacing")
-      .setDesc("Horizontal spacing of the mind map nodes")
+      .setDesc("Horizontal spacing of the mindmap nodes")
       .addText((text) => text
         .setValue(this.settings.spacingHorizontal.toString())
         .setPlaceholder("Example: 80")
@@ -85,7 +85,7 @@ export class SettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Horizontal padding")
-      .setDesc("Leading space before the content of mind map nodes")
+      .setDesc("Leading space before the content of mindmap nodes")
       .addText((text) => text
         .setValue(this.settings.paddingX.toString())
         .setPlaceholder("Example: 8")
@@ -96,7 +96,7 @@ export class SettingsTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Initial expand level")
       .setDesc(
-        "Sets the initial depth of the mind map. 0 means all nodes are collapsed, 1 means only the root node is expanded, etc.\nTo expand all nodes, set this to -1."
+        "Sets the initial depth of the mindmap. 0 means all nodes are collapsed, 1 means only the root node is expanded, etc.\nTo expand all nodes, set this to -1."
       )
       .addText((text) => text
         .setValue(this.settings.initialExpandLevel.toString())
@@ -197,7 +197,7 @@ export class SettingsTab extends PluginSettingTab {
             this.settings.useThemeFont = value
           ));
 
-      // Mind map coloring settings
+      // Mindmap coloring settings
 
       new Setting(containerEl)
         .setHeading()
@@ -221,7 +221,7 @@ export class SettingsTab extends PluginSettingTab {
   
       this.colorSettings[1] = new Setting(containerEl)
         .setName("Depth 1 color")
-        .setDesc("Color for the first level of the mind map")
+        .setDesc("Color for the first level of the mindmap")
         .addColorPicker((colPicker) => colPicker
           .setValue(this.settings.depth1Color)
           .onChange((value: string) =>
@@ -241,7 +241,7 @@ export class SettingsTab extends PluginSettingTab {
   
       this.colorSettings[2] = new Setting(containerEl)
         .setName("Depth 2 color")
-        .setDesc("Color for the second level of the mind map")
+        .setDesc("Color for the second level of the mindmap")
         .addColorPicker((colPicker) => colPicker
           .setValue(this.settings.depth2Color)
           .onChange((value: string) =>
@@ -259,7 +259,7 @@ export class SettingsTab extends PluginSettingTab {
   
       this.colorSettings[3] = new Setting(containerEl)
         .setName("Depth 3 color")
-        .setDesc("Color for the third level of the mind map")
+        .setDesc("Color for the third level of the mindmap")
         .addColorPicker((colPicker) => colPicker
           .setValue(this.settings.depth3Color)
           .onChange((value: string) =>

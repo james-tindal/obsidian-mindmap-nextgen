@@ -4,7 +4,7 @@ import { MM_VIEW_TYPE } from "src/constants"
 export class LoadingView extends ItemView {
   private static instances: LoadingView[] = [];
   public getViewType() { return MM_VIEW_TYPE };
-  public getDisplayText() { return "Mind Map" };
+  public getDisplayText() { return "Mindmap" };
   public getIcon() { return "dot-network" };
   private isLoadingView = true;
 

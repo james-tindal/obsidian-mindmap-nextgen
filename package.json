@@ -1,7 +1,7 @@
 {
   "name": "obsidian-mindmap-nextgen",
   "version": "1.3.0",
-  "description": "An Obsidian plugin for displaying markdown notes as mind maps using Markmap",
+  "description": "An Obsidian plugin for displaying markdown notes as mindmaps using Markmap",
   "main": "main.js",
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",

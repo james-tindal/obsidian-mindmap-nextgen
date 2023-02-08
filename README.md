@@ -1,46 +1,28 @@
-# Obsidian Mind Map
-
+# Mindmap NextGen
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/verocloud/obsidian-mindmap-nextgen/release.yml?logo=github&style=for-the-badge)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/verocloud/obsidian-mindmap-nextgen?style=for-the-badge&sort=semver)
 
-This repository contains a plugin for [Obsidian](https://obsidian.md/) for viewing Markdown notes as Mind Maps using [Markmap](https://markmap.js.org/).
+Obsidian plugin to view your notes as mindmaps using [Markmap](https://markmap.js.org/).
 
 A similar plugin is available for [Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=gera2ld.markmap-vscode).
 
-## Features
-
-- [x] Preview your current note as a Mind Map
-- [x] **Markmap.js is totally up to date with the [original project](https://markmap.js.org)**
-- [x] **Inline markmap preview!**
-- [x] Mind Map preview updates
-   * as you select other panes, similar to the [Local Graph](https://forum.obsidian.md/t/how-to-open-a-local-graph-view-pane-on-the-right-sidebar/7190), [Outline](https://publish.obsidian.md/help/Plugins/Outline) and [Backlink](https://publish.obsidian.md/help/Plugins/Backlinks) panes
-   * as you change settings
-   * as you change your file content
-   * as you resize the windows or anything related to layout
-   * as you open the markdown on another page
-- [x] Accepts custom and Markmap.js default frontmatter options
-- [x] Copy preview to clipboard as PNG image
-- [x] Implements Katex (LaTex plugin)
-- [x] Implements checkmarks (such as this list)
-- [x] Has branch coloring and depth coloring approaches
-- [x] Avoids XSS injection.
-
-#### Below an preview image with the default content of the official [markmap website](https://markmap.js.org/repl) try it out. Just with the `maxWidth` option.
-
-![Mind Map Demo Image](https://user-images.githubusercontent.com/21978588/206906147-01c56767-b04e-41a2-875e-2b13b31f6e02.png)
-
-#### And below an inline markmap preview.
-
-![Inline Markmap Preview](images/mind-map-inline-demo.png)
-
-#### This plugin is highly customizable, as you can see in settings.
-
-![image](https://user-images.githubusercontent.com/21978588/206906311-30b0f845-b9ee-4da4-812b-9ced97b3b0aa.png)
-
-![image](https://user-images.githubusercontent.com/21978588/206906336-fad3f4ce-170f-481b-9b51-5069e42e9cfc.png)
-
-![image](https://user-images.githubusercontent.com/21978588/206906349-41ae3843-ed51-4438-a848-c55772448e7a.png)
+## Table of contents
++ [Usage](#usage)
++ ["More options" menu](#more-options-menu)
+  + [Pin/Unpin](#pinunpin)
+  + [Copy screenshot](#copy-screenshot)
+  + [Collapse all](#collapse-all)
+  + [Toggle toolbar](#toggle-toolbar)
++ [Settings](#settings)
+  + [Frontmatter](#frontmatter)
+  + [Coloring approaches](#coloring-approaches)
+  + [Highlight inline markmaps](#highlight-inline-markmaps)
+  + [Use title as root node](#use-title-as-root-node)
++ [Other features](#other-features)
+  + [Checkboxes](#checkboxes)
++ [Installing](#installing)
++ [Contributing](#contributing)
 
 
 ## Usage
@@ -51,34 +33,80 @@ Open the command palette (cmd/ctrl-p) and begin typing the name of one of the 2 
 
 What's the difference between a pinned and an unpinned mindmap? A pinned mindmap is linked to a single Markdown document. An unpinned mindmap will update based on whichever document is the last one you clicked on.
 
-### Frontmatter
+You can also insert mindmaps inside your document using a Markdown code block tagged with "markmap". For example:
 
-The plugin also accepts frontmatter options (each of the [official markmap docs](https://markmap.js.org/docs/json-options) except for `extraJs` and `extraCss`). Frontmatter options has higher priority than the settings from the settings tab which means that if you set `maxWidth` on settings to 400px and on frontmatter to 200px, the maxWidth will be set to 200px.
+~~~
+```markmap
+# Mindmap
+## Mindmap
+```
+~~~
 
-The settings in each document's frontmatter take priority over those selected in your plugin settings.
 
-It is also good to note that the frontmatter only works for that markdown it is in. If you open another Markdown file without frontmatter, the settings from settings tab will be used.
+## "More options" menu
 
-As well as the default frontmatter options, it also supports these other options (and maybe more soon):
+This is the menu in the top right of each tab.
 
-**screenshotTextColor:** Set the text color of the screenshot. It accepts any valid CSS color (hex, color name, rgb, rgba and hsl). This color is applied to screenshots only, and not while using the plugin.
+<img width="104" alt="image" src="https://user-images.githubusercontent.com/10291002/217636599-1b33270b-4887-4153-aa07-468255ccf5f2.png">
 
-**highlight:** A boolean option that allows you to activate a border and a different background color for the inline markmap. If the frontmatter setting is present, it will have higher priority than the settings tab.
 
-**titleAsRootNode:** Set the ["Use title as root node" option](#document-title-as-root-node) for this document.
+### Pin/Unpin
+
+Switch the tab to unpinned, or pin it to the active document.
+
+### Copy screenshot
+
+Copy a PNG of the mindmap to the clipboard.
+Background and text color are configurable in settings or the document's frontmatter.
+
+### Collapse all
+
+Closes all mindmap nodes, leaving just the root visible
+
+### Toggle toolbar
+
+Show or hide the toolbar in the bottom right of the mindmap
+
+
+## Other Features
+
+### Checkboxes
+
+Checkboxes will be displayed in the mindmap like so:
+
+```
+# Housework
+## Main
+- [x] Dishes
+- [ ] Cleaning the bathroom
+- [x] Change the light bulbs
+- [ ] something else
+## [x] Also works on titles
+```
+![Mindmap checkbox example](images/mind-map-checkboxes.png)
+
+
+## Frontmatter
+
+Some settings can be set in each document's frontmatter. Frontmatter settings take precedence over global settings, when set.
+
+The plugin will use any of [markmap's settings](https://markmap.js.org/docs/json-options) except for `extraJs` and `extraCss`).
 
 **Example:**
 ```markdown
 ---
 markmap:
-  screenshotFgColor: #28F48D
+  screenshotTextColor: #28F48D
   highlight: true
   titleAsRootNode: true
 ---
 ```
 
+
+## Settings
+
 ### Coloring approaches
-There are three approaches to coloring the branches of the mind map for you to choose from, either in plugin settings or each document's frontmatter.
+There are three approaches to coloring the branches of the mindmap for you to choose from, either in plugin settings or each document's frontmatter.
 
 #### Branch coloring
 This mode will choose random different colors per branch. The "Color freeze level" setting decides at what depth the branches will stop picking new colors.
@@ -92,127 +120,39 @@ In this mode, all branches are colored with a single color, which you can choose
 #### Branch thickness
 Regardless which coloring approach you choose, you can set branch thickness for the first three depth levels, and a default thickness for levels beyond that.
 
-### Inline Markmap
 
-You can also use the inline markmap syntax to create a mindmap in your note. You must create a ` ```markmap ` code
-block. As an example, the following code:
+### Highlight inline markmaps
 
-````markdown
-```markmap
-# parent
+Frontmatter setting: `highlight`
 
-## child 1
-
-- we are family
-
-## child 2
-
-- we are family
-```
-````
-
-will generate the following mindmap:
-
-![Inline Markmap Preview](images/mind-map-inline-demo.png)
-
-#### Highlighting markmap
-
-You can also activate a border and a different background color for the markmap when rendering inline. To do this, you must add the `highlight` option to the frontmatter code with values `true` or `false`, and you can also use the settings tab. And as always, if frontmatter is present, it will have higher priority than the settings tab.
-
-File example:
-
-```markdown
----
-markmap:
-   highlight: true
----
-
-# Parent
-
-## Child 1
-
-## Child 2
-
-```
-### Toolbar
-
-It also has a toolbar that can zoom in, zoom out, reset view and toggle the descendants of the selected node. The toolbar can also be toggled on and off, just click on more options and click on "toggle toolbar".
-
-### Rendering checkboxes
-
-This plugin can also render and display checkboxes, which can be the default lists or also headings. Below and markdown example:
-
-```
----
-markmap:
-  screenshotTextColor: red
-  highlight: false
----
+Add a background to inline markmaps to make them stand out from the rest of the page.
 
 
-# Housework
+### Use title as root node
 
-## Main
+Frontmatter setting: `titleAsRootNode`
 
-- [x] Dishes
-- [ ] Cleaning the bathroom
-- [x] Change the light bulbs
-- [ ] something else
+Generate mindmaps with the title at the bottom level, so you can avoid repeating the title.
 
-## [x] Also works on titles
-```
 
-And below an result example:
+### Screenshot settings
 
-![Mind Map checkbox example](images/mind-map-checkboxes.png)
+Frontmatter settings: `screenshotTextColor`, `screenshotBgColor`
 
-### Notes
+Decide what colors the screenshot function will use.
 
-Once you run the plugin using Ctrl+P and opening the MindMap, you can't open it again. It changes its content if you change the file you are working on, so that you can work on multiple files and check any of them easily. If you desire, you can close the preview and open it again later.
+Take screenshots via the ["More options" menu](#more-options-menu).
 
-### Preview More Options Menu
-
-The Mind Map Preview view has 4 options from the "more options" menu:
-
-![Mindmap more options](images/mindmap-more-options.png)
-
-#### Pin
-
-Allows you to pin the Mind Map preview pane to the current note so that you can select other notes with the current Mind Map remaining in place. A pin icon will appear in the header of the Mind Map preview pane. Click the pin icon to unpin.
-
-#### Copy screenshot
-
-Places a copy of the Mind Map SVG on your clipboard allowing you to paste it into a note in Obsidian or into an image editor of your choice. About the background and foreground colors you have three options:
-
-1. Set the background as transparent, then the foreground color will be the default;
-2. Select a background color;
-3. Set the background and foreground colors to be as the current theme. So that the screenshot will look the same as show the plugin is displayed.
-
-#### Collapse all
-
-Hides all nodes except the root.
-
-### Document title as root node
-
-Select "Use title as root node" in plugin settings to generate mind maps with the title at the bottom level, so you can avoid repeating the title.
-You can also enable this setting per document by putting ```titleAsRootNode: true``` inside a ```markmap:``` block in the frontmatter at the top of your document.
-```markdown
----
-markmap:
-   titleAsRootNode: true
----
-document text
-```
-
-## Compatibility
-
-The obsidian version I have tested is **v1.0.3**, which is recommended to use at least version **v1.0.0**.
 
 ## Installing
 
-As of now this plugin is not registered in Obsidian Community Plugins, but it has been published and is awaiting approval. So the only way to do it is by building nightly releases. Go to [nightly installation](#nightly-installation) section.
+Search for "Mindmap NextGen" in the Community Plugins section in your Obsidian settings.
 
-## Manual installation
+### Compatibility
+
+The obsidian version I have tested is **v1.0.3**, which is recommended to use at least version **v1.0.0**.
+
+### Manual installation
 
 1. Download the [latest release](https://github.com/MasterTuto/obsidian-mindmap-vb/releases/latest)
 2. Extract the obsidian-mindmap-nextgen folder from the zip to your vault's plugins folder: `<vault>/.obsidian/plugins/`  
@@ -220,7 +160,7 @@ As of now this plugin is not registered in Obsidian Community Plugins, but it ha
 3. Reload Obsidian
 4. If prompted about Safe Mode, you can disable safe mode and enable the plugin.
 
-## Nightly Installation
+### Nightly Installation
 
 Before anything you will need the following tools installed on your machine:
 * [NodeJS](https://nodejs.org/en/)
@@ -242,9 +182,9 @@ Before anything you will need the following tools installed on your machine:
 10. Run `npm install`.
 11. Run `npm run dev`.
 12. Go to `Settings` > `Community plugins` on Obsidian.
-13. Reload the plugins folder, and then enable "Mind Map NextGen"
+13. Reload the plugins folder, and then enable "Mindmap NextGen"
 
-## For developers
+## Contributing
 
 Pull requests and issues are both welcome and appreciated. 😀
 
