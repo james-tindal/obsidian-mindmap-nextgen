@@ -14,8 +14,8 @@ A similar plugin is available for [Visual Studio Code](https://marketplace.visua
   + [Copy screenshot](#copy-screenshot)
   + [Collapse all](#collapse-all)
   + [Toggle toolbar](#toggle-toolbar)
++ [Frontmatter](#frontmatter)
 + [Settings](#settings)
-  + [Frontmatter](#frontmatter)
   + [Coloring approaches](#coloring-approaches)
   + [Highlight inline markmaps](#highlight-inline-markmaps)
   + [Use title as root node](#use-title-as-root-node)
@@ -122,16 +122,17 @@ markmap:
 There are three approaches to coloring the branches of the mindmap for you to choose from, either in plugin settings or each document's frontmatter.
 
 #### Branch coloring
-This mode will choose random different colors per branch. The "Color freeze level" setting decides at what depth the branches will stop picking new colors.
+This mode will choose random colors per branch. "Color freeze level" decides at what depth the branches will stop changing colors.
 
 #### Depth coloring
-In this mode, branches are coloured depending on their depth level. In your plugin settings, you can choose the first three levels' colors, plus a default color for levels deeper than three.
+In this mode, branches are colored based on their depth in the mindmap. You can choose the first three levels' colors, plus a default color for levels deeper than three.
 
 #### Single color
-In this mode, all branches are colored with a single color, which you can choose in your plugin settings.
+In this mode, all branches are the same color.
 
-#### Branch thickness
-Regardless which coloring approach you choose, you can set branch thickness for the first three depth levels, and a default thickness for levels beyond that.
+
+### Line thickness
+Set line thickness for the first three depth levels, and a default thickness for levels beyond that.
 
 
 ### Highlight inline markmaps

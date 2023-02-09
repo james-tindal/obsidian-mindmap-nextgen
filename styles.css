@@ -10,6 +10,13 @@
     display: none;
 }
 
+.mmng-coloring-approach-description {
+    border-top: none;
+    padding-top: 0;
+}
+
+.mmng-coloring-approach-description .setting-item-description { padding-top: 0 }
+
 
 /* Mindmaps */
 
