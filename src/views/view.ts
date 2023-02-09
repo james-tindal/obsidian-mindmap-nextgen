@@ -140,8 +140,8 @@ export default class View extends ItemView {
 
     let { root: root_, frontmatter, features } = transformer.transform(sanitisedMarkdown);
     const { styles, scripts } = transformer.getUsedAssets(features);
-    if (scripts) loadJS(scripts);
-    if (styles) loadCSS(styles);
+    if (scripts) loadJS(scripts);     // @ts-expect-error
+    if (styles) loadCSS(styles.filter(s => !s.data?.href.contains("prismjs") ));
 
     const actualFrontmatter = frontmatter as CustomFrontmatter;
 
