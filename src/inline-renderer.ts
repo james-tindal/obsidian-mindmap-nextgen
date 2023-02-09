@@ -59,8 +59,8 @@ export function inlineRenderer(settings: PluginSettings): Handler {
 
     const { root, frontmatter: frontmatter_, features } = transformer.transform(markdownContent);
     const { styles, scripts } = transformer.getUsedAssets(features);
-    if (scripts) loadJS(scripts);
-    if (styles) loadCSS(styles);
+    if (scripts) loadJS(scripts);     // @ts-expect-error
+    if (styles) loadCSS(styles.filter(s => !s.data?.href.contains("prismjs") ));
 
     const frontmatter = frontmatter_ as CustomFrontmatter;
 
