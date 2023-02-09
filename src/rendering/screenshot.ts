@@ -3,41 +3,35 @@ import { Markmap } from "markmap-view";
 import d3SvgToPng from "d3-svg-to-png";
 
 import { PluginSettings, ScreenshotBgStyle } from "src/filesystem";
-import { FrontmatterOptions } from "src/types/models"
 
-interface ScreenshotSettings {
-  backgroundColor: string;
-  textColor: string;
-}
-
-interface ThemeColors {
-  text: string,
+export interface ScreenshotColors {
   background: string;
+  text: string;
 }
 
 export async function takeScreenshot(
   pluginSettings: PluginSettings,
-  currentMm: Markmap,
-  frontmatterOptions: FrontmatterOptions
+  markmap: Markmap,
+  frontmatterColors: ScreenshotColors
 ) {
-  const themeColors = getThemeColors(currentMm);
-  const screenshotSettings = getScreenshotSettings(pluginSettings, frontmatterOptions, themeColors);
-  prepareSvgDom(screenshotSettings, currentMm);
-  const pngDataUrl: string = await createPng(screenshotSettings, currentMm);
-  restoreSvgDom(themeColors, currentMm);
+  const themeColors = getThemeColors(markmap);
+  const screenshotSettings = getScreenshotSettings(pluginSettings, frontmatterColors, themeColors);
+  prepareSvgDom(screenshotSettings, markmap);
+  const pngDataUrl: string = await createPng(screenshotSettings, markmap);
+  restoreSvgDom(themeColors, markmap);
   copyImageToClipboard(pngDataUrl);
 }
 
-const getThemeColors = (currentMm: Markmap): ThemeColors => ({
-  text: currentMm.svg.style("color"),
-  background: getComputedStyle(currentMm.svg.node()!.parentElement!).backgroundColor
+const getThemeColors = (markmap: Markmap): ScreenshotColors => ({
+  text: markmap.svg.style("color"),
+  background: getComputedStyle(markmap.svg.node()!.parentElement!).backgroundColor
 });
 
 function getScreenshotSettings(
   pluginSettings: PluginSettings,
-  frontmatterOptions: FrontmatterOptions,
-  themeColors: ThemeColors
-): ScreenshotSettings {
+  frontmatterColors: ScreenshotColors,
+  themeColors: ScreenshotColors
+): ScreenshotColors {
 
   const pluginSettingsBGC = {
     [ScreenshotBgStyle.Transparent]: "transparent",
@@ -45,24 +39,24 @@ function getScreenshotSettings(
     [ScreenshotBgStyle.Theme]: themeColors.background
   }[ pluginSettings.screenshotBgStyle ];
 
-  const frontmatterBGC = frontmatterOptions?.screenshotBgColor;
+  const frontmatterBGC = frontmatterColors?.background;
 
-  const backgroundColor = frontmatterBGC || pluginSettingsBGC;
+  const background = frontmatterBGC || pluginSettingsBGC;
 
-  const textColor =
-    frontmatterOptions?.screenshotTextColor ||
+  const text =
+    frontmatterColors?.text ||
     pluginSettings.screenshotTextColorEnabled && pluginSettings.screenshotTextColor ||
     themeColors.text;
 
-  return { backgroundColor, textColor };
+  return { background, text };
 }
 
-function prepareSvgDom({ textColor }: ScreenshotSettings, currentMm: Markmap) {
-  setTextColor(textColor, currentMm);
+function prepareSvgDom({ text }: ScreenshotColors, markmap: Markmap) {
+  setTextColor(text, markmap);
 }
 
-function setTextColor(textColor: string, currentMm: Markmap) {
-  const svg = currentMm.svg;
+function setTextColor(textColor: string, markmap: Markmap) {
+  const svg = markmap.svg;
 
   svg.style("color", textColor);
 
@@ -74,19 +68,19 @@ function setTextColor(textColor: string, currentMm: Markmap) {
     });
 }
 
-function createPng({ backgroundColor }: ScreenshotSettings, currentMm: Markmap) {
-  return currentMm.fit().then(() =>
+function createPng({ background }: ScreenshotColors, markmap: Markmap) {
+  return markmap.fit().then(() =>
     d3SvgToPng("#markmap", "markmap.png", {
       scale: 3,
       format: "png",
       download: false,
-      background: backgroundColor,
+      background,
       quality: 1,
     }));
 }
 
-function restoreSvgDom(themeColors: ThemeColors, currentMm: Markmap) {
-  setTextColor(themeColors.text, currentMm);
+function restoreSvgDom(themeColors: ScreenshotColors, markmap: Markmap) {
+  setTextColor(themeColors.text, markmap);
 }
 
 function copyImageToClipboard(pngDataUrl: string) {

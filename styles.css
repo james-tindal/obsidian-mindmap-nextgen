@@ -82,7 +82,7 @@
 
 /* Toolbars */
 
-.markmap-toolbar-container .mm-toolbar {
+.mm-toolbar {
     position: absolute;
     bottom: 2rem;
     right: 1rem;
@@ -98,16 +98,16 @@
     justify-content: space-between;
 }
 
-.markmap-toolbar-container .mm-toolbar .mm-toolbar-brand {
+.mm-toolbar .mm-toolbar-brand {
     display: none;
 }
 
-.markmap-toolbar-container .mm-toolbar .mm-toolbar-item {
+.mm-toolbar .mm-toolbar-item {
     height: 20px;
     color: black;
 }
 
-.markmap-toolbar-container .mm-toolbar .mm-toolbar-item.active,
-.markmap-toolbar-container .mm-toolbar .mm-toolbar-item:hover {
+.mm-toolbar .mm-toolbar-item.active,
+.mm-toolbar .mm-toolbar-item:hover {
     color: brown;
 }
