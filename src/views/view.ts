@@ -1,42 +1,28 @@
-import { ItemView, Menu, TFile, WorkspaceLeaf } from "obsidian";
-import { Transformer, builtInPlugins } from "markmap-lib";
-import { Markmap, deriveOptions } from "markmap-view";
-import { INode, IMarkmapOptions, loadJS, loadCSS } from "markmap-common";
-import { Toolbar } from "markmap-toolbar";
+import { ItemView, Menu, WorkspaceLeaf } from "obsidian";
 
-import { MM_VIEW_TYPE } from "src/constants";
-import { createSVG } from "src/markmap-svg";
-import { takeScreenshot } from "src/rendering/screenshot";
-import { htmlEscapePlugin, checkBoxPlugin } from "src/plugins";
 import { PluginSettings } from "src/filesystem";
-import { updateInternalLinks } from "src/rendering/linker"
-import { CustomFrontmatter, FrontmatterOptions } from "src/types/models"
+import { MM_VIEW_TYPE } from "src/constants"
+import { Renderer } from "src/rendering/view-renderer";
 
 
 export default class View extends ItemView {
-  private svg: SVGElement;
-  private settings: PluginSettings;
-  private markmap: Markmap;
-  private options: Partial<IMarkmapOptions>;
-  private frontmatterOptions: FrontmatterOptions;
-  private toolbar?: HTMLElement;
-  private hasRendered: boolean = false;
   private displayText: string;
   private pinned: boolean;
+  private renderer: Renderer;
   
   public isView = true;
 
+  public render: Renderer['render'];
+  public firstRender: Renderer['firstRender'];
+
   constructor(settings: PluginSettings, leaf: WorkspaceLeaf, displayText: string, pinned: boolean) {
     super(leaf);
-    this.settings = settings;
     this.displayText = displayText;
-
-    const { svg, markmap } = createSVG(this.containerEl);
-    this.svg = svg;
-    this.markmap = markmap;
-    this.createToolbar();
-
     this.pinned = pinned;
+
+    this.renderer = Renderer(this.containerEl, settings, this);
+    this.render = this.renderer.render;
+    this.firstRender = this.renderer.firstRender;
   }
 
   private static pinToggleListener: (view: View) => void;
@@ -63,6 +49,7 @@ export default class View extends ItemView {
   }
 
   private onMoreOptionsMenu(menu: Menu) {
+    const { collapseAll, toggleToolbar, takeScreenshot } = this.renderer;
     menu
       .addItem((item) => item
         .setIcon("pin")
@@ -72,175 +59,19 @@ export default class View extends ItemView {
       .addItem((item) => item
         .setIcon("image-file")
         .setTitle("Copy screenshot")
-        .onClick(() =>
-          takeScreenshot(
-            this.settings,
-            this.markmap,
-            this.frontmatterOptions
-      )))
+        .onClick(takeScreenshot)
+      )
       .addItem((item) => item
         .setIcon("folder")
         .setTitle("Collapse All")
-        .onClick(() => this.collapseAll())
+        .onClick(collapseAll)
       )
       .addItem((item) => item
         .setIcon("view")
         .setTitle("Toogle toolbar")
-        .onClick(() => this.toggleToolbar())
+        .onClick(toggleToolbar)
       );
 
     menu.showAtPosition({ x: 0, y: 0 });
-  }
-
-  private toggleToolbar() {
-    if (this.toolbar) {
-      this.toolbar.remove();
-      this.toolbar = undefined;
-    } else {
-      this.createToolbar();
-    }
-  }
-
-  private createToolbar() {
-    const container = document.createElement("div");
-    container.className = "markmap-toolbar-container";
-
-    const el = Toolbar.create(this.markmap) as HTMLElement;
-
-    container.append(el);
-    this.containerEl.append(container);
-
-    this.toolbar = container;
-  }
-
-  private collapseAll() {
-    this.markmap.setData(this.markmap.state.data, {
-      ...this.options,
-      initialExpandLevel: 0,
-    });
-  }
-
-  public async firstRender(file: TFile) {
-    if (this.hasRendered) return;
-    this.hasRendered = true;
-    await this.render(file);
-    this.markmap.fit();
-  }
-
-  public async render(file: TFile, content?: string) {
-    if (!this.hasRendered) return;
-
-    const markdown = content ? content : await app.vault.cachedRead(file);
-
-    if (!markdown) return;
-
-    const sanitisedMarkdown = this.sanitiseMarkdown(markdown);
-    
-    const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin, ]);
-
-    let { root: root_, frontmatter, features } = transformer.transform(sanitisedMarkdown);
-    const { styles, scripts } = transformer.getUsedAssets(features);
-    if (scripts) loadJS(scripts);     // @ts-expect-error
-    if (styles) loadCSS(styles.filter(s => !s.data?.href.contains("prismjs") ));
-
-    const actualFrontmatter = frontmatter as CustomFrontmatter;
-
-    const markmapOptions = deriveOptions(frontmatter?.markmap);
-
-    const frontmatterOptions = this.frontmatterOptions = {
-      ...markmapOptions,
-      screenshotTextColor: actualFrontmatter?.markmap?.screenshotTextColor,
-      screenshotBgColor: actualFrontmatter?.markmap?.screenshotBgColor,
-      titleAsRootNode: actualFrontmatter?.markmap?.titleAsRootNode
-    };
-
-    const titleAsRootNode =
-      typeof frontmatterOptions.titleAsRootNode === 'boolean'
-      ? frontmatterOptions.titleAsRootNode
-      : this.settings.titleAsRootNode;
-
-    const root = titleAsRootNode ? this.titleAsRootNode(root_, file.basename) : root_;
-    updateInternalLinks(root);
-
-    const settings = this.settings;
-    
-    const computedColor = getComputedStyle(this.containerEl).getPropertyValue("--text-normal");
-
-    if (computedColor) {
-      this.svg.setAttr(
-        "style",
-        `--mm-line-height: ${settings.lineHeight ?? "1em"};`
-      );
-    }
-
-    const options: Partial<IMarkmapOptions> = {
-      autoFit: false,
-      nodeMinHeight: settings.nodeMinHeight ?? 16,
-      spacingVertical: settings.spacingVertical ?? 5,
-      spacingHorizontal: settings.spacingHorizontal ?? 80,
-      paddingX: settings.paddingX ?? 8,
-      embedGlobalCSS: true,
-      fitRatio: 1,
-      initialExpandLevel: settings.initialExpandLevel ?? -1,
-      maxWidth: settings.maxWidth ?? 0,
-      duration: settings.animationDuration ?? 500,
-    };
-
-    const coloring = settings.coloring
-
-    if (coloring === "depth")
-      options.color =
-        this.depthColoring(frontmatter?.markmap?.color);
-    if (coloring === "single")
-      options.color =
-        () => settings.defaultColor;
-
-    this.options = options;
-
-    this.markmap.setData(root, {
-      ...options,
-      ...markmapOptions,
-    });
-  }
-
-  private waitForSave() {
-    return new Promise((resolve) => {
-      const listener = app.vault.on('modify', file => {
-        resolve(file);
-        app.vault.offref(listener)
-      })
-    });
-  }
-
-  private sanitiseMarkdown(markdown: string) {
-    // Remove info string from code fence unless it in the list of default languages from
-    // https://prismjs.com/#supported-languages
-    const allowedLanguages = ["markup", "html", "xml", "svg", "mathml", "ssml", "atom", "rss", "js", "javascript", "css", "clike"]
-    return markdown.replace(/```(.+)/g, (_, capture) => {
-      const backticks = capture.match(/(`*).*/)?.[1]
-      const infoString = capture.match(/`*(.*)/)?.[1]
-      const t = infoString?.trim()
-      const sanitisedInfoString = allowedLanguages.includes(t) ? t : ""
-      return "```" + (backticks || "") + sanitisedInfoString
-    })
-  }
-
-  private titleAsRootNode(root: INode, title: string) {
-    if (root.content == "") return { ...root, content: title }
-    return { content: title, children: [root], type: 'heading', depth: 0 }
-  }
-
-  private depthColoring(frontmatterColors?: string[]) {
-    return ({ depth }: INode) => {
-      depth = depth!;
-      if (frontmatterColors?.length)
-        return frontmatterColors[depth % frontmatterColors.length]
-
-      const colors = [this.settings.depth1Color, this.settings.depth2Color, this.settings.depth3Color];
-
-      return depth < 3 ?
-        colors[depth] :
-        this.settings.defaultColor
-    };
   }
 }

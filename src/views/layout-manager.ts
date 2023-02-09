@@ -1,6 +1,6 @@
 import { WorkspaceSplit, WorkspaceTabs, WorkspaceLeaf, TFile } from "obsidian"
 import { range } from "ramda"
-import { MM_VIEW_TYPE } from "../constants"
+import { MM_VIEW_TYPE } from "src/constants";
 import { LeafManager } from "./leaf-manager"
 import { LoadingView } from "./loading-view"
 import View from "./view"
