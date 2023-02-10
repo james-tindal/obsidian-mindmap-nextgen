@@ -1,12 +1,15 @@
 import { MarkdownPostProcessorContext } from "obsidian";
-import { Transformer } from "markmap-lib";
+import { IFeatures, Transformer } from "markmap-lib";
 const transformer = new Transformer();
 import { Markmap, deriveOptions } from "markmap-view";
 import { IMarkmapJSONOptions, IMarkmapOptions, INode, loadCSS, loadJS } from "markmap-common";
+import { pick } from "ramda";
 
 import { PluginSettings } from "src/filesystem";
 import { cssClasses } from "src/constants";
-import { toggleBodyClass } from "./style-tools";
+import { toggleBodyClass } from "src/rendering/style-tools";
+import { FrontmatterOptions } from "src/types/models";
+import { updateInternalLinks } from "src/rendering/linker";
 
 
 toggleBodyClass("highlight", cssClasses.highlight)
@@ -55,50 +58,89 @@ type CustomFrontmatter = {
 };
 
 export function inlineRenderer(settings: PluginSettings): Handler {
-  return function handler(markdownContent: string, containerDiv: HTMLDivElement, ctx: MarkdownPostProcessorContext) {
+  return function handler(markdown: string, containerDiv: HTMLDivElement, ctx: MarkdownPostProcessorContext) {
 
-    const { root, frontmatter: frontmatter_, features } = transformer.transform(markdownContent);
-    const { styles, scripts } = transformer.getUsedAssets(features);
-    if (scripts) loadJS(scripts);     // @ts-expect-error
-    if (styles) loadCSS(styles.filter(s => !s.data?.href.contains("prismjs") ));
+    const sanitisedMarkdown = removeUnrecognisedLanguageTags(markdown);
+    const { root, frontmatter, features } = transformer.transform(sanitisedMarkdown);
+    loadAssets(features);
+    const { markmapOptions } = getOptions(frontmatter);
 
-    const frontmatter = frontmatter_ as CustomFrontmatter;
+    updateInternalLinks(root);
 
-    const markmapOptions = deriveOptions(frontmatter?.markmap ?? {});
+    const svg = appendSvg(containerDiv);
+    renderMarkmap(svg, root, markmapOptions);
+  }
 
-    const options: Partial<IMarkmapOptions> = {
+  function getOptions(frontmatter?: { markmap?: IMarkmapJSONOptions }) {
+    const frontmatterOptions = (frontmatter?.markmap || {}) as FrontmatterOptions;
+  
+    const titleAsRootNode =
+      "titleAsRootNode" in frontmatterOptions
+      ? frontmatterOptions.titleAsRootNode
+      : settings.titleAsRootNode;
+  
+    const options = {
       autoFit: false,
-      color: applyColor(frontmatter?.markmap?.color, settings),
-      duration: 500,
-      nodeMinHeight: settings.nodeMinHeight ?? 16,
-      spacingVertical: settings.spacingVertical ?? 5,
-      spacingHorizontal: settings.spacingHorizontal ?? 80,
-      paddingX: settings.paddingX ?? 8,
       embedGlobalCSS: true,
       fitRatio: 1,
-      ...markmapOptions,
+      ...pick([
+        "duration",
+        "initialExpandLevel",
+        "maxWidth",
+        "nodeMinHeight",
+        "paddingX",
+        "spacingVertical",
+        "spacingHorizontal",
+      ], settings),
+      ...deriveOptions(frontmatter?.markmap)
     };
+  
+    const coloring = settings.coloring
+  
+    if (coloring === "depth")
+      options.color =
+        depthColoring(frontmatter?.markmap?.color);
+    if (coloring === "single")
+      options.color =
+        () => settings.defaultColor;
+    
+    return { titleAsRootNode, markmapOptions: options }
+  }
 
-    const svg = appendSvg(containerDiv, settings.lineHeight);
-    renderMarkmap(svg, root, options);
+  function depthColoring(frontmatterColors?: string[]) {
+    return ({ depth }: INode) => {
+      depth = depth!;
+      if (frontmatterColors?.length)
+        return frontmatterColors[depth % frontmatterColors.length]
+
+      const colors = [settings.depth1Color, settings.depth2Color, settings.depth3Color];
+
+      return depth < 3 ?
+        colors[depth] :
+        settings.defaultColor
+    };
   }
 }
 
-function applyColor(frontmatterColors: string[] | undefined, settings: PluginSettings) {
-  return ({ depth }: INode) => {
-    depth = depth!;
-    if (settings.coloring == "single")
-      return settings.defaultColor;
+function removeUnrecognisedLanguageTags(markdown: string) {
+  // Remove info string from code fence unless it in the list of default languages from
+  // https://prismjs.com/#supported-languages
+  const allowedLanguages = ["markup", "html", "xml", "svg", "mathml", "ssml", "atom", "rss", "js", "javascript", "css", "clike"]
+  return markdown.replace(/```(.+)/g, (_, capture) => {
+    const backticks = capture.match(/(`*).*/)?.[1]
+    const infoString = capture.match(/`*(.*)/)?.[1]
+    const t = infoString?.trim()
+    const sanitisedInfoString = allowedLanguages.includes(t) ? t : ""
+    return "```" + (backticks || "") + sanitisedInfoString
+  })
+}
 
-    const colors = frontmatterColors?.length
-      ? frontmatterColors
-      : [settings.depth1Color, settings.depth2Color, settings.depth3Color];
-
-    if (frontmatterColors?.length)
-      return colors[depth % colors.length];
-    else
-      return depth < colors.length ? colors[depth] : settings.defaultColor;
-  };
+function loadAssets(features: IFeatures) {
+  const { styles, scripts } = transformer.getUsedAssets(features);
+  if (scripts) loadJS(scripts);
+  if (styles) loadCSS(styles.filter(s =>
+    // @ts-expect-error
+    !s.data?.href.contains("prismjs") ));
 }
 
 function renderMarkmap(
@@ -111,13 +153,8 @@ function renderMarkmap(
   setTimeout(() => mm.fit(), 10);
 }
 
-function appendSvg(
-  containerDiv: HTMLDivElement,
-  lineHeight: string
-) {
+function appendSvg(containerDiv: HTMLDivElement) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-
-  svg.setAttr("style", `--mm-line-height: ${lineHeight ?? "1em"}`);
 
   containerDiv.appendChild(svg);
 
