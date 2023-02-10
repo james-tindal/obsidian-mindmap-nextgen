@@ -1,13 +1,15 @@
 import { deriveOptions, Markmap } from "markmap-view";
 import { ItemView, TFile } from "obsidian";
-import { Toolbar } from "markmap-toolbar"
-import { IMarkmapOptions, INode, loadCSS, loadJS } from "markmap-common";
-import { builtInPlugins, Transformer } from "markmap-lib";
+import { Toolbar } from "markmap-toolbar";
+import { IMarkmapJSONOptions, IMarkmapOptions, INode, loadCSS, loadJS } from "markmap-common";
+import { builtInPlugins, IFeatures, Transformer } from "markmap-lib";
+const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin ]);
+import { pick } from "ramda";
 
 import { PluginSettings } from "src/filesystem";
 import { updateInternalLinks } from "src/rendering/linker";
 import { htmlEscapePlugin, checkBoxPlugin } from "src/plugins";
-import { CustomFrontmatter, FrontmatterOptions } from "src/types/models";
+import { FrontmatterOptions } from "src/types/models";
 import { ScreenshotColors, takeScreenshot } from "src/rendering/screenshot";
 import View from "src/views/view";
 
@@ -23,7 +25,6 @@ export function Renderer(containerEl: ItemView["containerEl"], settings: PluginS
     hasRendered: boolean
     frontmatterColors?: ScreenshotColors
     markmapOptions?: Partial<IMarkmapOptions>
-    frontmatterOptions?: FrontmatterOptions
   } = {
     hasRendered: false
   };
@@ -57,60 +58,46 @@ export function Renderer(containerEl: ItemView["containerEl"], settings: PluginS
   async function render(file: TFile, content?: string) {
     if (!state.hasRendered) return;
 
-    const markdown = content ? content : await app.vault.cachedRead(file);
-
-    if (!markdown) return;
+    const markdown = content ?? await app.vault.cachedRead(file);
 
     const sanitisedMarkdown = removeUnrecognisedLanguageTags(markdown);
+    
+    const { root, frontmatter, features } = transformer.transform(sanitisedMarkdown);
+    loadAssets(features);
+    const { titleAsRootNode, markmapOptions } = getOptions(frontmatter);
 
-    const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin, ]);
+    svg.setAttr("style", `--mm-line-height: ${settings.lineHeight ?? "1em"}`);
 
-    let { root: root_, frontmatter, features } = transformer.transform(sanitisedMarkdown);
-    const { styles, scripts } = transformer.getUsedAssets(features);
-    if (scripts) loadJS(scripts);
-    if (styles) loadCSS(styles.filter(s =>
-      // @ts-expect-error
-      !s.data?.href.contains("prismjs") ));
+    if (titleAsRootNode) addTitleToRootNode(root, file.basename);
+    updateInternalLinks(root);
 
-    const actualFrontmatter = frontmatter as CustomFrontmatter;
+    markmap.setData(root, markmapOptions);
 
-    const markmapOptions = deriveOptions(frontmatter?.markmap);
+    state.markmapOptions = markmapOptions;
+  }
 
-    const frontmatterOptions = state.frontmatterOptions = {
-      ...markmapOptions,
-      screenshotTextColor: actualFrontmatter?.markmap?.screenshotTextColor,
-      screenshotBgColor: actualFrontmatter?.markmap?.screenshotBgColor,
-      titleAsRootNode: actualFrontmatter?.markmap?.titleAsRootNode
-    };
+  function getOptions(frontmatter?: { markmap?: IMarkmapJSONOptions }) {
+    const frontmatterOptions = (frontmatter?.markmap || {}) as FrontmatterOptions;
 
     const titleAsRootNode =
-      typeof frontmatterOptions.titleAsRootNode === 'boolean'
+      "titleAsRootNode" in frontmatterOptions
       ? frontmatterOptions.titleAsRootNode
       : settings.titleAsRootNode;
 
-    const root = titleAsRootNode ? addTitleToRootNode(root_, file.basename) : root_;
-    updateInternalLinks(root);
-
-    const computedColor = getComputedStyle(containerEl).getPropertyValue("--text-normal");
-
-    if (computedColor) {
-      svg.setAttr(
-        "style",
-        `--mm-line-height: ${settings.lineHeight ?? "1em"};`
-      );
-    }
-
-    const options: Partial<IMarkmapOptions> = {
+    const options = {
       autoFit: false,
-      nodeMinHeight: settings.nodeMinHeight ?? 16,
-      spacingVertical: settings.spacingVertical ?? 5,
-      spacingHorizontal: settings.spacingHorizontal ?? 80,
-      paddingX: settings.paddingX ?? 8,
       embedGlobalCSS: true,
       fitRatio: 1,
-      initialExpandLevel: settings.initialExpandLevel ?? -1,
-      maxWidth: settings.maxWidth ?? 0,
-      duration: settings.animationDuration ?? 500,
+      ...pick([
+        "duration",
+        "initialExpandLevel",
+        "maxWidth",
+        "nodeMinHeight",
+        "paddingX",
+        "spacingVertical",
+        "spacingHorizontal",
+      ], settings),
+      ...deriveOptions(frontmatter?.markmap)
     };
 
     const coloring = settings.coloring
@@ -121,31 +108,13 @@ export function Renderer(containerEl: ItemView["containerEl"], settings: PluginS
     if (coloring === "single")
       options.color =
         () => settings.defaultColor;
-
-    state.markmapOptions = options;
-
-    markmap.setData(root, {
-      ...options,
-      ...markmapOptions,
-    });
-  }
-
-  function removeUnrecognisedLanguageTags(markdown: string) {
-    // Remove info string from code fence unless it in the list of default languages from
-    // https://prismjs.com/#supported-languages
-    const allowedLanguages = ["markup", "html", "xml", "svg", "mathml", "ssml", "atom", "rss", "js", "javascript", "css", "clike"]
-    return markdown.replace(/```(.+)/g, (_, capture) => {
-      const backticks = capture.match(/(`*).*/)?.[1]
-      const infoString = capture.match(/`*(.*)/)?.[1]
-      const t = infoString?.trim()
-      const sanitisedInfoString = allowedLanguages.includes(t) ? t : ""
-      return "```" + (backticks || "") + sanitisedInfoString
-    })
+    
+    return { titleAsRootNode, markmapOptions: options }
   }
 
   function addTitleToRootNode(root: INode, title: string) {
-    if (root.content == "") return { ...root, content: title }
-    return { content: title, children: [root], type: 'heading', depth: 0 }
+    if (root.content == "") root.content = title;
+    else root = { content: title, children: [root], type: 'heading', depth: 0 }
   }
 
   function depthColoring(frontmatterColors?: string[]) {
@@ -172,4 +141,25 @@ function initialise(containerEl: ItemView["containerEl"]) {
   contentEl.append(svg, toolbar);
 
   return { svg, markmap, toolbar };
+}
+
+function loadAssets(features: IFeatures) {
+  const { styles, scripts } = transformer.getUsedAssets(features);
+  if (scripts) loadJS(scripts);
+  if (styles) loadCSS(styles.filter(s =>
+    // @ts-expect-error
+    !s.data?.href.contains("prismjs") ));
+}
+
+function removeUnrecognisedLanguageTags(markdown: string) {
+  // Remove info string from code fence unless it in the list of default languages from
+  // https://prismjs.com/#supported-languages
+  const allowedLanguages = ["markup", "html", "xml", "svg", "mathml", "ssml", "atom", "rss", "js", "javascript", "css", "clike"]
+  return markdown.replace(/```(.+)/g, (_, capture) => {
+    const backticks = capture.match(/(`*).*/)?.[1]
+    const infoString = capture.match(/`*(.*)/)?.[1]
+    const t = infoString?.trim()
+    const sanitisedInfoString = allowedLanguages.includes(t) ? t : ""
+    return "```" + (backticks || "") + sanitisedInfoString
+  })
 }
