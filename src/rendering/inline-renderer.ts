@@ -5,8 +5,8 @@ const transformer = new Transformer();
 import { Markmap, deriveOptions } from "markmap-view";
 import { IMarkmapJSONOptions, IMarkmapOptions, INode, loadCSS, loadJS } from "markmap-common";
 
-import { PluginSettings, toggleBodyClass } from "./filesystem";
-import { cssClasses } from "./constants"
+import { PluginSettings, toggleBodyClass } from "src/filesystem";
+import { cssClasses } from "src/constants";
 
 
 toggleBodyClass("highlight", cssClasses.highlight)

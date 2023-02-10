@@ -1,4 +1,4 @@
-import { ItemView, Menu, TFile, WorkspaceLeaf, stringifyYaml } from "obsidian";
+import { ItemView, Menu, TFile, WorkspaceLeaf } from "obsidian";
 import { Transformer, builtInPlugins } from "markmap-lib";
 import { Markmap, deriveOptions } from "markmap-view";
 import { INode, IMarkmapOptions, loadJS, loadCSS } from "markmap-common";
@@ -6,10 +6,10 @@ import { Toolbar } from "markmap-toolbar";
 
 import { MM_VIEW_TYPE } from "src/constants";
 import { createSVG } from "src/markmap-svg";
-import { takeScreenshot } from "src/screenshot";
+import { takeScreenshot } from "src/rendering/screenshot";
 import { htmlEscapePlugin, checkBoxPlugin } from "src/plugins";
 import { PluginSettings } from "src/filesystem";
-import { updateInternalLinks } from "src/linker"
+import { updateInternalLinks } from "src/rendering/linker"
 import { CustomFrontmatter, FrontmatterOptions } from "src/types/models"
 
 
