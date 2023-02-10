@@ -1,7 +1,7 @@
 import { INode } from "markmap-common";
 import { getLinkpath } from "obsidian";
 
-import { INTERNAL_LINK_REGEX } from "./constants";
+import { INTERNAL_LINK_REGEX } from "src/constants";
 
 export function updateInternalLinks(node: INode) {
   replaceInternalLinks(node);

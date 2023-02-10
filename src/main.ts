@@ -1,9 +1,9 @@
 import { App, Plugin as ObsidianPlugin, PluginManifest } from "obsidian";
-import { inlineRenderer } from "./inline-renderer";
-import { FilesystemManager } from "./filesystem";
-import { SettingsTab } from "./settings-tab"
-import { ViewManager } from "./views/view-manager"
-import { LayoutManager } from "./views/layout-manager"
+import { inlineRenderer } from "src/rendering/inline-renderer";
+import { FilesystemManager } from "src/filesystem";
+import { SettingsTab } from "src/settings-tab"
+import { ViewManager } from "src/views/view-manager"
+import { LayoutManager } from "src/views/layout-manager"
 
 
 export default class Plugin extends ObsidianPlugin {
