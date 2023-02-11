@@ -3,7 +3,6 @@ import { ItemView, TFile } from "obsidian";
 import { Toolbar } from "markmap-toolbar";
 import { IMarkmapJSONOptions, IMarkmapOptions, INode, loadCSS, loadJS } from "markmap-common";
 import { builtInPlugins, IFeatures, Transformer } from "markmap-lib";
-const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin ]);
 import { pick } from "ramda";
 
 import { PluginSettings } from "src/filesystem";
@@ -11,7 +10,8 @@ import { updateInternalLinks } from "src/rendering/linker";
 import { htmlEscapePlugin, checkBoxPlugin } from "src/plugins";
 import { FrontmatterOptions } from "src/types/models";
 import { ScreenshotColors, takeScreenshot } from "src/rendering/screenshot";
-import View from "src/views/view";
+
+const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin ]);
 
 
 // There are two structures
@@ -19,8 +19,8 @@ import View from "src/views/view";
 // Renderer after first render, with more state
 
 export type Renderer = ReturnType<typeof Renderer>
-export function Renderer(containerEl: ItemView["containerEl"], settings: PluginSettings, view: View) {
-  const { svg, markmap, toolbar } = initialise(containerEl);
+export function Renderer(containerEl: ItemView["containerEl"], settings: PluginSettings) {
+  const { markmap, toolbar } = initialise(containerEl);
   const state: {
     hasRendered: boolean
     frontmatterColors?: ScreenshotColors

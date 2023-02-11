@@ -1,11 +1,12 @@
-import { MarkdownPostProcessorContext } from "obsidian";
+import { ItemView, MarkdownPostProcessorContext, MarkdownRenderChild } from "obsidian";
 import { IFeatures, Transformer } from "markmap-lib";
 const transformer = new Transformer();
 import { Markmap, deriveOptions } from "markmap-view";
-import { IMarkmapJSONOptions, IMarkmapOptions, INode, loadCSS, loadJS } from "markmap-common";
+import { IMarkmapJSONOptions, INode, loadCSS, loadJS } from "markmap-common";
 import { pick } from "ramda";
+import { AsyncReturnType } from "type-fest"
 
-import { PluginSettings } from "src/filesystem";
+import { settingsReady } from "src/filesystem";
 import { cssClasses } from "src/constants";
 import { toggleBodyClass } from "src/rendering/style-tools";
 import { FrontmatterOptions } from "src/types/models";
@@ -45,30 +46,51 @@ function updateFrontmatterHighlight(content: string) {
     classList.remove(cssClasses.highlight) }
 }
 
-type Handler = (
-  markdownContent: string,
-  containerDiv: HTMLDivElement,
-  ctx: MarkdownPostProcessorContext
-) => Promise<any> | void;
-
 type CustomFrontmatter = {
   markmap?: Partial<IMarkmapJSONOptions> & {
     highlight?: boolean;
   };
 };
 
-export function inlineRenderer(settings: PluginSettings): Handler {
-  return function handler(markdown: string, containerDiv: HTMLDivElement, ctx: MarkdownPostProcessorContext) {
+function InlineRendererManager() {
+  const renderers = new Set<InlineRenderer>();
 
-    const sanitisedMarkdown = removeUnrecognisedLanguageTags(markdown);
-    const { root, frontmatter, features } = transformer.transform(sanitisedMarkdown);
-    loadAssets(features);
+  return { create, renderAll }
+
+  function create(markdown: string, containerDiv: HTMLDivElement, ctx: MarkdownPostProcessorContext) {
+    const childComponent = new MarkdownRenderChild(containerDiv);
+    ctx.addChild(childComponent);
+    InlineRenderer(markdown, containerDiv)
+      .then(renderer => {
+        renderers.add(renderer);
+        childComponent.register(() => renderers.delete(renderer))
+      });
+  }
+
+  function renderAll() {
+    renderers.forEach(renderer => renderer.render())
+  }
+}
+export const inlineRendererManager = InlineRendererManager();
+
+type InlineRenderer = AsyncReturnType<typeof InlineRenderer>;
+async function InlineRenderer(markdown: string, containerDiv: HTMLDivElement) {
+  const settings = await settingsReady
+  const { markmap } = initialise(containerDiv);
+
+  const sanitisedMarkdown = removeUnrecognisedLanguageTags(markdown);
+  const { root, frontmatter, features } = transformer.transform(sanitisedMarkdown);
+  loadAssets(features);
+  updateInternalLinks(root);
+
+  render();
+
+  return { render }
+
+  function render() {
     const { markmapOptions } = getOptions(frontmatter);
-
-    updateInternalLinks(root);
-
-    const svg = appendSvg(containerDiv);
-    renderMarkmap(svg, root, markmapOptions);
+    markmap.setData(root, markmapOptions);
+    setTimeout(() => markmap.fit(), 100);
   }
 
   function getOptions(frontmatter?: { markmap?: IMarkmapJSONOptions }) {
@@ -143,20 +165,11 @@ function loadAssets(features: IFeatures) {
     !s.data?.href.contains("prismjs") ));
 }
 
-function renderMarkmap(
-  svg: SVGSVGElement,
-  root: INode,
-  options: Partial<IMarkmapOptions>,
-) {
-  const mm = Markmap.create(svg, options);
-  mm.setData(root);
-  setTimeout(() => mm.fit(), 10);
-}
-
-function appendSvg(containerDiv: HTMLDivElement) {
+function initialise(containerEl: ItemView["containerEl"]) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  const markmap = Markmap.create(svg, {});
 
-  containerDiv.appendChild(svg);
+  containerEl.append(svg);
 
-  return svg
+  return { svg, markmap };
 }

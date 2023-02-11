@@ -20,7 +20,7 @@ export default class View extends ItemView {
     this.displayText = displayText;
     this.pinned = pinned;
 
-    this.renderer = Renderer(this.containerEl, settings, this);
+    this.renderer = Renderer(this.containerEl, settings);
     this.render = this.renderer.render;
     this.firstRender = this.renderer.firstRender;
   }
