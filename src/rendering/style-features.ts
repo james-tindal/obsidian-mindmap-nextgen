@@ -3,6 +3,7 @@ import { settingChanges, settingsReady } from "src/filesystem"
 import Plugin from "src/main"
 import { layoutReady } from "src/utilities"
 import { views } from "src/views/view-manager"
+import { inlineRendererManager } from "./inline-renderer"
 import { globalStyle, toggleBodyClass, settingTriggers as t, themeChange } from "./style-tools"
 
 export function loadStyleFeatures(plugin: Plugin) {
@@ -19,7 +20,7 @@ async function useThemeFont() {
     const { font } = getComputedStyle(document.body);
     return `body.mmng-use-theme-font .markmap {font: ${font}}`;
   }, () => {
-    views.renderAll()
+    renderAll()
   })
 
   toggleBodyClass("useThemeFont", cssClasses.useThemeFont)
@@ -53,17 +54,21 @@ async function lineHeight() {
   globalStyle.add(t.lineHeight, () => `:root { --mm-line-height: ${s.lineHeight} }`)
 }
 
+const renderAll = () => {
+  views.renderAll();
+  inlineRendererManager.renderAll();
+}
 
 
 
 
 // Color setting updates
-settingChanges.listen("coloring", views.renderAll);
-settingChanges.listen("defaultColor", views.renderAll);
-settingChanges.listen("depth1Color", views.renderAll);
-settingChanges.listen("depth2Color", views.renderAll);
-settingChanges.listen("depth3Color", views.renderAll);
-settingChanges.listen("colorFreezeLevel", views.renderAll);
+settingChanges.listen("coloring", renderAll);
+settingChanges.listen("defaultColor", renderAll);
+settingChanges.listen("depth1Color", renderAll);
+settingChanges.listen("depth2Color", renderAll);
+settingChanges.listen("depth3Color", renderAll);
+settingChanges.listen("colorFreezeLevel", renderAll);
 
 //
 settingChanges.listen("titleAsRootNode", views.renderAll);
