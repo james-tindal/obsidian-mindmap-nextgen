@@ -3,7 +3,6 @@
 
 :root {
     --mm-color-text: #fff;
-    --mm-line-height: 1em;
 }
 
 [hidden] {
@@ -26,9 +25,7 @@
     display: block;
 }
 
-.markmap div {
-    line-height: var(--mm-line-height, 1em);
-}
+.markmap div { line-height: var(--mm-line-height, 1em) }
 
 
 /* Code blocks inside mindmaps */
@@ -64,7 +61,6 @@
 
 .block-language-markmap { border-radius: 5px }
 .block-language-markmap svg { border-radius: 5px }
-.block-language-markmap div { line-height: var(--mm-line-height, 1em) }
 
 .mmng-highlight-inline .block-language-markmap {
     background-color: var(--code-background);

@@ -9,6 +9,7 @@ export function loadStyleFeatures(plugin: Plugin) {
   globalStyle.registerStyleElement(plugin);
   useThemeFont();
   lineThickness();
+  lineHeight();
 }
 
 async function useThemeFont() {
@@ -45,6 +46,11 @@ async function lineThickness() {
     .markmap path.markmap-link[data-depth="2"],
     .markmap    g.markmap-node[data-depth="2"] line {
       stroke-width: ${s.depth3Thickness} }`)
+}
+
+async function lineHeight() {
+  const s = await settingsReady;
+  globalStyle.add(t.lineHeight, () => `:root { --mm-line-height: ${s.lineHeight} }`)
 }
 
 

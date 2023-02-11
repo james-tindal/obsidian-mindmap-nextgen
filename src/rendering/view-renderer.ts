@@ -66,8 +66,6 @@ export function Renderer(containerEl: ItemView["containerEl"], settings: PluginS
     loadAssets(features);
     const { titleAsRootNode, markmapOptions } = getOptions(frontmatter);
 
-    svg.setAttr("style", `--mm-line-height: ${settings.lineHeight ?? "1em"}`);
-
     if (titleAsRootNode) addTitleToRootNode(root, file.basename);
     updateInternalLinks(root);
 
