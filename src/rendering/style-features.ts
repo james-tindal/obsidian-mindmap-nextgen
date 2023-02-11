@@ -1,5 +1,5 @@
 import { cssClasses } from "src/constants"
-import { settingChanges } from "src/filesystem"
+import { settingChanges, settingsReady } from "src/filesystem"
 import Plugin from "src/main"
 import { layoutReady } from "src/utilities"
 import { views } from "src/views/view-manager"
@@ -8,6 +8,7 @@ import { globalStyle, toggleBodyClass, settingTriggers as t, themeChange } from 
 export function loadStyleFeatures(plugin: Plugin) {
   globalStyle.registerStyleElement(plugin);
   useThemeFont();
+  lineThickness();
 }
 
 async function useThemeFont() {
@@ -23,17 +24,39 @@ async function useThemeFont() {
   toggleBodyClass("useThemeFont", cssClasses.useThemeFont)
 }
 
+async function lineThickness() {
+  const s = await settingsReady;
+  
+  globalStyle.add(t.defaultThickness, () => `
+    .markmap path.markmap-link,
+    .markmap g.markmap-node line {
+      stroke-width: ${s.defaultThickness} }`)
+
+  globalStyle.add(t.depth1Thickness, () => `
+    .markmap g[data-depth="0"].markmap-node line {
+      stroke-width: ${s.depth1Thickness} }`)
+
+  globalStyle.add(t.depth2Thickness, () => `
+    .markmap path.markmap-link[data-depth="1"],
+    .markmap    g.markmap-node[data-depth="1"] line {
+      stroke-width: ${s.depth2Thickness} }`)
+
+  globalStyle.add(t.depth3Thickness, () => `
+    .markmap path.markmap-link[data-depth="2"],
+    .markmap    g.markmap-node[data-depth="2"] line {
+      stroke-width: ${s.depth3Thickness} }`)
+}
+
+
+
+
 
 // Color setting updates
 settingChanges.listen("coloring", views.renderAll);
 settingChanges.listen("defaultColor", views.renderAll);
-settingChanges.listen("defaultThickness", views.renderAll);
 settingChanges.listen("depth1Color", views.renderAll);
-settingChanges.listen("depth1Thickness", views.renderAll);
 settingChanges.listen("depth2Color", views.renderAll);
-settingChanges.listen("depth2Thickness", views.renderAll);
 settingChanges.listen("depth3Color", views.renderAll);
-settingChanges.listen("depth3Thickness", views.renderAll);
 settingChanges.listen("colorFreezeLevel", views.renderAll);
 
 //

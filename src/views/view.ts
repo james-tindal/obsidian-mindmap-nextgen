@@ -163,8 +163,6 @@ export default class View extends ItemView {
     updateInternalLinks(root);
 
     const settings = this.settings;
-
-    setTimeout(() => this.applyWidths(), 100);
     
     const computedColor = getComputedStyle(this.containerEl).getPropertyValue("--text-normal");
 
@@ -244,37 +242,5 @@ export default class View extends ItemView {
         colors[depth] :
         this.settings.defaultColor
     };
-  }
-
-  private applyWidths() {
-    if (!this.svg) return;
-
-    const colors = [
-      this.settings.depth1Thickness,
-      this.settings.depth2Thickness,
-      this.settings.depth3Thickness,
-      this.settings.defaultThickness,
-    ];
-
-    this.svg
-      .querySelectorAll("path.markmap-link")
-      .forEach((el: SVGPathElement) => {
-        const colorIndex = Math.min(3, parseInt(el.dataset.depth!));
-
-        el.style.strokeWidth = `${colors[colorIndex]}`;
-      });
-
-    this.svg.querySelectorAll("g.markmap-node").forEach((el: SVGGElement) => {
-      const line = el.querySelector("line")!;
-
-      const colorIndex = Math.min(3, parseInt(el.dataset.depth!));
-      line!.style.strokeWidth = `${colors[colorIndex]}`;
-    });
-
-    this.svg.querySelectorAll("circle").forEach((el) => {
-      this.registerDomEvent(el as unknown as HTMLElement, "click", () =>
-        setTimeout(() => this.applyWidths(), 50)
-      );
-    });
   }
 }
