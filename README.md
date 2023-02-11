@@ -17,8 +17,10 @@ A similar plugin is available for [Visual Studio Code](https://marketplace.visua
 + [Frontmatter](#frontmatter)
 + [Settings](#settings)
   + [Coloring approaches](#coloring-approaches)
+  + [Line thickness](#line-thickness)
   + [Highlight inline markmaps](#highlight-inline-markmaps)
   + [Use title as root node](#use-title-as-root-node)
+  + [Markmap settings](#markmap-settings)
 + [Other features](#other-features)
   + [Checkboxes](#checkboxes)
   + [LaTeX](#latex)
@@ -156,6 +158,11 @@ Frontmatter settings: `screenshotTextColor`, `screenshotBgColor`
 Decide what colors the screenshot function will use.
 
 Take screenshots via the ["More options" menu](#more-options-menu).
+
+
+### Markmap settings
+
+There is a section in the plugin settings for adjusting the shape and size of different parts of the mindmap. It might seem confusing at first. You'll have to fiddle around with different combinations of settings to get it the way you like.
 
 
 ## Installing
