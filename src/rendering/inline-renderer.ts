@@ -105,8 +105,8 @@ async function InlineRenderer(markdown: string, containerDiv: HTMLDivElement) {
       autoFit: false,
       embedGlobalCSS: true,
       fitRatio: 1,
+      duration: settings.animationDuration,
       ...pick([
-        "duration",
         "initialExpandLevel",
         "maxWidth",
         "nodeMinHeight",
@@ -114,7 +114,7 @@ async function InlineRenderer(markdown: string, containerDiv: HTMLDivElement) {
         "spacingVertical",
         "spacingHorizontal",
       ], settings),
-      ...deriveOptions(frontmatter?.markmap)
+      ...deriveOptions({ colorFreezeLevel: settings.colorFreezeLevel, ...frontmatter?.markmap })
     };
   
     const coloring = settings.coloring

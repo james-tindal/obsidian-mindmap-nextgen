@@ -69,6 +69,13 @@ settingChanges.listen("depth1Color", renderAll);
 settingChanges.listen("depth2Color", renderAll);
 settingChanges.listen("depth3Color", renderAll);
 settingChanges.listen("colorFreezeLevel", renderAll);
-
 //
+
+settingChanges.listen("animationDuration", renderAll);
+settingChanges.listen("initialExpandLevel", renderAll);
+settingChanges.listen("maxWidth", renderAll);
+settingChanges.listen("nodeMinHeight", renderAll);
+settingChanges.listen("paddingX", renderAll);
+settingChanges.listen("spacingHorizontal", renderAll);
+settingChanges.listen("spacingVertical", renderAll);
 settingChanges.listen("titleAsRootNode", views.renderAll);
