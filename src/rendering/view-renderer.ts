@@ -86,8 +86,8 @@ export function Renderer(containerEl: ItemView["containerEl"], settings: PluginS
       autoFit: false,
       embedGlobalCSS: true,
       fitRatio: 1,
+      duration: settings.animationDuration,
       ...pick([
-        "duration",
         "initialExpandLevel",
         "maxWidth",
         "nodeMinHeight",
@@ -95,7 +95,7 @@ export function Renderer(containerEl: ItemView["containerEl"], settings: PluginS
         "spacingVertical",
         "spacingHorizontal",
       ], settings),
-      ...deriveOptions(frontmatter?.markmap)
+      ...deriveOptions({ colorFreezeLevel: settings.colorFreezeLevel, ...frontmatter?.markmap })
     };
 
     const coloring = settings.coloring
