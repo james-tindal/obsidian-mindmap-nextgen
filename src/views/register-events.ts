@@ -1,6 +1,5 @@
 import { debounce } from "obsidian"
-import { cssClasses } from "src/constants"
-import { PluginSettings, toggleBodyClass, settingChanges } from "src/filesystem"
+import { PluginSettings } from "src/filesystem"
 import Plugin from "src/main"
 import { EventListeners } from "./event-listeners"
 import View from "./view"
@@ -47,45 +46,4 @@ export async function registerEvents(plugin: Plugin, listeners: EventListeners, 
     callback: listeners.viewRequest["hotkey-open-pinned"],
     hotkeys: [],
   });
-
-  // Color setting updates
-  settingChanges.listen("coloring", views.renderAll);
-  settingChanges.listen("defaultColor", views.renderAll);
-  settingChanges.listen("defaultThickness", views.renderAll);
-  settingChanges.listen("depth1Color", views.renderAll);
-  settingChanges.listen("depth1Thickness", views.renderAll);
-  settingChanges.listen("depth2Color", views.renderAll);
-  settingChanges.listen("depth2Thickness", views.renderAll);
-  settingChanges.listen("depth3Color", views.renderAll);
-  settingChanges.listen("depth3Thickness", views.renderAll);
-  settingChanges.listen("colorFreezeLevel", views.renderAll);
-
-  //
-  settingChanges.listen("titleAsRootNode", views.renderAll);
-
-  // Use theme font
-  // Would be nice to have self-contained features which can register event listeners.
-
-  function onThemeChange(callback: (theme: string) => void) {
-    const originalSetTheme = app.customCss.setTheme.bind(app.customCss);
-    app.customCss.setTheme = theme => {
-      callback(theme);
-      return originalSetTheme(theme);
-    }
-    plugin.register(() => app.customCss.setTheme = originalSetTheme);
-  }
-
-  const styleText = () => {
-    const { font } = getComputedStyle(document.body);
-    return `body.mmng-use-theme-font .markmap {font: ${font}}`;
-  }
-  const styleEl = document.head.createEl('style', { text: styleText() });
-  const updateFont = () => styleEl.textContent = styleText();
-
-  onThemeChange(() => {
-    if (settings.useThemeFont) views.renderAll();
-  })
-  toggleBodyClass("useThemeFont", cssClasses.useThemeFont)
-  settingChanges.listen("useThemeFont", updateFont);
-  settingChanges.listen("useThemeFont", views.renderAll);
 }

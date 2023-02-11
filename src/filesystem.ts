@@ -271,6 +271,7 @@ type Get = {
 }
 
 const [ resolveSettingsReady, settingsReady ] = PromiseSubject<PluginSettings>();
+export { settingsReady };
 
 const events = new LocalEvents<keyof PluginSettings>();
 export const settingChanges
@@ -309,12 +310,4 @@ export async function FilesystemManager (
     saveLayout,
     loadLayout
   };
-}
-
-export function toggleBodyClass(setting: keyof PluginSettings, className: string) {
-  const fn = yes => yes
-    ? document.body.classList.add(className)
-    : document.body.classList.remove(className)
-  settingChanges.listen(setting, fn);
-  settingsReady.then(settings => fn(settings[setting]));
 }

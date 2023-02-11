@@ -1,3 +1,5 @@
+import { curry } from "ramda"
+
 type Path<EventName> = [EventName, number]
 
 export class LocalEvents<EventName extends string> {
@@ -9,7 +11,7 @@ export class LocalEvents<EventName extends string> {
     listeners.forEach(cb => cb(data))
   }
 
-  public listen(name: EventName, callback: Function) {
+  public listen = curry((name: EventName, callback: Function) => {
     const path: Path<EventName> =
       [name, this.listeners?.[name]?.length ?? 0]
 
@@ -19,7 +21,7 @@ export class LocalEvents<EventName extends string> {
       this.listeners[name] = [callback]
 
     return this.unlisten(path);
-  }
+  })
 
   private unlisten([name, index]: Path<EventName>) {
     return () => { delete this.listeners[name][index] }
@@ -31,3 +33,5 @@ export function PromiseSubject<T>(): [(value: T | PromiseLike<T>) => void, Promi
   const promise = new Promise<T>(resolve => resolver = resolve)
   return [ resolver, promise ]
 }
+
+export const layoutReady = new Promise<void>(resolve => app.workspace.onLayoutReady(resolve))

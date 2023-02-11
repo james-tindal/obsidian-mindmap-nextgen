@@ -30,6 +30,9 @@
     line-height: var(--mm-line-height, 1em);
 }
 
+
+/* Code blocks inside mindmaps */
+
 /* Remove markmap's code block style */
 .markmap-foreign.markmap-foreign code {
     color: inherit;

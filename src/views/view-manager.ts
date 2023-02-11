@@ -10,9 +10,10 @@ import { ViewCreatorManager } from "./view-creator-manager"
 import { CreateLeafIn, LeafManager } from "./leaf-manager"
 
 
+export const views = Views();
+
 export function ViewManager(plugin: Plugin, settings: PluginSettings, layoutManager: LayoutManager) {
 
-  const views = Views();
   const viewCreatorManager = new ViewCreatorManager(plugin, settings, views);
   const createLeafIn = CreateLeafIn(settings.splitDirection);
   const leafManager = LeafManager(views, createLeafIn, viewCreatorManager.constructView);

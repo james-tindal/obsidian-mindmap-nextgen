@@ -1,12 +1,12 @@
 import { MarkdownPostProcessorContext } from "obsidian";
-
 import { Transformer } from "markmap-lib";
 const transformer = new Transformer();
 import { Markmap, deriveOptions } from "markmap-view";
 import { IMarkmapJSONOptions, IMarkmapOptions, INode, loadCSS, loadJS } from "markmap-common";
 
-import { PluginSettings, toggleBodyClass } from "src/filesystem";
+import { PluginSettings } from "src/filesystem";
 import { cssClasses } from "src/constants";
+import { toggleBodyClass } from "./style-tools";
 
 
 toggleBodyClass("highlight", cssClasses.highlight)
