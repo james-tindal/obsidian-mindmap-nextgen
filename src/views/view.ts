@@ -49,7 +49,7 @@ export default class View extends ItemView {
   }
 
   private onMoreOptionsMenu(menu: Menu) {
-    const { collapseAll, toggleToolbar, takeScreenshot } = this.renderer;
+    const { collapseAll, toolbar, takeScreenshot } = this.renderer;
     menu
       .addItem((item) => item
         .setIcon("pin")
@@ -63,13 +63,13 @@ export default class View extends ItemView {
       )
       .addItem((item) => item
         .setIcon("folder")
-        .setTitle("Collapse All")
+        .setTitle("Collapse all")
         .onClick(collapseAll)
       )
       .addItem((item) => item
         .setIcon("view")
-        .setTitle("Toogle toolbar")
-        .onClick(toggleToolbar)
+        .setTitle(`${toolbar.hidden ? "Show" : "Hide"} toolbar`)
+        .onClick(toolbar.toggle)
       );
 
     menu.showAtPosition({ x: 0, y: 0 });
