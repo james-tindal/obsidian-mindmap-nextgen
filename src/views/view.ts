@@ -2,7 +2,7 @@ import { ItemView, Menu, WorkspaceLeaf } from "obsidian";
 
 import { PluginSettings } from "src/filesystem";
 import { MM_VIEW_TYPE } from "src/constants"
-import { Renderer } from "src/rendering/view-renderer";
+import { Renderer } from "src/rendering/renderer-view";
 
 
 export default class View extends ItemView {

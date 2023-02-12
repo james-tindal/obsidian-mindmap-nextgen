@@ -1,5 +1,5 @@
 import { App, Plugin as ObsidianPlugin, PluginManifest } from "obsidian";
-import { inlineRendererManager } from "src/rendering/inline-renderer";
+import { inlineRendererManager } from "src/rendering/renderer-inline";
 import { FilesystemManager } from "src/filesystem";
 import { SettingsTab } from "src/settings-tab"
 import { ViewManager } from "src/views/view-manager"
