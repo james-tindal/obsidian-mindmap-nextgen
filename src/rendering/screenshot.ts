@@ -70,7 +70,7 @@ function setTextColor(textColor: string, markmap: Markmap) {
 
 function createPng({ background }: ScreenshotColors, markmap: Markmap) {
   return markmap.fit().then(() =>
-    d3SvgToPng("#markmap", "markmap.png", {
+    d3SvgToPng(markmap.svg.node()!, "markmap.png", {
       scale: 3,
       format: "png",
       download: false,

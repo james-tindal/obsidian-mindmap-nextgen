@@ -14,10 +14,6 @@ import { ScreenshotColors, takeScreenshot } from "src/rendering/screenshot";
 const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin ]);
 
 
-// There are two structures
-// Initial renderer after construct
-// Renderer after first render, with more state
-
 export type Renderer = ReturnType<typeof Renderer>
 export function Renderer(containerEl: ItemView["containerEl"], settings: PluginSettings) {
   const { markmap, toolbar } = initialise(containerEl);
@@ -29,15 +25,15 @@ export function Renderer(containerEl: ItemView["containerEl"], settings: PluginS
     hasRendered: false
   };
 
-  return { collapseAll, toggleToolbar, firstRender, render,
-    takeScreenshot: () => takeScreenshot(settings, markmap, state.frontmatterColors!)
-  }
-
-
-  function toggleToolbar() {
-    toolbar.hidden
-    ? toolbar.hidden = false
-    : toolbar.hidden = true
+  return { collapseAll, firstRender, render,
+    takeScreenshot: () => takeScreenshot(settings, markmap, state.frontmatterColors!),
+    toolbar: {
+      get hidden() { return toolbar.hidden},
+      toggle: () => 
+        toolbar.hidden
+        ? toolbar.hidden = false
+        : toolbar.hidden = true
+    }
   }
 
   // This relies on firstRender having already happened, so state.markmapOptions is set.
