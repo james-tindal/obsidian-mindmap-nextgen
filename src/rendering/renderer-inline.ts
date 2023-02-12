@@ -1,8 +1,6 @@
 import { ItemView, MarkdownPostProcessorContext, MarkdownRenderChild } from "obsidian";
-import { IFeatures, Transformer } from "markmap-lib";
-const transformer = new Transformer();
 import { Markmap, deriveOptions } from "markmap-view";
-import { IMarkmapJSONOptions, INode, loadCSS, loadJS } from "markmap-common";
+import { IMarkmapJSONOptions, INode } from "markmap-common";
 import { pick } from "ramda";
 import { AsyncReturnType } from "type-fest"
 
@@ -10,7 +8,7 @@ import { settingsReady } from "src/filesystem";
 import { cssClasses } from "src/constants";
 import { toggleBodyClass } from "src/rendering/style-tools";
 import { FrontmatterOptions } from "src/types/models";
-import { updateInternalLinks } from "src/rendering/linker";
+import readMarkdown, { transformer } from "./renderer-common"
 
 
 toggleBodyClass("highlight", cssClasses.highlight)
@@ -78,10 +76,7 @@ async function InlineRenderer(markdown: string, containerDiv: HTMLDivElement) {
   const settings = await settingsReady
   const { markmap } = initialise(containerDiv);
 
-  const sanitisedMarkdown = removeUnrecognisedLanguageTags(markdown);
-  const { root, frontmatter, features } = transformer.transform(sanitisedMarkdown);
-  loadAssets(features);
-  updateInternalLinks(root);
+  const { root, frontmatter } = readMarkdown(markdown);
 
   render();
 
@@ -142,27 +137,6 @@ async function InlineRenderer(markdown: string, containerDiv: HTMLDivElement) {
         settings.defaultColor
     };
   }
-}
-
-function removeUnrecognisedLanguageTags(markdown: string) {
-  // Remove info string from code fence unless it in the list of default languages from
-  // https://prismjs.com/#supported-languages
-  const allowedLanguages = ["markup", "html", "xml", "svg", "mathml", "ssml", "atom", "rss", "js", "javascript", "css", "clike"]
-  return markdown.replace(/```(.+)/g, (_, capture) => {
-    const backticks = capture.match(/(`*).*/)?.[1]
-    const infoString = capture.match(/`*(.*)/)?.[1]
-    const t = infoString?.trim()
-    const sanitisedInfoString = allowedLanguages.includes(t) ? t : ""
-    return "```" + (backticks || "") + sanitisedInfoString
-  })
-}
-
-function loadAssets(features: IFeatures) {
-  const { styles, scripts } = transformer.getUsedAssets(features);
-  if (scripts) loadJS(scripts);
-  if (styles) loadCSS(styles.filter(s =>
-    // @ts-expect-error
-    !s.data?.href.contains("prismjs") ));
 }
 
 function initialise(containerEl: ItemView["containerEl"]) {

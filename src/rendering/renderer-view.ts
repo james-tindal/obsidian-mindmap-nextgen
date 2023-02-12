@@ -1,17 +1,15 @@
 import { deriveOptions, Markmap } from "markmap-view";
 import { ItemView, TFile } from "obsidian";
 import { Toolbar } from "markmap-toolbar";
-import { IMarkmapJSONOptions, IMarkmapOptions, INode, loadCSS, loadJS } from "markmap-common";
-import { builtInPlugins, IFeatures, Transformer } from "markmap-lib";
+import { IMarkmapJSONOptions, IMarkmapOptions, INode } from "markmap-common";
 import { pick } from "ramda";
 
 import { PluginSettings } from "src/filesystem";
 import { updateInternalLinks } from "src/rendering/linker";
-import { htmlEscapePlugin, checkBoxPlugin } from "src/plugins";
 import { FrontmatterOptions } from "src/types/models";
 import { ScreenshotColors, takeScreenshot } from "src/rendering/screenshot";
+import readMarkdown from "./renderer-common"
 
-const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin ]);
 
 
 export type Renderer = ReturnType<typeof Renderer>
@@ -55,11 +53,8 @@ export function Renderer(containerEl: ItemView["containerEl"], settings: PluginS
     if (!state.hasRendered) return;
 
     const markdown = content ?? await app.vault.cachedRead(file);
-
-    const sanitisedMarkdown = removeUnrecognisedLanguageTags(markdown);
     
-    const { root, frontmatter, features } = transformer.transform(sanitisedMarkdown);
-    loadAssets(features);
+    const { root, frontmatter } = readMarkdown(markdown);
     const { titleAsRootNode, markmapOptions } = getOptions(frontmatter);
 
     if (titleAsRootNode) addTitleToRootNode(root, file.basename);
@@ -135,25 +130,4 @@ function initialise(containerEl: ItemView["containerEl"]) {
   contentEl.append(svg, toolbar);
 
   return { svg, markmap, toolbar };
-}
-
-function loadAssets(features: IFeatures) {
-  const { styles, scripts } = transformer.getUsedAssets(features);
-  if (scripts) loadJS(scripts);
-  if (styles) loadCSS(styles.filter(s =>
-    // @ts-expect-error
-    !s.data?.href.contains("prismjs") ));
-}
-
-function removeUnrecognisedLanguageTags(markdown: string) {
-  // Remove info string from code fence unless it in the list of default languages from
-  // https://prismjs.com/#supported-languages
-  const allowedLanguages = ["markup", "html", "xml", "svg", "mathml", "ssml", "atom", "rss", "js", "javascript", "css", "clike"]
-  return markdown.replace(/```(.+)/g, (_, capture) => {
-    const backticks = capture.match(/(`*).*/)?.[1]
-    const infoString = capture.match(/`*(.*)/)?.[1]
-    const t = infoString?.trim()
-    const sanitisedInfoString = allowedLanguages.includes(t) ? t : ""
-    return "```" + (backticks || "") + sanitisedInfoString
-  })
 }
