@@ -3,7 +3,7 @@ import { settingChanges, settingsReady } from "src/filesystem"
 import Plugin from "src/main"
 import { layoutReady } from "src/utilities"
 import { views } from "src/views/view-manager"
-import { inlineRendererManager } from "./inline-renderer"
+import { inlineRendererManager } from "./renderer-inline"
 import { globalStyle, toggleBodyClass, settingTriggers as t, themeChange } from "./style-tools"
 
 export function loadStyleFeatures(plugin: Plugin) {
