@@ -45,6 +45,7 @@
     "@babel/preset-env": "^7.20.2",
     "@codemirror/state": "^6.2.0",
     "@codemirror/view": "^6.7.3",
+    "auto-bind": "^5.0.1",
     "d3-svg-to-png": "^0.2.1",
     "markmap-common": "^0.14.2",
     "markmap-lib": "^0.14.4",

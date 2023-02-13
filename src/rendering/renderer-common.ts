@@ -5,7 +5,6 @@ import { updateInternalLinks } from "./linker";
 export const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin ]);
 
 
-
 export default function readMarkdown(markdown: string) {
   const sanitisedMarkdown = removeUnrecognisedLanguageTags(markdown);
     

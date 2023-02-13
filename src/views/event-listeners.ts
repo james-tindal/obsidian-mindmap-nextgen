@@ -110,8 +110,7 @@ export function EventListeners(views: Views, settings: PluginSettings, layoutMan
   },
 
   fileOpen(file) {
-    if (file === null) return;
-    if (file.extension !== "md") return;
+    if (file?.extension !== "md") return;
 
     if (views.has(file)) {
       const view = views.get(file)!;

@@ -1,10 +1,9 @@
-import { ItemView, MarkdownPostProcessorContext, MarkdownRenderChild } from "obsidian";
+import { ItemView } from "obsidian";
 import { Markmap, deriveOptions } from "markmap-view";
 import { IMarkmapJSONOptions, INode } from "markmap-common";
 import { pick } from "ramda";
-import { AsyncReturnType } from "type-fest"
 
-import { settingsReady } from "src/filesystem";
+import { PluginSettings } from "src/filesystem";
 import { cssClasses } from "src/constants";
 import { toggleBodyClass } from "src/rendering/style-tools";
 import { FrontmatterOptions } from "src/types/models";
@@ -13,8 +12,7 @@ import readMarkdown, { transformer } from "./renderer-common"
 
 toggleBodyClass("highlight", cssClasses.highlight)
 app.workspace.on("file-open", async file => {
-  file = file!;
-  if (file.extension !== "md") return;
+  if (file?.extension !== "md") return;
   const content = await app.vault.cachedRead(file);
 
   updateFrontmatterHighlight(content);
@@ -50,42 +48,27 @@ type CustomFrontmatter = {
   };
 };
 
-function InlineRendererManager() {
-  const renderers = new Set<InlineRenderer>();
 
-  return { create, renderAll }
-
-  function create(markdown: string, containerDiv: HTMLDivElement, ctx: MarkdownPostProcessorContext) {
-    const childComponent = new MarkdownRenderChild(containerDiv);
-    ctx.addChild(childComponent);
-    InlineRenderer(markdown, containerDiv)
-      .then(renderer => {
-        renderers.add(renderer);
-        childComponent.register(() => renderers.delete(renderer))
-      });
-  }
-
-  function renderAll() {
-    renderers.forEach(renderer => renderer.render())
-  }
-}
-export const inlineRendererManager = InlineRendererManager();
-
-type InlineRenderer = AsyncReturnType<typeof InlineRenderer>;
-async function InlineRenderer(markdown: string, containerDiv: HTMLDivElement) {
-  const settings = await settingsReady
-  const { markmap } = initialise(containerDiv);
+export type InlineRenderer = ReturnType<typeof InlineRenderer>;
+export function InlineRenderer(markdown: string, containerEl: HTMLDivElement, settings: PluginSettings) {
+  const { markmap } = initialise(containerEl);
 
   const { root, frontmatter } = readMarkdown(markdown);
+  let hasFit = false;
 
   render();
 
-  return { render }
+  return { render, fit, containerEl }
+
+  function fit() {
+    if (hasFit) return;
+    markmap.fit();
+    hasFit = true;
+  }
 
   function render() {
     const { markmapOptions } = getOptions(frontmatter);
     markmap.setData(root, markmapOptions);
-    setTimeout(() => markmap.fit(), 100);
   }
 
   function getOptions(frontmatter?: { markmap?: IMarkmapJSONOptions }) {
