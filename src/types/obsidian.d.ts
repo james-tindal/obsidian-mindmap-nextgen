@@ -4419,9 +4419,8 @@ export class Workspace extends Events {
      * @public
      */
     on(name: 'active-leaf-change', callback: (leaf: WorkspaceLeaf | null) => any, ctx?: any): EventRef;
-    /**
-     * @public
-     */
+
+    /* file is null when an empty tab is opened. */
     on(name: 'file-open', callback: (file: TFile | null) => any, ctx?: any): EventRef;
 
     /**
@@ -4568,7 +4567,7 @@ export class WorkspaceLeaf extends WorkspaceItem {
     constructor(app: App);
 
     canNavigate(): boolean;
-    constructort(t,n);
+    constructor(t,n);
     detach(): void;
     getDisplayText(): string;
     getEphemeralState();

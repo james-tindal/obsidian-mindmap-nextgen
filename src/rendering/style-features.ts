@@ -1,9 +1,9 @@
+import { codeblocks } from "src/codeblocks"
 import { cssClasses } from "src/constants"
 import { settingChanges, settingsReady } from "src/filesystem"
 import Plugin from "src/main"
 import { layoutReady } from "src/utilities"
 import { views } from "src/views/view-manager"
-import { inlineRendererManager } from "./renderer-inline"
 import { globalStyle, toggleBodyClass, settingTriggers as t, themeChange } from "./style-tools"
 
 export function loadStyleFeatures(plugin: Plugin) {
@@ -56,7 +56,7 @@ async function lineHeight() {
 
 const renderAll = () => {
   views.renderAll();
-  inlineRendererManager.renderAll();
+  codeblocks.renderAll();
 }
 
 

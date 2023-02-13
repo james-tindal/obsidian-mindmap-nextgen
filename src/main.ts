@@ -1,10 +1,11 @@
 import { App, Plugin as ObsidianPlugin, PluginManifest } from "obsidian";
-import { inlineRendererManager } from "src/rendering/renderer-inline";
 import { FilesystemManager } from "src/filesystem";
 import { SettingsTab } from "src/settings-tab"
 import { ViewManager } from "src/views/view-manager"
 import { LayoutManager } from "src/views/layout-manager"
 import { loadStyleFeatures } from "src/rendering/style-features"
+import { codeblocks } from "src/codeblocks"
+
 
 export default class Plugin extends ObsidianPlugin {
   public static instance: Plugin;
@@ -28,7 +29,7 @@ export default class Plugin extends ObsidianPlugin {
 
     ViewManager(this, settings, layoutManager);
 
-    this.registerMarkdownCodeBlockProcessor("markmap", inlineRendererManager.create);
+    this.registerMarkdownCodeBlockProcessor("markmap", codeblocks.handler(settings));
 
     loadStyleFeatures(this);
   }
