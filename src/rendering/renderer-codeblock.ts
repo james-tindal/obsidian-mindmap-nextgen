@@ -1,13 +1,15 @@
 import { ItemView, parseYaml } from "obsidian";
 import { Markmap, deriveOptions } from "markmap-view";
-import { IMarkmapJSONOptions, INode } from "markmap-common";
+import { INode } from "markmap-common";
 import { pick } from "ramda";
 
-import { PluginSettings } from "src/filesystem";
+import { CodeBlockSettings, FileSettings, GlobalSettings } from "src/filesystem";
 import { cssClasses, FRONT_MATTER_REGEX } from "src/constants";
+import { CodeBlock } from "src/workspace/types"
 import { toggleBodyClass } from "src/rendering/style-tools";
-import { FrontmatterOptions } from "src/types/models";
-import readMarkdown from "./renderer-common";
+import readMarkdown from "src/rendering/renderer-common";
+import { renderCodeblocks$ } from "src/rendering/style-features"
+import Callbag from "src/utilities/callbag"
 
 
 type Frontmatter = Partial<{
@@ -46,41 +48,59 @@ async function updateFrontmatterHighlight(frontmatter: Frontmatter | null) {
 }
 
 
-export type InlineRenderer = ReturnType<typeof InlineRenderer>;
-export function InlineRenderer(markdown: string, containerEl: HTMLDivElement, settings: PluginSettings) {
+
+export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>;
+export function CodeBlockRenderer(codeBlock: CodeBlock, globalSettings: GlobalSettings, fileSettings: FileSettings) {
+
+  // * Combine 3 settings objects
+  // * 
+
+  const { markdown, containerEl } = codeBlock;
+
   const { markmap } = initialise(containerEl);
 
-  const { root, frontmatter } = readMarkdown(markdown);
-  let hasFit = false;
+  const settings = { globalSettings, fileSettings }
+
+  const { rootNode, settings: codeBlockSettings } = readMarkdown<CodeBlock>(markdown);
+
+  let hasFit = false
+  function fit() {
+    if (!hasFit) markmap.fit()
+  }
 
   render();
+  Callbag.subscribe(renderCodeblocks$, render);
 
-  return { render, fit, containerEl }
+  return { render, fit, updateGlobalSettings, updateFileSettings }
 
-  function fit() {
-    if (hasFit) return;
-    markmap.fit();
-    hasFit = true;
+  function updateGlobalSettings(globalSettings: GlobalSettings) {
+    settings.globalSettings = globalSettings
+    render()
+  }
+
+  function updateFileSettings(fileSettings: FileSettings) {
+    settings.fileSettings = fileSettings
+    render()
   }
 
   function render() {
-    const { markmapOptions } = getOptions(frontmatter);
-    markmap.setData(root, markmapOptions);
+    const { markmapOptions } = getOptions(codeBlockSettings);
+    markmap.setData(rootNode, markmapOptions);
   }
 
-  function getOptions(frontmatter?: { markmap?: IMarkmapJSONOptions }) {
-    const frontmatterOptions = (frontmatter?.markmap || {}) as FrontmatterOptions;
-  
+  function getOptions(codeBlockSettings: CodeBlockSettings) {
     const titleAsRootNode =
-      "titleAsRootNode" in frontmatterOptions
-      ? frontmatterOptions.titleAsRootNode
-      : settings.titleAsRootNode;
+      "titleAsRootNode" in codeBlockSettings
+      ? codeBlockSettings.titleAsRootNode
+      : globalSettings.titleAsRootNode;
+
+      // console.log(deriveOptions({ colorFreezeLevel: globalSettings.colorFreezeLevel, ...codeBlockSettings }))
   
     const options = {
       autoFit: false,
       embedGlobalCSS: true,
       fitRatio: 1,
-      duration: settings.animationDuration,
+      duration: globalSettings.animationDuration,
       ...pick([
         "initialExpandLevel",
         "maxWidth",
@@ -88,18 +108,18 @@ export function InlineRenderer(markdown: string, containerEl: HTMLDivElement, se
         "paddingX",
         "spacingVertical",
         "spacingHorizontal",
-      ], settings),
-      ...deriveOptions({ colorFreezeLevel: settings.colorFreezeLevel, ...frontmatter?.markmap })
+      ], globalSettings),
+      ...deriveOptions({ colorFreezeLevel: globalSettings.colorFreezeLevel, ...codeBlockSettings })
     };
   
-    const coloring = settings.coloring
+    const coloring = globalSettings.coloring
   
     if (coloring === "depth")
       options.color =
-        depthColoring(frontmatter?.markmap?.color);
+        depthColoring(codeBlockSettings?.color);
     if (coloring === "single")
       options.color =
-        () => settings.defaultColor;
+        () => globalSettings.defaultColor;
     
     return { titleAsRootNode, markmapOptions: options }
   }
@@ -110,11 +130,11 @@ export function InlineRenderer(markdown: string, containerEl: HTMLDivElement, se
       if (frontmatterColors?.length)
         return frontmatterColors[depth % frontmatterColors.length]
 
-      const colors = [settings.depth1Color, settings.depth2Color, settings.depth3Color];
+      const colors = [globalSettings.depth1Color, globalSettings.depth2Color, globalSettings.depth3Color];
 
       return depth < 3 ?
         colors[depth] :
-        settings.defaultColor
+        globalSettings.defaultColor
     };
   }
 }

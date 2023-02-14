@@ -1,20 +1,20 @@
 import { ViewCreator, WorkspaceLeaf } from "obsidian"
 import { MM_VIEW_TYPE } from "src/constants"
-import { PluginSettings } from "src/filesystem"
+import { GlobalSettings } from "src/filesystem"
 import Plugin from "src/main"
 import { MindmapSubject } from "./layout-manager"
-import View from "./view"
+import MindmapTabView from "./view"
 import { Views, getActiveFile } from "./view-manager"
 
 export class ViewCreatorManager {
   private static plugin: Plugin;
-  private static settings: PluginSettings;
+  private static settings: GlobalSettings;
   private static views: Views;
   private static viewCreator: ViewCreator;
   private static instance: ViewCreatorManager;
   private static waitForLastConstruct = Promise.resolve();
 
-  constructor(plugin: Plugin, settings: PluginSettings, views: Views) {
+  constructor(plugin: Plugin, settings: GlobalSettings, views: Views) {
     if (ViewCreatorManager.instance) return ViewCreatorManager.instance;
     ViewCreatorManager.instance = this;
     ViewCreatorManager.plugin = plugin;
@@ -33,13 +33,13 @@ export class ViewCreatorManager {
       const displayText = pinned ? subject.basename : "Mindmap";
   
       ViewCreatorManager.viewCreator = () => {
-        const view = new View(settings, leaf, displayText, pinned);
+        const view = new MindmapTabView(settings, leaf, displayText, pinned);
         views.set(subject, view);
         return view;
       }
       await leaf.setViewState({ type: MM_VIEW_TYPE, active: true });
 
-      const view = leaf.view as View;
+      const view = leaf.view as MindmapTabView;
       const file = pinned ? subject : getActiveFile();
 
       ViewCreatorManager.waitUntilActive(leaf)

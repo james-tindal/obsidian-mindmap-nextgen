@@ -3,7 +3,7 @@ import { Markmap } from "markmap-view";
 import d3SvgToPng from "d3-svg-to-png";
 import { ZoomTransform } from "d3-zoom"
 
-import { PluginSettings, ScreenshotBgStyle } from "src/filesystem";
+import { GlobalSettings, ScreenshotBgStyle } from "src/filesystem";
 
 export interface ScreenshotColors {
   background: string;
@@ -11,12 +11,12 @@ export interface ScreenshotColors {
 }
 
 export async function takeScreenshot(
-  pluginSettings: PluginSettings,
+  globalSettings: GlobalSettings,
   markmap: Markmap,
   frontmatterColors: ScreenshotColors
 ) {
   const themeColors = getThemeColors(markmap);
-  const screenshotSettings = getScreenshotSettings(pluginSettings, frontmatterColors, themeColors);
+  const screenshotSettings = getScreenshotSettings(globalSettings, frontmatterColors, themeColors);
   prepareSvgDom(screenshotSettings, markmap);
   const pngDataUrl: string = await createPng(screenshotSettings, markmap);
   restoreSvgDom(themeColors, markmap);
@@ -29,24 +29,24 @@ const getThemeColors = (markmap: Markmap): ScreenshotColors => ({
 });
 
 function getScreenshotSettings(
-  pluginSettings: PluginSettings,
+  globalSettings: GlobalSettings,
   frontmatterColors: ScreenshotColors,
   themeColors: ScreenshotColors
 ): ScreenshotColors {
 
-  const pluginSettingsBGC = {
+  const globalSettingsBGC = {
     [ScreenshotBgStyle.Transparent]: "transparent",
-    [ScreenshotBgStyle.Color]: pluginSettings.screenshotBgColor,
+    [ScreenshotBgStyle.Color]: globalSettings.screenshotBgColor,
     [ScreenshotBgStyle.Theme]: themeColors.background
-  }[ pluginSettings.screenshotBgStyle ];
+  }[ globalSettings.screenshotBgStyle ];
 
   const frontmatterBGC = frontmatterColors?.background;
 
-  const background = frontmatterBGC || pluginSettingsBGC;
+  const background = frontmatterBGC || globalSettingsBGC;
 
   const text =
     frontmatterColors?.text ||
-    pluginSettings.screenshotTextColorEnabled && pluginSettings.screenshotTextColor ||
+    globalSettings.screenshotTextColorEnabled && globalSettings.screenshotTextColor ||
     themeColors.text;
 
   return { background, text };

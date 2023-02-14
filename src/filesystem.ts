@@ -1,7 +1,8 @@
 import type { Plugin_2, SplitDirection } from "obsidian";
-import { LocalEvents, PromiseSubject } from "./utilities"
+import { LocalEvents, PromiseSubject } from "./utilities/utilities"
 import { Layout } from "./views/layout-manager"
 import type { SettingsTab } from "./settings-tab"
+import Callbag from "./utilities/callbag"
 
 export enum ScreenshotBgStyle {
   Transparent = "transparent",
@@ -228,7 +229,10 @@ const useDefaultsForMissingKeys =
   }
 })
 
-export type PluginSettings = v2["settings"];
+export type GlobalSettings = v2["settings"];
+export type FileSettings = Omit<Partial<GlobalSettings>, "splitDirection" | "useThemeFont"> & { color?: string[] }
+export type CodeBlockSettings = Omit<FileSettings, "titleAsRootNode">
+
 type FileSystemData = v2;
 const latestVersion = "2.0";
 
@@ -263,17 +267,20 @@ function upgrade(data: any): FileSystemData {
 }
 
 type Set = {
-  set: <K extends keyof PluginSettings>(_: any, key: K, value: PluginSettings[K]) => boolean;
+  set: <K extends keyof GlobalSettings>(_: any, key: K, value: GlobalSettings[K]) => boolean;
 }
 
 type Get = {
-  get: <K extends keyof PluginSettings>(_: any, key: K) => PluginSettings[K];
+  get: <K extends keyof GlobalSettings>(_: any, key: K) => GlobalSettings[K];
 }
 
-const [ resolveSettingsReady, settingsReady ] = PromiseSubject<PluginSettings>();
+const [ resolveSettingsReady, settingsReady ] = PromiseSubject<GlobalSettings>();
 export { settingsReady };
 
-const events = new LocalEvents<keyof PluginSettings>();
+const { source: globalSettings$, push: pushSettings } = Callbag.subject<GlobalSettings>();
+export { globalSettings$ }
+
+const events = new LocalEvents<keyof GlobalSettings>();
 export const settingChanges
  : { listen: typeof events.listen }
  = { listen: events.listen.bind(events) }
@@ -284,6 +291,7 @@ export async function FilesystemManager (
   saveData: Plugin_2["saveData"]
 ) {
   const fsd: FileSystemData = upgrade(await loadData());
+  pushSettings(fsd.settings);
   saveData(fsd);
   resolveSettingsReady(fsd.settings);
 
@@ -293,13 +301,14 @@ export async function FilesystemManager (
     set(_, key, value) {
       fsd.settings[key] = value;
       events.emit(key, value)
+      pushSettings(fsd.settings);
       saveData(fsd);
       return true;
     }
   }
 
-  const getterSetter = new Proxy<PluginSettings>(fsd.settings, { ...get, ...set });
-  const getter       = new Proxy<PluginSettings>(fsd.settings, { ...get, ...cantSet });
+  const getterSetter = new Proxy<GlobalSettings>(fsd.settings, { ...get, ...set });
+  const getter       = new Proxy<GlobalSettings>(fsd.settings, { ...get, ...cantSet });
 
   const saveLayout = (layout: Layout) => { fsd.layout = layout; saveData(fsd) };
   const loadLayout = () => fsd.layout;
@@ -311,3 +320,4 @@ export async function FilesystemManager (
     loadLayout
   };
 }
+

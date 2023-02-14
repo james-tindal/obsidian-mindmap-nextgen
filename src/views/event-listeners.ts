@@ -1,9 +1,9 @@
 import { TFile, MarkdownView, MarkdownFileInfo, WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs, Editor, TAbstractFile } from "obsidian"
-import { PluginSettings } from "src/filesystem"
+import { GlobalSettings } from "src/filesystem"
 import { LayoutManager } from "./layout-manager"
 import { LeafManager } from "./leaf-manager"
 import { LoadingView } from "./loading-view"
-import View from "./view"
+import MindmapTabView from "./view"
 import { ViewCreatorManager } from "./view-creator-manager"
 import { getActiveFile, Views } from "./view-manager"
 
@@ -21,7 +21,7 @@ export type EventListeners = {
   fileOpen(file: TFile | null): void;
   renameFile(file: TAbstractFile, oldPath: string): void;
 }
-export function EventListeners(views: Views, settings: PluginSettings, layoutManager: LayoutManager, leafManager: LeafManager): EventListeners { return {
+export function EventListeners(views: Views, settings: GlobalSettings, layoutManager: LayoutManager, leafManager: LeafManager): EventListeners { return {
   appLoading(setViewCreator: ViewCreatorManager['setViewCreator']) {
     setViewCreator((leaf: WorkspaceLeaf) => new LoadingView(leaf));
   },
@@ -41,7 +41,7 @@ export function EventListeners(views: Views, settings: PluginSettings, layoutMan
       else {
         const currentTab = parent.children[parent.currentTab];
         const view = currentTab.view;
-        const loaded = view instanceof View;
+        const loaded = view instanceof MindmapTabView;
         if (!loaded) return;
         const subject = views.get(view)!;
         const file = subject === "unpinned" ? getActiveFile() : subject;

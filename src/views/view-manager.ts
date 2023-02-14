@@ -1,18 +1,20 @@
 import { TFile } from "obsidian"
 
-import { PluginSettings } from "src/filesystem";
+import { GlobalSettings } from "src/filesystem";
 import Plugin from "src/main";
-import View from "./view"
+import MindmapTabView from "./view"
 import { LayoutManager, MindmapSubject } from "./layout-manager"
 import { EventListeners } from "./event-listeners"
 import { registerEvents } from "./register-events"
 import { ViewCreatorManager } from "./view-creator-manager"
 import { CreateLeafIn, LeafManager } from "./leaf-manager"
+import { renderTabs$ } from "src/rendering/style-features"
+import Callbag from "src/utilities/callbag"
 
 
 export const views = Views();
 
-export function ViewManager(plugin: Plugin, settings: PluginSettings, layoutManager: LayoutManager) {
+export function ViewManager(plugin: Plugin, settings: GlobalSettings, layoutManager: LayoutManager) {
 
   const viewCreatorManager = new ViewCreatorManager(plugin, settings, views);
   const createLeafIn = CreateLeafIn(settings.splitDirection);
@@ -20,22 +22,24 @@ export function ViewManager(plugin: Plugin, settings: PluginSettings, layoutMana
   const eventListeners = EventListeners(views, settings, layoutManager, leafManager)
 
   registerEvents(plugin, eventListeners, views, viewCreatorManager.setViewCreator, settings);
+
+  Callbag.subscribe(renderTabs$, views.renderAll)
 }
 
-type Get<MSV extends MindmapSubject | View> = MSV extends View ? MindmapSubject : View;
+type Get<MSV extends MindmapSubject | MindmapTabView> = MSV extends MindmapTabView ? MindmapSubject : MindmapTabView;
 
 export type Views = ReturnType<typeof Views>;
 function Views() {
-  const subject2view = new Map<MindmapSubject, View>();
-  const view2subject = new Map<View, MindmapSubject>();
+  const subject2view = new Map<MindmapSubject, MindmapTabView>();
+  const view2subject = new Map<MindmapTabView, MindmapSubject>();
 
   const views = {
     has: (subject: MindmapSubject) => subject2view.has(subject),
-    get: <MSV extends MindmapSubject | View>(msv: MSV): Get<MSV> | undefined =>
-      View.isView(msv)
+    get: <MSV extends MindmapSubject | MindmapTabView>(msv: MSV): Get<MSV> | undefined =>
+      msv instanceof MindmapTabView
         ? <Get<MSV>> view2subject.get(msv)
         : <Get<MSV>> subject2view.get(msv),
-    set(subject: MindmapSubject, view: View) {
+    set(subject: MindmapSubject, view: MindmapTabView) {
       views.delete(view);
       views.delete(subject);
       subject2view.set(subject, view);
@@ -43,8 +47,8 @@ function Views() {
 
       view.register(() =>  views.delete(view))
     },
-    delete(msv: MindmapSubject | View) {
-      if (View.isView(msv)) {
+    delete(msv: MindmapSubject | MindmapTabView) {
+      if (msv instanceof MindmapTabView) {
         const view = msv;
         const subject = view2subject.get(view)!;
         view2subject.delete(view);

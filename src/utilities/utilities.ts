@@ -29,6 +29,8 @@ export class LocalEvents<EventName extends string> {
   }
 }
 
+export type MaybePromise<T> = T | Promise<T>
+
 export function PromiseSubject<T>(): [(value: T | PromiseLike<T>) => void, Promise<T>] {
   let resolver;
   const promise = new Promise<T>(resolve => resolver = resolve)
@@ -47,23 +49,10 @@ export function* genLog<T>(message: string, generator: Generator<T>) {
   }
 }
 
-export class FindSet<T> extends Set<T> {
-  constructor(...args: (Iterable<T> | null | undefined)[]) {
-    super(...args);
+// Map constructor that binds all methods to the instance
+export class Map<K, V> extends globalThis.Map<K, V> {
+  constructor(entries?: readonly (readonly [K, V])[] | null) {
+    super(entries);
     autoBind(this);
-  }
-
-  public find(pred: (v: T) => any) {
-    for (const value of this)
-      if (pred(value))
-        return value
-  }
-
-  public filter(pred: (v: T) => any) {
-    return [...(function*(set) {
-      for (const value of set)
-        if (pred(value))
-          yield value
-    })(this)]
   }
 }
