@@ -1,19 +1,18 @@
 import { deriveOptions, Markmap } from "markmap-view";
 import { ItemView, TFile } from "obsidian";
 import { Toolbar } from "markmap-toolbar";
-import { IMarkmapJSONOptions, IMarkmapOptions, INode } from "markmap-common";
+import { IMarkmapOptions, INode } from "markmap-common";
 import { pick } from "ramda";
 
-import { PluginSettings } from "src/filesystem";
+import { FileSettings, GlobalSettings } from "src/filesystem";
 import { updateInternalLinks } from "src/rendering/linker";
-import { FrontmatterOptions } from "src/types/models";
 import { ScreenshotColors, takeScreenshot } from "src/rendering/screenshot";
 import readMarkdown from "./renderer-common"
 
 
 
-export type Renderer = ReturnType<typeof Renderer>
-export function Renderer(containerEl: ItemView["containerEl"], settings: PluginSettings) {
+export type TabRenderer = ReturnType<typeof TabRenderer>
+export function TabRenderer(containerEl: ItemView["containerEl"], globalSettings: GlobalSettings) {
   const { markmap, toolbar } = initialise(containerEl);
   const state: {
     hasRendered: boolean
@@ -24,7 +23,7 @@ export function Renderer(containerEl: ItemView["containerEl"], settings: PluginS
   };
 
   return { collapseAll, firstRender, render,
-    takeScreenshot: () => takeScreenshot(settings, markmap, state.frontmatterColors!),
+    takeScreenshot: () => takeScreenshot(globalSettings, markmap, state.frontmatterColors!),
     toolbar: {
       get hidden() { return toolbar.hidden},
       toggle: () => 
@@ -54,30 +53,28 @@ export function Renderer(containerEl: ItemView["containerEl"], settings: PluginS
 
     const markdown = content ?? await app.vault.cachedRead(file);
     
-    const { root, frontmatter } = readMarkdown(markdown);
-    const { titleAsRootNode, markmapOptions } = getOptions(frontmatter);
+    const { rootNode, settings: fileSettings } = readMarkdown<TFile>(markdown);
+    const { titleAsRootNode, markmapOptions } = getOptions(fileSettings);
 
-    if (titleAsRootNode) addTitleToRootNode(root, file.basename);
-    updateInternalLinks(root);
+    if (titleAsRootNode) addTitleToRootNode(rootNode, file.basename);
+    updateInternalLinks(rootNode);
 
-    markmap.setData(root, markmapOptions);
+    markmap.setData(rootNode, markmapOptions);
 
     state.markmapOptions = markmapOptions;
   }
 
-  function getOptions(frontmatter?: { markmap?: IMarkmapJSONOptions }) {
-    const frontmatterOptions = (frontmatter?.markmap || {}) as FrontmatterOptions;
-
+  function getOptions(fileSettings: FileSettings) {
     const titleAsRootNode =
-      "titleAsRootNode" in frontmatterOptions
-      ? frontmatterOptions.titleAsRootNode
-      : settings.titleAsRootNode;
+      "titleAsRootNode" in fileSettings
+      ? fileSettings.titleAsRootNode
+      : globalSettings.titleAsRootNode;
 
     const options = {
       autoFit: false,
       embedGlobalCSS: true,
       fitRatio: 1,
-      duration: settings.animationDuration,
+      duration: globalSettings.animationDuration,
       ...pick([
         "initialExpandLevel",
         "maxWidth",
@@ -85,18 +82,18 @@ export function Renderer(containerEl: ItemView["containerEl"], settings: PluginS
         "paddingX",
         "spacingVertical",
         "spacingHorizontal",
-      ], settings),
-      ...deriveOptions({ colorFreezeLevel: settings.colorFreezeLevel, ...frontmatter?.markmap })
+      ], globalSettings),
+      ...deriveOptions({ colorFreezeLevel: globalSettings.colorFreezeLevel, ...fileSettings })
     };
 
-    const coloring = settings.coloring
+    const coloring = globalSettings.coloring
 
     if (coloring === "depth")
       options.color =
-        depthColoring(frontmatter?.markmap?.color);
+        depthColoring(fileSettings.color);
     if (coloring === "single")
       options.color =
-        () => settings.defaultColor;
+        () => globalSettings.defaultColor;
     
     return { titleAsRootNode, markmapOptions: options }
   }
@@ -112,11 +109,11 @@ export function Renderer(containerEl: ItemView["containerEl"], settings: PluginS
       if (frontmatterColors?.length)
         return frontmatterColors[depth % frontmatterColors.length]
 
-      const colors = [settings.depth1Color, settings.depth2Color, settings.depth3Color];
+      const colors = [globalSettings.depth1Color, globalSettings.depth2Color, globalSettings.depth3Color];
 
       return depth < 3 ?
         colors[depth] :
-        settings.defaultColor
+        globalSettings.defaultColor
     };
   }
 }

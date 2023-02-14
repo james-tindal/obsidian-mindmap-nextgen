@@ -1,18 +1,23 @@
 import { loadJS, loadCSS } from "markmap-common";
 import { builtInPlugins, IFeatures, Transformer } from "markmap-lib";
+import { TFile } from "obsidian"
+import { CodeBlockSettings, FileSettings } from "src/filesystem"
 import { htmlEscapePlugin, checkBoxPlugin } from "src/plugins";
 import { updateInternalLinks } from "./linker";
+import { CodeBlock } from "src/workspace/types"
 export const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin ]);
 
 
-export default function readMarkdown(markdown: string) {
+export default function readMarkdown<Type extends TFile | CodeBlock>(markdown: string) {
   const sanitisedMarkdown = removeUnrecognisedLanguageTags(markdown);
     
   const { root, frontmatter, features } = transformer.transform(sanitisedMarkdown);
   loadAssets(features);
   updateInternalLinks(root);
 
-  return { root, frontmatter }
+  const settings = frontmatter?.markmap || {} as Type extends TFile ? FileSettings : CodeBlockSettings
+
+  return { rootNode: root, settings }
 }
 
 export function removeUnrecognisedLanguageTags(markdown: string) {

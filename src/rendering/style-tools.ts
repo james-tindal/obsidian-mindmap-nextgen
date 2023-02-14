@@ -1,8 +1,8 @@
-import { PluginSettings, settingChanges, settingsReady } from "src/filesystem";
+import { GlobalSettings, settingChanges, settingsReady } from "src/filesystem";
 import Plugin from "src/main";
 
 
-export function toggleBodyClass(setting: keyof PluginSettings, className: string) {
+export function toggleBodyClass(setting: keyof GlobalSettings, className: string) {
   const fn = yes => yes
     ? document.body.classList.add(className)
     : document.body.classList.remove(className)
@@ -12,8 +12,8 @@ export function toggleBodyClass(setting: keyof PluginSettings, className: string
 
 export type Trigger = (next: () => void) => void
 export const themeChange = next => app.workspace.on("css-change", next);
-export const settingTriggers = new Proxy(<Record<keyof PluginSettings, Trigger>>{}, {
-  get: (_, key: keyof PluginSettings) => settingChanges.listen(key)
+export const settingTriggers = new Proxy(<Record<keyof GlobalSettings, Trigger>>{}, {
+  get: (_, key: keyof GlobalSettings) => settingChanges.listen(key)
 })
 
 export const globalStyle = (() => {

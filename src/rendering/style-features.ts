@@ -1,10 +1,15 @@
-import { codeblocks } from "src/codeblocks"
 import { cssClasses } from "src/constants"
 import { settingChanges, settingsReady } from "src/filesystem"
 import Plugin from "src/main"
-import { layoutReady } from "src/utilities"
-import { views } from "src/views/view-manager"
+import Callbag from "src/utilities/callbag"
+import { layoutReady } from "src/utilities/utilities"
 import { globalStyle, toggleBodyClass, settingTriggers as t, themeChange } from "./style-tools"
+
+
+const { source: renderCodeblocks$, push: renderCodeblocks } = Callbag.subject<void>();
+const { source: renderTabs$, push: renderTabs } = Callbag.subject<void>();
+export { renderCodeblocks$, renderTabs$ }
+const renderAll = () => { renderTabs(); renderCodeblocks() };
 
 export function loadStyleFeatures(plugin: Plugin) {
   globalStyle.registerStyleElement(plugin);
@@ -54,13 +59,6 @@ async function lineHeight() {
   globalStyle.add(t.lineHeight, () => `:root { --mm-line-height: ${s.lineHeight} }`)
 }
 
-const renderAll = () => {
-  views.renderAll();
-  codeblocks.renderAll();
-}
-
-
-
 
 // Color setting updates
 settingChanges.listen("coloring", renderAll);
@@ -78,4 +76,4 @@ settingChanges.listen("nodeMinHeight", renderAll);
 settingChanges.listen("paddingX", renderAll);
 settingChanges.listen("spacingHorizontal", renderAll);
 settingChanges.listen("spacingVertical", renderAll);
-settingChanges.listen("titleAsRootNode", views.renderAll);
+settingChanges.listen("titleAsRootNode", renderTabs);

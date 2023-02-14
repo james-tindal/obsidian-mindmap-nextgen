@@ -3,7 +3,7 @@ import { range } from "ramda"
 import { MM_VIEW_TYPE } from "src/constants";
 import { LeafManager } from "./leaf-manager"
 import { LoadingView } from "./loading-view"
-import View from "./view"
+import MindmapTabView from "./view"
 import { Views, getActiveFile } from "./view-manager"
 
 
@@ -41,7 +41,7 @@ export function LayoutManager(
       }
       else {
         if (node.view.getViewType() !== MM_VIEW_TYPE) return null;
-        const view = node.view as View;
+        const view = node.view as MindmapTabView;
         const subject = views.get(view);
         if (subject) return Subject.serialise(subject);
         else         return null;
@@ -78,7 +78,7 @@ export function LayoutManager(
           // Set currentTab of each tab group
           const currentTab = tabs.children[currentTabIndex];
           app.workspace.setActiveLeaf(currentTab);
-          const view = currentTab.view as View;
+          const view = currentTab.view as MindmapTabView;
           const subject = views.get(view);
           const file = subject === "unpinned" ? getActiveFile() : subject;
           if (file) view.firstRender(file);

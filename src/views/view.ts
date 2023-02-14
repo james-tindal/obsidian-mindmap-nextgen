@@ -1,36 +1,34 @@
 import { ItemView, Menu, WorkspaceLeaf } from "obsidian";
 
-import { PluginSettings } from "src/filesystem";
+import { GlobalSettings } from "src/filesystem";
 import { MM_VIEW_TYPE } from "src/constants"
-import { Renderer } from "src/rendering/renderer-view";
+import { TabRenderer } from "src/rendering/renderer-tab"
 
 
-export default class View extends ItemView {
+export default class MindmapTabView extends ItemView {
   private displayText: string;
   private pinned: boolean;
-  private renderer: Renderer;
   
-  public isView = true;
+  private renderer: TabRenderer;
+  public render: TabRenderer['render'];
+  public firstRender: TabRenderer['firstRender'];
 
-  public render: Renderer['render'];
-  public firstRender: Renderer['firstRender'];
-
-  constructor(settings: PluginSettings, leaf: WorkspaceLeaf, displayText: string, pinned: boolean) {
+  constructor(settings: GlobalSettings, leaf: WorkspaceLeaf, displayText: string, pinned: boolean) {
     super(leaf);
     this.displayText = displayText;
     this.pinned = pinned;
 
-    this.renderer = Renderer(this.containerEl, settings);
+    this.renderer = TabRenderer(this.containerEl, settings)
     this.render = this.renderer.render;
     this.firstRender = this.renderer.firstRender;
   }
 
-  private static pinToggleListener: (view: View) => void;
-  public static onPinToggle(listener: (view: View) => void) {
-    View.pinToggleListener = listener;
+  private static pinToggleListener: (view: MindmapTabView) => void;
+  public static onPinToggle(listener: (view: MindmapTabView) => void) {
+    MindmapTabView.pinToggleListener = listener;
   }
   private togglePinned() {
-    View.pinToggleListener(this)
+    MindmapTabView.pinToggleListener(this)
   }
 
   public getViewType() { return MM_VIEW_TYPE };
@@ -40,12 +38,6 @@ export default class View extends ItemView {
   public setDisplayText(displayText: string) {
     this.displayText = displayText;
     this.leaf.updateHeader();
-  }
-
-  public static isView(x: any): x is View {
-    return typeof x === "object"
-        && "isView" in x
-        && x.isView === true;
   }
 
   private onMoreOptionsMenu(menu: Menu) {

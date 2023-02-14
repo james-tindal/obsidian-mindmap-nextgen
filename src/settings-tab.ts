@@ -1,11 +1,11 @@
 import { PluginSettingTab, Setting, SplitDirection } from "obsidian";
-import { Coloring, PluginSettings, ScreenshotBgStyle } from "./filesystem";
+import { Coloring, GlobalSettings, ScreenshotBgStyle } from "./filesystem";
 
 import Plugin from "./main";
 
 
 export class SettingsTab extends PluginSettingTab {
-  constructor(settings: PluginSettings) {
+  constructor(settings: GlobalSettings) {
     super(app, Plugin.instance);
 
     const sections = [
@@ -24,7 +24,7 @@ export class SettingsTab extends PluginSettingTab {
 
 const fragment = () => new DocumentFragment as unknown as HTMLElement;
 
-function SectionGeneral(settings: PluginSettings) {
+function SectionGeneral(settings: GlobalSettings) {
   const section = fragment();
 
   new Setting(section)
@@ -74,7 +74,7 @@ function SectionGeneral(settings: PluginSettings) {
 
 type ColorSettings = Record<number | "default" | "single" | "freezeLevel", Setting>
 
-function SectionColoring(settings: PluginSettings) {
+function SectionColoring(settings: GlobalSettings) {
   const section = fragment();
   const colors = {} as ColorSettings;
 
@@ -183,7 +183,7 @@ function SectionColoring(settings: PluginSettings) {
 }
 
 
-function SectionThickness(settings: PluginSettings) {
+function SectionThickness(settings: GlobalSettings) {
   const section = fragment();
 
   new Setting(section)
@@ -230,7 +230,7 @@ function SectionThickness(settings: PluginSettings) {
 }
 
 
-function SectionScreenshots(settings: PluginSettings) {
+function SectionScreenshots(settings: GlobalSettings) {
   const section = fragment();
 
   new Setting(section)
@@ -281,7 +281,7 @@ function SectionScreenshots(settings: PluginSettings) {
 }
 
 
-function SectionMarkmap(settings: PluginSettings) {
+function SectionMarkmap(settings: GlobalSettings) {
   const section = fragment();
 
   new Setting(section)
