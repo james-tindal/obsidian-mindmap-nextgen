@@ -1,34 +1,39 @@
-import { ItemView } from "obsidian";
+import { Editor, ItemView, parseYaml, TFile } from "obsidian";
 import { Markmap, deriveOptions } from "markmap-view";
 import { IMarkmapJSONOptions, INode } from "markmap-common";
 import { pick } from "ramda";
 
 import { PluginSettings } from "src/filesystem";
-import { cssClasses } from "src/constants";
+import { cssClasses, FRONT_MATTER_REGEX } from "src/constants";
 import { toggleBodyClass } from "src/rendering/style-tools";
 import { FrontmatterOptions } from "src/types/models";
-import readMarkdown, { transformer } from "./renderer-common"
+import readMarkdown from "./renderer-common";
 
+
+type Frontmatter = Partial<{
+  markmap: Partial<{
+    highlight: boolean;
+  }>
+}>
+const getFrontmatter1 = (file: TFile) =>
+  new Promise<Frontmatter>(resolve =>
+    app.fileManager.processFrontMatter(file, resolve));
+const getFrontmatter2 = (editor: Editor) => {
+  const str = FRONT_MATTER_REGEX.exec(editor.getValue())?.[0].slice(4, -4);
+  return str && parseYaml(str)
+};
 
 toggleBodyClass("highlight", cssClasses.highlight)
-app.workspace.on("file-open", async file => {
-  if (file?.extension !== "md") return;
-  const content = await app.vault.cachedRead(file);
+app.workspace.on("file-open", file =>
+  file?.extension === 'md' &&
+  getFrontmatter1(file).then(updateFrontmatterHighlight))
+app.workspace.on("editor-change", (editor, { file }) =>
+  file?.extension === 'md' &&
+  updateFrontmatterHighlight(getFrontmatter2(editor)))
 
-  updateFrontmatterHighlight(content);
-})
-app.workspace.on("editor-change", (editor, { file }) => {
-  file = file!;
-  if (file.extension !== "md") return;
-  const content = editor.getValue();
 
-  updateFrontmatterHighlight(content);
-})
-
-function updateFrontmatterHighlight(content: string) {
-  const frontmatter = transformer.transform(content).frontmatter as CustomFrontmatter | undefined;
+async function updateFrontmatterHighlight(frontmatter: Frontmatter | null) {
   const highlight = frontmatter?.markmap?.highlight;
-
   const classList = app.workspace.activeLeaf!.containerEl.parentElement!.classList;
 
   if (typeof highlight !== 'boolean') {
@@ -41,12 +46,6 @@ function updateFrontmatterHighlight(content: string) {
     classList.add(cssClasses.highlightOff)
     classList.remove(cssClasses.highlight) }
 }
-
-type CustomFrontmatter = {
-  markmap?: Partial<IMarkmapJSONOptions> & {
-    highlight?: boolean;
-  };
-};
 
 
 export type InlineRenderer = ReturnType<typeof InlineRenderer>;
