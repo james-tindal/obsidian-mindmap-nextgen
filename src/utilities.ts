@@ -67,3 +67,11 @@ export class FindSet<T> extends Set<T> {
     })(this)]
   }
 }
+
+// Map constructor that binds all methods to the instance
+export class Map<K, V> extends globalThis.Map<K, V> {
+  constructor(entries?: readonly (readonly [K, V])[] | null) {
+    super(entries);
+    autoBind(this);
+  }
+}

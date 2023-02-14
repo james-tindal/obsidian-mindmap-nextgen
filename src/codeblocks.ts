@@ -2,7 +2,7 @@ import { MarkdownPostProcessorContext, MarkdownRenderChild, WorkspaceLeaf, Works
 
 import { PluginSettings } from "src/filesystem";
 import { InlineRenderer } from "src/rendering/renderer-inline";
-import { FindSet, nextTick } from "src/utilities";
+import { FindSet, nextTick, Map } from "src/utilities";
 
 
 const inlineRenderers = InlineRenderers();
@@ -91,9 +91,8 @@ function InlineRenderers() {
 
 function ByLeaf() {
   const map = new Map<WorkspaceLeaf, Set<InlineRenderer>>();
-  const get = (leaf: WorkspaceLeaf) => map.get(leaf);
 
-  return { add, delete: _delete, get }
+  return { add, delete: _delete, get: map.get }
 
   function add(leaf: WorkspaceLeaf, ir: InlineRenderer) {
     if (map.has(leaf))
