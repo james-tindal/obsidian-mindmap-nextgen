@@ -1,5 +1,5 @@
 import type { Plugin_2, SplitDirection } from "obsidian";
-import { LocalEvents, PromiseSubject } from "./utilities"
+import { Callbag, LocalEvents, PromiseSubject } from "./utilities"
 import { Layout } from "./views/layout-manager"
 import type { SettingsTab } from "./settings-tab"
 
@@ -228,7 +228,8 @@ const useDefaultsForMissingKeys =
   }
 })
 
-export type PluginSettings = v2["settings"];
+export type _PluginSettings = v2["settings"];
+export interface PluginSettings extends _PluginSettings {};
 type FileSystemData = v2;
 const latestVersion = "2.0";
 
@@ -275,8 +276,10 @@ export { settingsReady };
 
 const events = new LocalEvents<keyof PluginSettings>();
 export const settingChanges
- : { listen: typeof events.listen }
- = { listen: events.listen.bind(events) }
+  : { listen: typeof events.listen }
+  = { listen: events.listen.bind(events) }
+
+export const globalSettings$ = Callbag.subject<PluginSettings>();
 
 export type FilesystemManager = Awaited<ReturnType<typeof FilesystemManager>>;
 export async function FilesystemManager (
@@ -289,17 +292,18 @@ export async function FilesystemManager (
 
   const get: Get = { get: (_, key) => fsd.settings[key] }
   const cantSet: Set = { set: () => false }
+  const getter = new Proxy<PluginSettings>(fsd.settings, { ...get, ...cantSet });
   const set: Set = {
     set(_, key, value) {
       fsd.settings[key] = value;
-      events.emit(key, value)
+      events.emit(key, value);
+      globalSettings$.push(getter);
       saveData(fsd);
       return true;
     }
   }
-
   const getterSetter = new Proxy<PluginSettings>(fsd.settings, { ...get, ...set });
-  const getter       = new Proxy<PluginSettings>(fsd.settings, { ...get, ...cantSet });
+
 
   const saveLayout = (layout: Layout) => { fsd.layout = layout; saveData(fsd) };
   const loadLayout = () => fsd.layout;

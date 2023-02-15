@@ -1,4 +1,3 @@
-import autoBind from "auto-bind"
 import { curry } from "ramda"
 
 type Path<EventName> = [EventName, number]
@@ -47,6 +46,9 @@ export function* genLog<T>(message: string, generator: Generator<T>) {
   }
 }
 
+
+import autoBind from "auto-bind"
+
 export class FindSet<T> extends Set<T> {
   constructor(...args: (Iterable<T> | null | undefined)[]) {
     super(...args);
@@ -75,3 +77,22 @@ export class Map<K, V> extends globalThis.Map<K, V> {
     autoBind(this);
   }
 }
+
+import create from "callbag-create";
+import of from "callbag-of";
+import combine from "callbag-combine";
+import pipe from "callbag-pipe";
+import map from "callbag-map";
+import subscribe from "callbag-subscribe";
+import pairwise from "callbag-pairwise";
+import startWith from "callbag-start-with";
+import makeSubject from "callbag-subject";
+import dropRepeats from "callbag-drop-repeats";
+import sampleCombine from "callbag-sample-combine";
+
+const subject = <T>() => {
+  const instance = makeSubject<T>();
+  return Object.assign(instance, { push(v: T) { instance(1, v) } });
+}
+
+export const Callbag = { create, of, combine, subject, pipe, map, subscribe, dropRepeats, pairwise, startWith, sampleCombine }

@@ -2,17 +2,18 @@ import { loadJS, loadCSS } from "markmap-common";
 import { builtInPlugins, IFeatures, Transformer } from "markmap-lib";
 import { htmlEscapePlugin, checkBoxPlugin } from "src/plugins";
 import { updateInternalLinks } from "./linker";
+import { FrontmatterSettings } from "./renderer-inline"
 export const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin ]);
 
 
 export default function readMarkdown(markdown: string) {
   const sanitisedMarkdown = removeUnrecognisedLanguageTags(markdown);
     
-  const { root, frontmatter, features } = transformer.transform(sanitisedMarkdown);
+  const { root, frontmatter: fm, features } = transformer.transform(sanitisedMarkdown);
   loadAssets(features);
   updateInternalLinks(root);
 
-  return { root, frontmatter }
+  return { root, frontmatterSettings: (fm?.markmap || {}) as Partial<FrontmatterSettings> }
 }
 
 export function removeUnrecognisedLanguageTags(markdown: string) {
