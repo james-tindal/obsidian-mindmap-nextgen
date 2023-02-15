@@ -1,6 +1,7 @@
 import { Notice } from "obsidian";
 import { Markmap } from "markmap-view";
 import d3SvgToPng from "d3-svg-to-png";
+import { ZoomTransform } from "d3-zoom"
 
 import { PluginSettings, ScreenshotBgStyle } from "src/filesystem";
 
@@ -69,9 +70,11 @@ function setTextColor(textColor: string, markmap: Markmap) {
 }
 
 function createPng({ background }: ScreenshotColors, markmap: Markmap) {
+  const svg = markmap.svg.node()! as SVGSVGElement & { __zoom: ZoomTransform };
+  
   return markmap.fit().then(() =>
-    d3SvgToPng(markmap.svg.node()!, "markmap.png", {
-      scale: 3,
+    d3SvgToPng(svg, "markmap.png", {
+      scale: 2 / svg.__zoom.k,
       format: "png",
       download: false,
       background,
