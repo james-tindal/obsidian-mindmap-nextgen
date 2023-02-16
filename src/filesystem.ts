@@ -279,7 +279,8 @@ export const settingChanges
   : { listen: typeof events.listen }
   = { listen: events.listen.bind(events) }
 
-export const globalSettings$ = Callbag.subject<PluginSettings>();
+const { source: globalSettings$, emitter: pushSettings } = Callbag.subject<PluginSettings>()
+export { globalSettings$ }
 
 export type FilesystemManager = Awaited<ReturnType<typeof FilesystemManager>>;
 export async function FilesystemManager (
@@ -297,7 +298,7 @@ export async function FilesystemManager (
     set(_, key, value) {
       fsd.settings[key] = value;
       events.emit(key, value);
-      globalSettings$.push(getter);
+      pushSettings(getter);
       saveData(fsd);
       return true;
     }

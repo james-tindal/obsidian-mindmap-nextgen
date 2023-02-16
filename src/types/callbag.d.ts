@@ -30,3 +30,11 @@ declare module "callbag-sample-combine" {
 
   export default sampleCombine
 }
+
+declare module "callbag-filter" {
+  import type { Source } from "callbag"
+
+  const filter: <I, O extends I>(fn: (v: I) => v is O) => (i: Source<I>) => Source<O>
+
+  export default filter
+}

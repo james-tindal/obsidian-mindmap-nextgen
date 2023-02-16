@@ -85,14 +85,14 @@ import pipe from "callbag-pipe";
 import map from "callbag-map";
 import subscribe from "callbag-subscribe";
 import pairwise from "callbag-pairwise";
+import filter from "callbag-filter";
 import startWith from "callbag-start-with";
-import makeSubject from "callbag-subject";
+import flatMap from "callbag-flat-map";
 import dropRepeats from "callbag-drop-repeats";
 import sampleCombine from "callbag-sample-combine";
+import fromFunction from "callbag-from-function";
+import { Source } from "callbag"
 
-const subject = <T>() => {
-  const instance = makeSubject<T>();
-  return Object.assign(instance, { push(v: T) { instance(1, v) } });
-}
+const subject = <T>(): { source: Source<T>, emitter: (t: T) => void } => fromFunction()
 
-export const Callbag = { create, of, combine, subject, pipe, map, subscribe, dropRepeats, pairwise, startWith, sampleCombine }
+export const Callbag = { combine, create, dropRepeats, filter, flatMap, map, of, pairwise, pipe, sampleCombine, startWith, subject, subscribe }
