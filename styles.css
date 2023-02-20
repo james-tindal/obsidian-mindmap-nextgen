@@ -23,6 +23,7 @@
     width: 100%;
     height: 100%;
     display: block;
+    white-space: nowrap;
 }
 
 .markmap div { line-height: var(--mm-line-height, 1em) }
