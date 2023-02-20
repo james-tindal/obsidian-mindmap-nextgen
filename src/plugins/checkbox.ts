@@ -10,47 +10,29 @@ export const checkBoxPlugin: ITransformPlugin = {
   transform: (transformHooks) => {
     transformHooks.parser.tap((md) => {
       md.use((md) => {
-        md.inline.ruler.push(
-          "checkbox",
-          (state) => {
-            const mdCheckRegex = /^ *-? *\[[ xX]\] +/;
+        md.inline.ruler.push("checkbox", (state) => {
+          if (state.pos !== 0) return false;
 
-            if (!mdCheckRegex.test(state.src)) {
-              return false;
-            }
+          const match = /^ *-? *\[(?<state>[ xX])\] +/.exec(state.src);
+          const checked = match?.groups?.state !== " ";
+          const length = match?.[0].length!;
+          const token = `checkbox_${checked ? "" : "un"}chkd`;
 
-            const mdCheckedRegex = /^ *-? *\[[xX]\] +/;
-            const mdUncheckedRegex = /^ *-? *\[ \] +/;
+          if (!match) return false
 
-            if (mdCheckedRegex.test(state.src)) {
-              state.src = state.src.replace(mdCheckedRegex, "");
-              state.push({
-                type: "checkbox_chkd",
-                content: "checkbox_chkd",
-                level: state.level + 1,
-              });
-            } else if (mdUncheckedRegex.test(state.src)) {
-              state.src = state.src.replace(mdUncheckedRegex, "");
-              state.push({
-                type: "checkbox_unchkd",
-                content: "checkbox_unchkd",
-                level: state.level + 1,
-              });
-            }
+          state.push({
+            type: token,
+            level: state.level,
+            block: false
+          });
 
-            return true;
-          },
-          {}
-        );
+          state.pos += length;
+          return true;
+        }, {});
       });
 
-      md.renderer.rules.checkbox_chkd = () => {
-        return `<span class="mm-ng-checkbox-checked">✓&nbsp;</span>`;
-      };
-
-      md.renderer.rules.checkbox_unchkd = () => {
-        return `<span class="mm-ng-checkbox-unchecked">✗&nbsp;</span>`;
-      };
+      md.renderer.rules.checkbox_chkd   = () => `<span class="mm-ng-checkbox-checked">✓&nbsp;</span>`;
+      md.renderer.rules.checkbox_unchkd = () => `<span class="mm-ng-checkbox-unchecked">✗&nbsp;</span>`;
     });
 
     return {
