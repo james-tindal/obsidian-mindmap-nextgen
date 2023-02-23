@@ -1,4 +1,4 @@
-import { Editor, ItemView, parseYaml, TFile } from "obsidian";
+import { ItemView, parseYaml } from "obsidian";
 import { Markmap, deriveOptions } from "markmap-view";
 import { IMarkmapJSONOptions, INode } from "markmap-common";
 import { pick } from "ramda";
@@ -15,21 +15,19 @@ type Frontmatter = Partial<{
     highlight: boolean;
   }>
 }>
-const getFrontmatter1 = (file: TFile) =>
-  new Promise<Frontmatter>(resolve =>
-    app.fileManager.processFrontMatter(file, resolve));
-const getFrontmatter2 = (editor: Editor) => {
-  const str = FRONT_MATTER_REGEX.exec(editor.getValue())?.[0].slice(4, -4);
+
+function getFrontmatter(fileContent: string) {
+  const str = FRONT_MATTER_REGEX.exec(fileContent)?.[0].slice(4, -4);
   return str && parseYaml(str)
-};
+}
 
 toggleBodyClass("highlight", cssClasses.highlight)
 app.workspace.on("file-open", file =>
   file?.extension === 'md' &&
-  getFrontmatter1(file).then(updateFrontmatterHighlight))
+  app.vault.read(file).then(getFrontmatter).then(updateFrontmatterHighlight))
 app.workspace.on("editor-change", (editor, { file }) =>
   file?.extension === 'md' &&
-  updateFrontmatterHighlight(getFrontmatter2(editor)))
+  updateFrontmatterHighlight(getFrontmatter(editor.getValue())))
 
 
 async function updateFrontmatterHighlight(frontmatter: Frontmatter | null) {
