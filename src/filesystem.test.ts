@@ -65,7 +65,7 @@ describe("Filesystem Settings Manager", () => {
         screenshotBgColor: '#002b36',
         screenshotBgStyle: ScreenshotBgStyle.Color,
         titleAsRootNode: true,
-        useThemeFont: false
+        useThemeFont: false,
       }
     }
 

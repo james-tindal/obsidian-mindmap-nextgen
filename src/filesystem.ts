@@ -230,7 +230,7 @@ const useDefaultsForMissingKeys =
 })
 
 export type GlobalSettings = v2["settings"];
-export type FileSettings = Omit<Partial<GlobalSettings>, "splitDirection" | "useThemeFont"> & { color?: string[] }
+export type FileSettings = Omit<GlobalSettings, "splitDirection" | "useThemeFont"> & { color?: string[] }
 export type CodeBlockSettings = Omit<FileSettings, "titleAsRootNode">
 
 type FileSystemData = v2;

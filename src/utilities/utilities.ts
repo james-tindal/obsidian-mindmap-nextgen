@@ -37,7 +37,6 @@ export function PromiseSubject<T>(): [(value: T | PromiseLike<T>) => void, Promi
   return [ resolver, promise ]
 }
 
-export const layoutReady = new Promise<void>(resolve => app.workspace.onLayoutReady(resolve))
 export const nextTick = () => new Promise<void>(setImmediate)
 
 export function* genLog<T>(message: string, generator: Generator<T>) {
