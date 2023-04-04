@@ -1,6 +1,9 @@
-import { loadJS, loadCSS } from "markmap-common";
+import { loadJS, loadCSS, IMarkmapOptions, INode } from "markmap-common";
 import { builtInPlugins, IFeatures, Transformer } from "markmap-lib";
 import { TFile } from "obsidian"
+import { deriveOptions } from "markmap-view"
+import { pick } from "ramda"
+
 import { CodeBlockSettings, FileSettings } from "src/filesystem"
 import { htmlEscapePlugin, checkBoxPlugin } from "src/plugins";
 import { updateInternalLinks } from "./linker";
@@ -15,7 +18,7 @@ export default function readMarkdown<Type extends TFile | CodeBlock>(markdown: s
   loadAssets(features);
   updateInternalLinks(root);
 
-  const settings = frontmatter?.markmap || {} as Type extends TFile ? FileSettings : CodeBlockSettings
+  const settings = (frontmatter?.markmap || {}) as Type extends TFile ? FileSettings : CodeBlockSettings
 
   return { rootNode: root, settings }
 }
@@ -39,4 +42,47 @@ export function loadAssets(features: IFeatures) {
   if (styles) loadCSS(styles.filter(s =>
     // @ts-expect-error
     !s.data?.href.contains("prismjs") ));
+}
+
+export function getOptions(settings: CodeBlockSettings): Partial<IMarkmapOptions> {
+  // Use colors from global settings:
+  // const { color: branchColoring } = deriveOptions({ ...settings, color: settings.color?.length ? settings.color : [settings.depth1Color, settings.depth2Color, settings.depth3Color] })
+
+  const { color: branchColoring } = deriveOptions(pick(["color", "colorFreezeLevel"], settings))
+  const colorFn = {
+    branch: branchColoring,
+    depth: depthColoring(settings),
+    single: () => settings.defaultColor
+  }[settings.coloring]
+
+  return {
+    autoFit: false,
+    embedGlobalCSS: true,
+    fitRatio: 1,
+    duration: settings.animationDuration,
+    ...pick([
+      "initialExpandLevel",
+      "maxWidth",
+      "nodeMinHeight",
+      "paddingX",
+      "spacingVertical",
+      "spacingHorizontal",
+    ], settings),
+    ...colorFn && { color: colorFn }
+  }
+}
+
+function depthColoring(settings: CodeBlockSettings) {
+  return ({ depth }: INode) => {
+    depth = depth!
+
+    if (settings.color?.length)
+      return settings.color[depth % settings.color.length]
+
+    const colors = [settings.depth1Color, settings.depth2Color, settings.depth3Color]
+
+    return depth < 3
+      ? colors[depth]
+      : settings.defaultColor
+  }
 }

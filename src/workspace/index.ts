@@ -79,16 +79,15 @@ const layout$ = Callbag.pipe(
 const fileChange$: Source<{ file: TFile, bodyText: string }> =
   Callbag.create(next => {
     app.workspace.on("editor-change", (editor, info) => next({ file: info.file!, bodyText: editor.getValue() }));
-    app.vault.on("modify", (abstractFile) =>
-      `search for the file in our set of open files. if found, push settings updates and renders. 
-       This should go in a separate stream.`);
+    // app.vault.on("modify", (abstractFile) =>
+    //   `search for the file in our set of open files. if found, push settings updates and renders. 
+    //    This should go in a separate stream.`);
   })
 
 const file$ = Callbag.pipe(
   fileChange$,
   map(({ file, bodyText }) => ({ file, ...readMarkdown<TFile>(bodyText) }))
 )
-
 
 
 const { source: codeBlock$, push: codeBlockEvent } = Callbag.subject<InputEvent & { tag: `codeBlock ${"created" | "deleted"}` }>()
@@ -125,7 +124,6 @@ const match = <Event extends Tagged<string, any>, Return>
 
 type EventMatcher = Matcher<InputEvent, MaybePromise<void | CodeBlockEvent | Iterable<MaybePromise<void | CodeBlockEvent>>>>
 
-Callbag.subscribe(inputEvent$, x => console.log("inputEvent$", x))
 
 async function getSettings (fileHandle: TFile) {
   const markdown = await app.vault.cachedRead(fileHandle)
@@ -186,8 +184,8 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
     return tabRow.codeBlocks.map(CodeBlockEvent.current)
   },
   "tab not current": tabLeaf => {
-    const tabRow = database.tabs.find(row => row.leaf === tabLeaf)!
-    tabRow.isCurrent = false
+    const tabRow = database.tabs.find(row => row.leaf === tabLeaf)
+    tabRow && (tabRow.isCurrent = false)
   },
   "tab closed": tabLeaf => {
     const tabRow = database.tabs.find(row => row.leaf === tabLeaf)!
@@ -270,7 +268,6 @@ const codeBlockEvent$ = Callbag.pipe(
   reject((x): x is void => !x),
 )
 
-Callbag.subscribe(codeBlockEvent$, x => console.log("codeBlockEvent$", x))
 
 const renderers = new Map<CodeBlock, CodeBlockRenderer>()
 Callbag.subscribe(codeBlockEvent$, event => match(event, {
