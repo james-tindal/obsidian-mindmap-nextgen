@@ -23,7 +23,6 @@
     width: 100%;
     height: 100%;
     display: block;
-    white-space: nowrap;
 }
 
 .markmap div { line-height: var(--mm-line-height, 1em) }
@@ -62,6 +61,8 @@
 
 .block-language-markmap { border-radius: 5px }
 .block-language-markmap svg { border-radius: 5px }
+
+.block-language-markmap { letter-spacing: normal }
 
 .mmng-highlight-inline .block-language-markmap {
     background-color: var(--code-background);
