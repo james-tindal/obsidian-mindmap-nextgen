@@ -14,7 +14,7 @@ if [ "$#" -ne 2 ]; then
     echo "Second one must be the minimum obsidian version for this release."
     echo ""
     echo "Example usage:"
-    echo "./release.sh 0.3.0 0.11.13"
+    echo "./release-1.sh 0.3.0 0.11.13"
     echo "Exiting."
 
     exit 1
@@ -51,25 +51,18 @@ then
   jq ". += {\"${NEW_VERSION}\": \"${MINIMUM_OBSIDIAN_VERSION}\"}" versions.json > "$TEMP_FILE" || exit 1
   mv "$TEMP_FILE" versions.json
 
-  read -p "Create git commit, tag, and push? [y/N] " -n 1 -r
+  read -p "Create git branch, commit, and push? [y/N] " -n 1 -r
   echo
   if [[ $REPLY =~ ^[Yy]$ ]]
   then
+    git checkout main
+    git fetch
+    git pull
+    git checkout -b "ops-upgrade-to-${NEW_VERSION}"
     git add -A .
-    git commit -m"ops: update to version ${NEW_VERSION}"
-    git tag "${NEW_VERSION}"
-    git push
-    LEFTHOOK=0 git push --tags
-  fi
-
-  read -p "Update documentation? [y/N] " -n 1 -r
-  echo
-  if [[ $REPLY =~ ^[Yy]$ ]]
-  then
-    git switch gh-pages
-    git merge main
-    LEFTHOOK=0 git push
-    git switch -
+    git commit -m "ops: upgrade to version ${NEW_VERSION}"
+    git push origin "ops-upgrade-to-${NEW_VERSION}"
+    echo "After you've merged this branch with main, push the new tag with release-2.sh"
   fi
 else
   echo "Exiting."
