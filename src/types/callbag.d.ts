@@ -47,3 +47,14 @@ declare module "callbag-pairwise" {
 
   export default pairwise
 }
+
+declare module "callbag-take-until" {
+  import { Source } from "callbag";
+
+  // const takeUntil: <T>(source: Source<T>) => Source<[T, T]>
+  const takeUntil: <I>(notifier: Source<unknown>) => (source: Source<I>) => Source<I>
+
+
+  export default takeUntil
+}
+

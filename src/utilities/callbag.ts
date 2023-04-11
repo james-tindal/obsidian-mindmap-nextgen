@@ -1,6 +1,7 @@
 import create from "callbag-create";
 import filter from "callbag-filter";
 import flatMap from "callbag-flat-map";
+import fromEvent from "callbag-from-event";
 import fromPromise from "callbag-from-promise";
 import map from "callbag-map";
 import merge from "callbag-merge";
@@ -10,8 +11,9 @@ import pipe from "callbag-pipe";
 import reject from "callbag-reject";
 import share from "callbag-share";
 import startWith from "callbag-start-with";
-import _subscribe from "callbag-subscribe";
+import subscribe from "callbag-subscribe";
 import take from "callbag-take";
+import takeUntil from "callbag-take-until";
 
 import { Source, UnwrapSource } from "callbag";
 
@@ -24,7 +26,13 @@ const subject = <T>(): { source: Source<T>, push: (v: T) => void } => {
   };
 }
 
-const subscribe = <T>(source: Source<T>, listener: (c: T) => void) => pipe(source, _subscribe(listener))
+type Listener<T> = (data: T) => any
+type Subscriber<T> = {
+  next?: Listener<T>,
+  error?: (err: any) => any,
+  complete?: () => any,
+}
+const subscribe2 = <T>(source: Source<T>, listener: Listener<T> | Subscriber<T>) => pipe(source, subscribe(listener))
 
 
 
@@ -32,6 +40,7 @@ const Callbag = {
   create,
   filter,
   flatMap,
+  fromEvent,
   fromPromise,
   map,
   merge,
@@ -42,14 +51,16 @@ const Callbag = {
   share,
   startWith,
   subject,
-  subscribe,
+  subscribe: subscribe2,
   take,
+  takeUntil
 }
 
 export {
   create,
   filter,
   flatMap,
+  fromEvent,
   fromPromise,
   map,
   merge,
@@ -62,6 +73,7 @@ export {
   subject,
   subscribe,
   take,
+  takeUntil
 }
 
 export default Callbag

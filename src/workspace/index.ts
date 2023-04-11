@@ -1,7 +1,7 @@
 import {  MarkdownPostProcessorContext, MarkdownRenderChild, TFile } from "obsidian"
 import { FileSettings, GlobalSettings, globalSettings$ } from "src/filesystem"
 import readMarkdown from "src/rendering/renderer-common"
-import Callbag, { filter, flatMap, fromPromise, map, merge, pairwise, reject, Source, startWith, take, UnwrapSource } from "src/utilities/callbag"
+import Callbag, { filter, flatMap, fromPromise, map, merge, pairwise, reject, Source, startWith, take } from "src/utilities/callbag"
 import { ImmutableSet } from "src/utilities/immutable-set"
 import { FileMap, getLayout } from "./get-layout"
 import { CodeBlockRow, createDb, Database, FileRow, TabRow } from "./db-schema"
@@ -40,7 +40,7 @@ const InputEvent = unionConstructors(
 type InputEvent = ExtractUnion<typeof InputEvent>
 
 const CodeBlockEvent = unionConstructors(
-  Tagged("start",          tr as { codeBlock: CodeBlock, globalSettings: GlobalSettings, fileSettings: FileSettings, isCurrent: boolean }),
+  Tagged("start",          tr as { codeBlock: CodeBlock, globalSettings: GlobalSettings, fileSettings: FileSettings, isCurrent: boolean, tabView: FileTab.View }),
   Tagged("current",        tr as { codeBlock: CodeBlock }),
   Tagged("globalSettings", tr as { codeBlock: CodeBlock, globalSettings: GlobalSettings }),
   Tagged("fileSettings",   tr as { codeBlock: CodeBlock, fileSettings: FileSettings }),
@@ -96,14 +96,15 @@ export async function codeBlockHandler(markdown: string, containerEl: HTMLDivEle
   const childComponent = new MarkdownRenderChild(containerEl)
   ctx.addChild(childComponent)
 
-  const codeBlock = new CodeBlock(markdown, containerEl)
+  const codeBlock = new CodeBlock(markdown, containerEl, () => ctx.getSectionInfo(containerEl)!)
   
   // elements aren't added to the DOM until after this function returns.
   // this puts "codeBlock created" after "tab opened"
   await nextTick()
 
   codeBlockEvent(InputEvent["codeBlock created"](codeBlock))
-  childComponent.register(() => codeBlockEvent(InputEvent["codeBlock deleted"](codeBlock)))
+  childComponent.register(() =>
+    codeBlockEvent(InputEvent["codeBlock deleted"](codeBlock)))
 }
 
 
@@ -218,8 +219,9 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
     const globalSettings = database.globalSettings
     const fileSettings = await tabRow.file.settings
     const isCurrent = tabRow.isCurrent
+    const tabView = tabRow.view
 
-    return CodeBlockEvent.start({ codeBlock, globalSettings, fileSettings, isCurrent })
+    return CodeBlockEvent.start({ codeBlock, globalSettings, fileSettings, isCurrent, tabView })
 
   },
   "codeBlock deleted": codeBlock => {
@@ -256,8 +258,6 @@ const codeBlockEvent$ = Callbag.pipe(
   take(1),
   flatMap(({ data: globalSettings }) => {
     const database = createDb(globalSettings)
-    // @ts-expect-error
-    window.database = database
     const eventMatcher = (event: InputEvent) => match(event, matcher(database))
     return map(eventMatcher)(inputEvent$)
   }),
@@ -271,8 +271,8 @@ const codeBlockEvent$ = Callbag.pipe(
 
 const renderers = new Map<CodeBlock, CodeBlockRenderer>()
 Callbag.subscribe(codeBlockEvent$, event => match(event, {
-  "start" ({ codeBlock, globalSettings, fileSettings, isCurrent }) {
-    const renderer = CodeBlockRenderer(codeBlock, globalSettings, fileSettings)
+  "start" ({ codeBlock, globalSettings, fileSettings, isCurrent, tabView }) {
+    const renderer = CodeBlockRenderer(codeBlock, tabView, globalSettings, fileSettings)
     if (isCurrent) renderer.fit()
     renderers.set(codeBlock, renderer)
   },
