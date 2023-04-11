@@ -231,7 +231,7 @@ const useDefaultsForMissingKeys =
 
 export type GlobalSettings = v2["settings"];
 export type FileSettings = Omit<GlobalSettings, "splitDirection" | "useThemeFont"> & { color?: string[] }
-export type CodeBlockSettings = Omit<FileSettings, "titleAsRootNode">
+export type CodeBlockSettings = Omit<FileSettings, "titleAsRootNode"> & { height?: number }
 
 type FileSystemData = v2;
 const latestVersion = "2.0";

@@ -72,6 +72,19 @@
     box-shadow: none;
 }
 
+.block-language-markmap .workspace-leaf-resize-handle {
+    bottom: 0;
+    left: 0;
+    border-bottom-style: solid;
+    border-bottom-width: var(--divider-width);
+    height: var(--divider-width-hover);
+    width: 100%;
+    cursor: row-resize;
+}
+.workspace-split.mod-root .workspace-leaf:last-child .block-language-markmap .workspace-leaf-resize-handle {
+    display: block
+}
+
 
 /* Toolbars */
 

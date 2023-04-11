@@ -1,4 +1,4 @@
-import { WorkspaceLeaf, ItemView, MarkdownView } from "obsidian"
+import { WorkspaceLeaf, ItemView, MarkdownView, MarkdownSectionInformation } from "obsidian"
 import MindmapTabView from "src/views/view"
 
 
@@ -22,6 +22,7 @@ export namespace FileTab {
 export class CodeBlock {
   constructor(
     public markdown: string,
-    public containerEl: HTMLDivElement
+    public containerEl: HTMLDivElement,
+    public getSectionInfo: () => MarkdownSectionInformation
   ) {}
 }
