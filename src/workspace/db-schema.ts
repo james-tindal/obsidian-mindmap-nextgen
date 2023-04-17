@@ -1,6 +1,6 @@
 import { TFile } from "obsidian"
 
-import { FileSettings, GlobalSettings } from "src/filesystem"
+import { FileSettings, GlobalSettings } from "src/settings/filesystem"
 import { CodeBlock } from "./types"
 import { FileTab } from "./types"
 import { MaybePromise } from "src/utilities/utilities"

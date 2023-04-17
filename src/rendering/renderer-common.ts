@@ -4,7 +4,7 @@ import { TFile } from "obsidian"
 import { deriveOptions } from "markmap-view"
 import { pick } from "ramda"
 
-import { CodeBlockSettings, FileSettings } from "src/filesystem"
+import { CodeBlockSettings, FileSettings } from "src/settings/filesystem"
 import { htmlEscapePlugin, checkBoxPlugin } from "src/plugins";
 import { updateInternalLinks } from "./internal-links";
 import { CodeBlock } from "src/workspace/types"

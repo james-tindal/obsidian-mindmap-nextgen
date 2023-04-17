@@ -3,7 +3,7 @@ import { Markmap } from "markmap-view";
 import d3SvgToPng from "d3-svg-to-png";
 import { ZoomTransform } from "d3-zoom"
 
-import { GlobalSettings, ScreenshotBgStyle } from "src/filesystem";
+import { GlobalSettings, ScreenshotBgStyle } from "src/settings/filesystem";
 
 export interface ScreenshotColors {
   background: string;
