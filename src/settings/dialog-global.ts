@@ -1,10 +1,10 @@
 import { PluginSettingTab, Setting, SplitDirection } from "obsidian";
 import { Coloring, GlobalSettings, ScreenshotBgStyle } from "./filesystem";
 
-import Plugin from "./main";
+import Plugin from "../main";
 
 
-export class SettingsTab extends PluginSettingTab {
+export class GlobalSettingsDialog extends PluginSettingTab {
   constructor(settings: GlobalSettings) {
     super(app, Plugin.instance);
 

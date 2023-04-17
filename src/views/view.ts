@@ -1,6 +1,6 @@
 import { ItemView, Menu, WorkspaceLeaf } from "obsidian";
 
-import { GlobalSettings } from "src/filesystem";
+import { GlobalSettings } from "src/settings/filesystem";
 import { MM_VIEW_TYPE } from "src/constants"
 import { TabRenderer } from "src/rendering/renderer-tab"
 

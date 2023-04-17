@@ -3,7 +3,7 @@ import { EditorPosition } from "obsidian"
 import autoBind from "auto-bind"
 import GrayMatter from "gray-matter"
 
-import { CodeBlockSettings, FileSettings, GlobalSettings } from "src/filesystem";
+import { CodeBlockSettings, FileSettings, GlobalSettings } from "src/settings/filesystem";
 import { cssClasses } from "src/constants";
 import { CodeBlock, FileTab } from "src/workspace/types"
 import readMarkdown, { getOptions } from "src/rendering/renderer-common";

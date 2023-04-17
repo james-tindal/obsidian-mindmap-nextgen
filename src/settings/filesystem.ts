@@ -1,8 +1,8 @@
 import type { Plugin_2, SplitDirection } from "obsidian";
-import { LocalEvents, PromiseSubject } from "./utilities/utilities"
-import { Layout } from "./views/layout-manager"
-import type { SettingsTab } from "./settings-tab"
-import Callbag from "./utilities/callbag"
+import { LocalEvents, PromiseSubject } from "../utilities/utilities"
+import { Layout } from "../views/layout-manager"
+import type { GlobalSettingsDialog } from "./dialog-global"
+import Callbag from "../utilities/callbag"
 
 export enum ScreenshotBgStyle {
   Transparent = "transparent",
@@ -315,7 +315,7 @@ export async function FilesystemManager (
 
   return {
     settings: getter,
-    createSettingsTab: (Constructor: typeof SettingsTab) => new Constructor(getterSetter),
+    createSettingsTab: (Constructor: typeof GlobalSettingsDialog) => new Constructor(getterSetter),
     saveLayout,
     loadLayout
   };

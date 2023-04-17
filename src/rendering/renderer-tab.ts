@@ -3,7 +3,7 @@ import { TFile } from "obsidian";
 import { Toolbar } from "markmap-toolbar";
 import { IMarkmapOptions, INode } from "markmap-common";
 
-import { FileSettings, GlobalSettings } from "src/filesystem";
+import { FileSettings, GlobalSettings } from "src/settings/filesystem";
 import { updateInternalLinks } from "src/rendering/internal-links";
 import { ScreenshotColors, takeScreenshot } from "src/rendering/screenshot";
 import readMarkdown, { getOptions } from "./renderer-common"

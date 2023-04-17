@@ -1,6 +1,6 @@
 import { TFile } from "obsidian"
 
-import { GlobalSettings } from "src/filesystem";
+import { GlobalSettings } from "src/settings/filesystem";
 import Plugin from "src/main";
 import MindmapTabView from "./view"
 import { LayoutManager, MindmapSubject } from "./layout-manager"

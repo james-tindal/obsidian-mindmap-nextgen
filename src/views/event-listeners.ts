@@ -1,5 +1,5 @@
 import { TFile, MarkdownView, MarkdownFileInfo, WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs, Editor, TAbstractFile } from "obsidian"
-import { GlobalSettings } from "src/filesystem"
+import { GlobalSettings } from "src/settings/filesystem"
 import { LayoutManager } from "./layout-manager"
 import { LeafManager } from "./leaf-manager"
 import { LoadingView } from "./loading-view"

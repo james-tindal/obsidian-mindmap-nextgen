@@ -1,5 +1,5 @@
 import {  MarkdownPostProcessorContext, MarkdownRenderChild, TFile } from "obsidian"
-import { FileSettings, GlobalSettings, globalSettings$ } from "src/filesystem"
+import { FileSettings, GlobalSettings, globalSettings$ } from "src/settings/filesystem"
 import readMarkdown from "src/rendering/renderer-common"
 import Callbag, { filter, flatMap, fromPromise, map, merge, pairwise, reject, Source, startWith, take } from "src/utilities/callbag"
 import { ImmutableSet } from "src/utilities/immutable-set"

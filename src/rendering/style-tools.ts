@@ -1,4 +1,4 @@
-import { GlobalSettings, settingChanges, settingsReady } from "src/filesystem";
+import { GlobalSettings, settingChanges, settingsReady } from "src/settings/filesystem";
 import Plugin from "src/main";
 
 
