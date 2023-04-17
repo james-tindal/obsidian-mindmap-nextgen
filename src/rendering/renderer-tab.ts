@@ -4,7 +4,7 @@ import { Toolbar } from "markmap-toolbar";
 import { IMarkmapOptions, INode } from "markmap-common";
 
 import { FileSettings, GlobalSettings } from "src/filesystem";
-import { updateInternalLinks } from "src/rendering/linker";
+import { updateInternalLinks } from "src/rendering/internal-links";
 import { ScreenshotColors, takeScreenshot } from "src/rendering/screenshot";
 import readMarkdown, { getOptions } from "./renderer-common"
 import { MindmapTab } from "src/workspace/types"

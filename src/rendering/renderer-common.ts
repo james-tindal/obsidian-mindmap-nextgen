@@ -6,7 +6,7 @@ import { pick } from "ramda"
 
 import { CodeBlockSettings, FileSettings } from "src/filesystem"
 import { htmlEscapePlugin, checkBoxPlugin } from "src/plugins";
-import { updateInternalLinks } from "./linker";
+import { updateInternalLinks } from "./internal-links";
 import { CodeBlock } from "src/workspace/types"
 export const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin ]);
 
