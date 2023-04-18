@@ -229,8 +229,16 @@ const useDefaultsForMissingKeys =
   }
 })
 
+type OmitFromFileSettings =
+| "splitDirection"
+| "useThemeFont"
+| "screenshotTextColor"
+| "screenshotTextColorEnabled"
+| "screenshotBgStyle"
+| "screenshotBgColor"
+
 export type GlobalSettings = v2["settings"];
-export type FileSettings = Omit<GlobalSettings, "splitDirection" | "useThemeFont"> & { color?: string[] }
+export type FileSettings = Omit<GlobalSettings, OmitFromFileSettings> & { color?: string[] }
 export type CodeBlockSettings = Omit<FileSettings, "titleAsRootNode"> & { height?: number }
 
 type FileSystemData = v2;

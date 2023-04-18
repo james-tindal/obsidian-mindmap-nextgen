@@ -3313,7 +3313,7 @@ export class Setting {
     /**
      * @public
      */
-    constructor(containerEl: HTMLElement);
+    constructor(containerEl: Node);
     /**
      * @public
      */

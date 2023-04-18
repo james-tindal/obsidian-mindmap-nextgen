@@ -37,7 +37,7 @@
     "rollup-plugin-copy": "^3.3.0",
     "ts-node": "^9.0.0",
     "tslib": "^2.0.3",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.4"
   },
   "dependencies": {
     "@babel/core": "^7.20.12",

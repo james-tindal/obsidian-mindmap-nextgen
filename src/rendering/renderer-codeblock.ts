@@ -1,5 +1,5 @@
 import { Markmap } from "markmap-view";
-import { EditorPosition } from "obsidian"
+import { ButtonComponent, EditorPosition } from "obsidian"
 import autoBind from "auto-bind"
 import GrayMatter from "gray-matter"
 
@@ -9,6 +9,7 @@ import { CodeBlock, FileTab } from "src/workspace/types"
 import { getOptions, parseMarkdown } from "src/rendering/renderer-common"
 import { renderCodeblocks$ } from "src/rendering/style-features"
 import Callbag, { flatMap, fromEvent, map, pairwise, takeUntil } from "src/utilities/callbag"
+import { CodeBlockSettingsDialog } from "src/settings/dialog-codeblock"
 
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>;
@@ -16,7 +17,7 @@ export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, g
 
   const { markdown, containerEl } = codeBlock;
 
-  const { markmap, svg } = initialise(containerEl);
+  const { markmap, svg } = createMarkmap(containerEl)
 
   const { rootNode, settings: codeBlockSettings } = parseMarkdown<"codeBlock">(markdown)
 
@@ -27,6 +28,9 @@ export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, g
   })
 
   SizeManager(containerEl, svg, settings)
+
+  if (tabView.getMode() === "source")
+    SettingsDialog(containerEl, settings)
 
   let hasFit = false
   function fit() {
@@ -60,7 +64,7 @@ export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, g
   }
 }
 
-function initialise(containerEl: CodeBlock["containerEl"]) {
+function createMarkmap(containerEl: CodeBlock["containerEl"]) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   const markmap = Markmap.create(svg, {});
 
@@ -106,23 +110,38 @@ class SettingsManager {
 
   saveHeight() {
     if (this.newHeight === undefined) return
+    this.updateFrontmatter(fm => {
+      fm.height = this.height
+    })
+    this.newHeight = undefined
+  }
 
+  proxy = new Proxy(this.merged, {
+    get: (_, key) =>
+      this.merged[key],
+    set: (_, key: string, value) => {
+      this.settings.codeBlock[key] = value
+      this.updateFrontmatter(fm => fm[key] = value)
+      return true
+    }
+  })
+
+  private updateFrontmatter(update: (frontmatter: GrayMatter.GrayMatterFile<string>["data"]) => void) {
     const editor = this.tabView.editor
     const sectionInfo = this.codeBlock.getSectionInfo()
     const lineStart = EditorLine(sectionInfo.lineStart + 1)
-    const lineEnd   = EditorLine(sectionInfo.lineEnd  )
+    const lineEnd   = EditorLine(sectionInfo.lineEnd)
 
     const text = editor.getRange(lineStart, lineEnd)
 
     const gm = GrayMatter(text)
     gm.data.markmap ??= {}
-    gm.data.markmap.height = this.height
+    update(gm.data.markmap)
 
     editor.replaceRange(
       GrayMatter.stringify(gm.content, gm.data),
       lineStart, lineEnd
     )
-    this.newHeight = undefined
   }
 }
 
@@ -153,4 +172,16 @@ function SizeManager(containerEl: CodeBlock["containerEl"], svg: SVGSVGElement, 
   })
 
   Callbag.subscribe(fromEvent(document, "mouseup"), settings.saveHeight)
+}
+
+function SettingsDialog(containerEl: CodeBlock["containerEl"], sm: SettingsManager) {
+  const dialog = new CodeBlockSettingsDialog(sm.proxy)
+
+  const button = new ButtonComponent(containerEl.parentElement!)
+    .setClass("edit-block-button")
+    .setClass("codeblock-settings-button")
+    .setIcon("sliders-horizontal")
+    .setTooltip("Edit block settings")
+
+  button.onClick(dialog.open)
 }

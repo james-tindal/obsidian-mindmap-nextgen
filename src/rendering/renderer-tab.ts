@@ -13,7 +13,7 @@ import { MindmapTab } from "src/workspace/types"
 
 export type TabRenderer = ReturnType<typeof TabRenderer>
 export function TabRenderer(containerEl: MindmapTab.View["containerEl"], globalSettings: GlobalSettings) {
-  const { markmap, toolbar } = initialise(containerEl);
+  const { markmap, toolbar } = createMarkmap(containerEl)
   const state: {
     hasRendered: boolean
     screenshotColors?: ScreenshotColors
@@ -72,7 +72,7 @@ export function TabRenderer(containerEl: MindmapTab.View["containerEl"], globalS
   }
 }
 
-function initialise(containerEl: MindmapTab.View["containerEl"]) {
+function createMarkmap(containerEl: MindmapTab.View["containerEl"]) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   const markmap = Markmap.create(svg, {});
   const toolbar = Toolbar.create(markmap) as HTMLDivElement;
