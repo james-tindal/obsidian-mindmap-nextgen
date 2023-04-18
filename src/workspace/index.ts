@@ -1,4 +1,6 @@
-import {  MarkdownPostProcessorContext, MarkdownRenderChild, TFile } from "obsidian"
+import {  Editor, MarkdownPostProcessorContext, MarkdownRenderChild, TFile } from "obsidian"
+import GrayMatter from "gray-matter"
+
 import { FileSettings, GlobalSettings, globalSettings$ } from "src/settings/filesystem"
 import Callbag, { filter, flatMap, map, merge, pairwise, Source, startWith, take } from "src/utilities/callbag"
 import { ImmutableSet } from "src/utilities/immutable-set"
@@ -9,6 +11,7 @@ import { CodeBlockRenderer } from "src/rendering/renderer-codeblock"
 import { nextTick } from "src/utilities/utilities"
 import { ExtractRecord, ExtractUnion, Matcher, Stackable, Tagged, match, tr, unionConstructors } from "./utilities"
 import { parseMarkdown } from "src/rendering/renderer-common"
+import { FileSettingsDialog } from "src/settings/dialog-file"
 
 
 const InputEvent = unionConstructors(
@@ -118,6 +121,30 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
     const tabRow = TabRow({ leaf, view: leaf.view, containerEl: leaf.containerEl, file: fileRow })
     database.tabs.add(tabRow)
     fileRow.tabs.add(tabRow)
+
+    // --
+    // as an external effect,
+    // this should really be moved to after the matcher
+    // --
+    const dialog = new FileSettingsDialog(new Proxy({} as FileSettings, {
+      get: (_, key) => ({ ...database.globalSettings, ...tabRow.file.settings } as FileSettings)[key],
+      set: (_, key, value) => {
+        updateFrontmatter(tabRow.view.editor, settings => settings[key] = value)
+        return true
+      }
+    }))
+    tabRow.view.addAction("dot-network", "Edit mindmap settings", dialog.open)
+
+    function updateFrontmatter(editor: Editor, update: (settings: FileSettings) => void) {
+      const text = editor.getValue()
+
+      const gm = GrayMatter(text)
+      gm.data.markmap ??= {}
+      update(gm.data.markmap)
+
+      editor.setValue(GrayMatter.stringify(gm.content, gm.data))
+    }
+    // --
 
     return database.codeBlocksWaiting
       .filter(codeBlock => leaf.containerEl.contains(codeBlock.containerEl))
