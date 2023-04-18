@@ -113,12 +113,12 @@ class SettingsManager {
 
     const text = editor.getRange(lineStart, lineEnd)
 
-    const md = GrayMatter(text)
-    md.data.markmap ??= {}
-    md.data.markmap.height = this.height
+    const gm = GrayMatter(text)
+    gm.data.markmap ??= {}
+    gm.data.markmap.height = this.height
 
     editor.replaceRange(
-      GrayMatter.stringify(md.content, md.data),
+      GrayMatter.stringify(gm.content, gm.data),
       lineStart, lineEnd
     )
     this.newHeight = undefined
