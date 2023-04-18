@@ -1,29 +1,14 @@
 import {  MarkdownPostProcessorContext, MarkdownRenderChild, TFile } from "obsidian"
 import { FileSettings, GlobalSettings, globalSettings$ } from "src/settings/filesystem"
 import readMarkdown from "src/rendering/renderer-common"
-import Callbag, { filter, flatMap, fromPromise, map, merge, pairwise, reject, Source, startWith, take } from "src/utilities/callbag"
+import Callbag, { filter, flatMap, map, merge, pairwise, Source, startWith, take } from "src/utilities/callbag"
 import { ImmutableSet } from "src/utilities/immutable-set"
 import { FileMap, getLayout } from "./get-layout"
 import { CodeBlockRow, createDb, Database, FileRow, TabRow } from "./db-schema"
 import { CodeBlock, FileTab } from "./types"
 import { CodeBlockRenderer } from "src/rendering/renderer-codeblock"
-import { MaybePromise, nextTick } from "src/utilities/utilities"
-
-
-
-interface Tagged<Tag extends string, Data> { tag: Tag, data: Data }
-const Tagged = <const Tag extends string, const Data>(tag: Tag, data: Data): Tagged<Tag, Data> => ({ tag, data })
-
-type ExtractUnion<Constructors extends Record<string, (data: any) => Tagged<string, any>>> =
-  ReturnType<Constructors[keyof Constructors]>
-
-function unionConstructors<Members extends readonly Tagged<string, any>[]>(...members: Members) {
-  return Object.fromEntries(members.map(({ tag, data }) => [tag, (data: any) => Tagged(tag, data)])) as
-    { [ Member in Members[number] as Member["tag"] ]: (data: Member["data"]) => Member }
-}
-
-const type_representative: unknown = undefined
-const tr = type_representative
+import { nextTick } from "src/utilities/utilities"
+import { ExtractRecord, ExtractUnion, Matcher, Stackable, Tagged, match, tr, unionConstructors } from "./utilities"
 
 
 const InputEvent = unionConstructors(
@@ -38,6 +23,7 @@ const InputEvent = unionConstructors(
   Tagged("globalSettings",   tr as GlobalSettings),
 )
 type InputEvent = ExtractUnion<typeof InputEvent>
+type InputEvents = ExtractRecord<typeof InputEvent>
 
 const CodeBlockEvent = unionConstructors(
   Tagged("start",          tr as { codeBlock: CodeBlock, globalSettings: GlobalSettings, fileSettings: FileSettings, isCurrent: boolean, tabView: FileTab.View }),
@@ -47,6 +33,24 @@ const CodeBlockEvent = unionConstructors(
   Tagged("end",            tr as { codeBlock: CodeBlock }),
 )
 type CodeBlockEvent = ExtractUnion<typeof CodeBlockEvent>
+
+
+const { source: codeBlock$, push: codeBlockEvent } = Callbag.subject<InputEvents[`codeBlock ${"created" | "deleted"}`]>()
+
+export async function codeBlockHandler(markdown: string, containerEl: HTMLDivElement, ctx: MarkdownPostProcessorContext) {
+  const childComponent = new MarkdownRenderChild(containerEl)
+  ctx.addChild(childComponent)
+
+  const codeBlock = new CodeBlock(markdown, containerEl, () => ctx.getSectionInfo(containerEl)!)
+
+  // elements aren't added to the DOM until after this function returns.
+  // this puts "codeBlock created" after "tab opened"
+  await nextTick()
+
+  codeBlockEvent(InputEvent["codeBlock created"](codeBlock))
+  childComponent.register(() =>
+    codeBlockEvent(InputEvent["codeBlock deleted"](codeBlock)))
+}
 
 
 
@@ -89,42 +93,13 @@ const file$ = Callbag.pipe(
   map(({ file, bodyText }) => ({ file, ...readMarkdown<TFile>(bodyText) }))
 )
 
-
-const { source: codeBlock$, push: codeBlockEvent } = Callbag.subject<InputEvent & { tag: `codeBlock ${"created" | "deleted"}` }>()
-
-export async function codeBlockHandler(markdown: string, containerEl: HTMLDivElement, ctx: MarkdownPostProcessorContext) {
-  const childComponent = new MarkdownRenderChild(containerEl)
-  ctx.addChild(childComponent)
-
-  const codeBlock = new CodeBlock(markdown, containerEl, () => ctx.getSectionInfo(containerEl)!)
-  
-  // elements aren't added to the DOM until after this function returns.
-  // this puts "codeBlock created" after "tab opened"
-  await nextTick()
-
-  codeBlockEvent(InputEvent["codeBlock created"](codeBlock))
-  childComponent.register(() =>
-    codeBlockEvent(InputEvent["codeBlock deleted"](codeBlock)))
-}
-
-
 const fileSettings$ = Callbag.pipe(file$, map(InputEvent.fileSettings))
 
 const globalSettingsEvent$ = Callbag.pipe(globalSettings$, map(InputEvent.globalSettings))
 
-const inputEvent$ = Callbag.share(merge(layout$, codeBlock$, fileSettings$, globalSettingsEvent$))
+const inputEvent$: Source<InputEvent> = Callbag.share(merge(layout$, codeBlock$, fileSettings$, globalSettingsEvent$))
 
-type _Matcher<Event extends Tagged<string, any>, Return = any> = {
-  [Data in Event["data"] as Event["tag"]]: (data: Data) => Return
-}
-type Matcher<Event extends Tagged<string, any>, Return = any> = Event extends any ? _Matcher<Event, Return> : never;
-
-const match = <Event extends Tagged<string, any>, Return>
-  (event: Event, matcher: Matcher<Event, Return>) =>
-    matcher[event.tag](event.data)
-
-type EventMatcher = Matcher<InputEvent, MaybePromise<void | CodeBlockEvent | Iterable<MaybePromise<void | CodeBlockEvent>>>>
-
+type EventMatcher = Matcher<InputEvent, Stackable<CodeBlockEvent>>
 
 async function getSettings (fileHandle: TFile) {
   const markdown = await app.vault.cachedRead(fileHandle)
@@ -249,23 +224,17 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
 }; return matcher }
 
 
-const isPromise = <T>(x): x is Promise<T> => x instanceof Promise
-const isIterable = <T>(x): x is Iterable<T> => !!x?.[Symbol.iterator]
 
 const codeBlockEvent$ = Callbag.pipe(
   inputEvent$,
-  filter((event): event is Tagged<"globalSettings", GlobalSettings> => event.tag === "globalSettings"),
+  filter((event): event is InputEvents["globalSettings"] => event.tag === "globalSettings"),
   take(1),
   flatMap(({ data: globalSettings }) => {
     const database = createDb(globalSettings)
     const eventMatcher = (event: InputEvent) => match(event, matcher(database))
     return map(eventMatcher)(inputEvent$)
   }),
-  flatMap(x => isPromise(x) ? fromPromise(x) : Callbag.of(x)),
-  reject((x): x is void => !x),
-  flatMap(x => isIterable(x) ? Callbag.of(...x) : Callbag.of(x)),
-  flatMap(x => isPromise(x) ? fromPromise(x) : Callbag.of(x)),
-  reject((x): x is void => !x),
+  Stackable.flatten
 )
 
 
