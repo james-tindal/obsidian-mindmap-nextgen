@@ -110,8 +110,8 @@ class SettingsManager {
 
   saveHeight() {
     if (this.newHeight === undefined) return
-    this.updateFrontmatter(fm => {
-      fm.height = this.height
+    this.updateFrontmatter(settings => {
+      settings.height = this.height
     })
     this.newHeight = undefined
   }
@@ -121,12 +121,12 @@ class SettingsManager {
       this.merged[key],
     set: (_, key: string, value) => {
       this.settings.codeBlock[key] = value
-      this.updateFrontmatter(fm => fm[key] = value)
+      this.updateFrontmatter(settings => settings[key] = value)
       return true
     }
   })
 
-  private updateFrontmatter(update: (frontmatter: GrayMatter.GrayMatterFile<string>["data"]) => void) {
+  private updateFrontmatter(update: (settings: CodeBlockSettings) => void) {
     const editor = this.tabView.editor
     const sectionInfo = this.codeBlock.getSectionInfo()
     const lineStart = EditorLine(sectionInfo.lineStart + 1)
