@@ -1,24 +1,25 @@
 import { loadJS, loadCSS, IMarkmapOptions, INode } from "markmap-common";
 import { builtInPlugins, IFeatures, Transformer } from "markmap-lib";
-import { TFile } from "obsidian"
 import { deriveOptions } from "markmap-view"
 import { pick } from "ramda"
+import GrayMatter from "gray-matter"
 
 import { CodeBlockSettings, FileSettings } from "src/settings/filesystem"
 import { htmlEscapePlugin, checkBoxPlugin } from "src/plugins";
 import { updateInternalLinks } from "./internal-links";
-import { CodeBlock } from "src/workspace/types"
 export const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin ]);
 
 
-export default function readMarkdown<Type extends TFile | CodeBlock>(markdown: string) {
-  const sanitisedMarkdown = removeUnrecognisedLanguageTags(markdown);
+export function parseMarkdown<Type extends "file" | "codeBlock">(text: string) {
+  const gm = GrayMatter(text)
+  const content = removeUnrecognisedLanguageTags(gm.content)
+  const frontmatter = gm.data
     
-  const { root, frontmatter, features } = transformer.transform(sanitisedMarkdown);
-  loadAssets(features);
-  updateInternalLinks(root);
+  const { root, features } = transformer.transform(content)
+  loadAssets(features)
+  updateInternalLinks(root)
 
-  const settings = (frontmatter?.markmap || {}) as Type extends TFile ? FileSettings : CodeBlockSettings
+  const settings = (frontmatter?.markmap || {}) as Type extends "file" ? FileSettings : CodeBlockSettings
 
   return { rootNode: root, settings }
 }

@@ -3,7 +3,7 @@ import { TFile } from "obsidian"
 import { FileSettings, GlobalSettings } from "src/settings/filesystem"
 import { CodeBlock } from "./types"
 import { FileTab } from "./types"
-import { MaybePromise } from "src/utilities/utilities"
+import { INode } from "markmap-common"
 
 
 export class DbSet<T> extends Set<T> {
@@ -47,7 +47,8 @@ export type TabRow = {
 
 export type FileRow = {
   handle: TFile
-  settings: MaybePromise<FileSettings>
+  settings: FileSettings
+  rootNode: INode
   tabs: DbSet<TabRow>
 }
 

@@ -6,7 +6,7 @@ import { IMarkmapOptions, INode } from "markmap-common";
 import { FileSettings, GlobalSettings } from "src/settings/filesystem";
 import { updateInternalLinks } from "src/rendering/internal-links";
 import { ScreenshotColors, takeScreenshot } from "src/rendering/screenshot";
-import readMarkdown, { getOptions } from "./renderer-common"
+import { getOptions, parseMarkdown } from "./renderer-common"
 import { MindmapTab } from "src/workspace/types"
 
 
@@ -53,7 +53,7 @@ export function TabRenderer(containerEl: MindmapTab.View["containerEl"], globalS
 
     const markdown = content ?? await app.vault.cachedRead(file);
     
-    const { rootNode, settings: fileSettings } = readMarkdown<TFile>(markdown);
+    const { rootNode, settings: fileSettings } = parseMarkdown<"file">(markdown)
     const settings: FileSettings = { ...globalSettings, ...fileSettings }
     const markmapOptions = getOptions(settings);
 

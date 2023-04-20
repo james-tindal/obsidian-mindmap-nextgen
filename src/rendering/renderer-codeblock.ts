@@ -6,7 +6,7 @@ import GrayMatter from "gray-matter"
 import { CodeBlockSettings, FileSettings, GlobalSettings } from "src/settings/filesystem";
 import { cssClasses } from "src/constants";
 import { CodeBlock, FileTab } from "src/workspace/types"
-import readMarkdown, { getOptions } from "src/rendering/renderer-common";
+import { getOptions, parseMarkdown } from "src/rendering/renderer-common"
 import { renderCodeblocks$ } from "src/rendering/style-features"
 import Callbag, { flatMap, fromEvent, map, pairwise, takeUntil } from "src/utilities/callbag"
 
@@ -18,7 +18,7 @@ export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, g
 
   const { markmap, svg } = initialise(containerEl);
 
-  const { rootNode, settings: codeBlockSettings } = readMarkdown<CodeBlock>(markdown);
+  const { rootNode, settings: codeBlockSettings } = parseMarkdown<"codeBlock">(markdown)
 
   const settings = new SettingsManager(tabView, codeBlock, {
     global: globalSettings,
@@ -31,6 +31,7 @@ export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, g
   let hasFit = false
   function fit() {
     if (!hasFit) markmap.fit()
+    hasFit = true
   }
 
   render();

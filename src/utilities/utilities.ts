@@ -29,8 +29,6 @@ export class LocalEvents<EventName extends string> {
   }
 }
 
-export type MaybePromise<T> = T | Promise<T>
-
 export function PromiseSubject<T>(): [(value: T | PromiseLike<T>) => void, Promise<T>] {
   let resolver;
   const promise = new Promise<T>(resolve => resolver = resolve)

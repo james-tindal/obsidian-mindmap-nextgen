@@ -2,7 +2,6 @@ import create from "callbag-create";
 import filter from "callbag-filter";
 import flatMap from "callbag-flat-map";
 import fromEvent from "callbag-from-event";
-import fromPromise from "callbag-from-promise";
 import map from "callbag-map";
 import merge from "callbag-merge";
 import of from "callbag-of";
@@ -41,7 +40,6 @@ const Callbag = {
   filter,
   flatMap,
   fromEvent,
-  fromPromise,
   map,
   merge,
   of,
@@ -61,7 +59,6 @@ export {
   filter,
   flatMap,
   fromEvent,
-  fromPromise,
   map,
   merge,
   of,
