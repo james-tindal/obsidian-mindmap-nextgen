@@ -1,6 +1,5 @@
 import {  MarkdownPostProcessorContext, MarkdownRenderChild, TFile } from "obsidian"
 import { FileSettings, GlobalSettings, globalSettings$ } from "src/settings/filesystem"
-import readMarkdown from "src/rendering/renderer-common"
 import Callbag, { filter, flatMap, map, merge, pairwise, Source, startWith, take } from "src/utilities/callbag"
 import { ImmutableSet } from "src/utilities/immutable-set"
 import { FileMap, getLayout } from "./get-layout"
@@ -9,6 +8,7 @@ import { CodeBlock, FileTab } from "./types"
 import { CodeBlockRenderer } from "src/rendering/renderer-codeblock"
 import { nextTick } from "src/utilities/utilities"
 import { ExtractRecord, ExtractUnion, Matcher, Stackable, Tagged, match, tr, unionConstructors } from "./utilities"
+import { parseMarkdown } from "src/rendering/renderer-common"
 
 
 const InputEvent = unionConstructors(
@@ -90,7 +90,7 @@ const fileChange$: Source<{ file: TFile, bodyText: string }> =
 
 const file$ = Callbag.pipe(
   fileChange$,
-  map(({ file, bodyText }) => ({ file, ...readMarkdown<TFile>(bodyText) }))
+  map(({ file, bodyText }) => ({ file, ...parseMarkdown<"file">(bodyText) }))
 )
 
 const fileSettings$ = Callbag.pipe(file$, map(InputEvent.fileSettings))
@@ -101,12 +101,6 @@ const inputEvent$: Source<InputEvent> = Callbag.share(merge(layout$, codeBlock$,
 
 type EventMatcher = Matcher<InputEvent, Stackable<CodeBlockEvent>>
 
-async function getSettings (fileHandle: TFile) {
-  const markdown = await app.vault.cachedRead(fileHandle)
-  const { settings } = readMarkdown<TFile>(markdown)
-  return settings
-}
-
 const matcher = (database: Database): EventMatcher => { const matcher = {
   "tab opened": leaf => {
     const fileHandle = leaf.view.file
@@ -116,7 +110,8 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
     if (fileRowInDb)
       fileRow = fileRowInDb
     else {
-      fileRow = FileRow({ handle: fileHandle, settings: getSettings(fileHandle) })
+      const fileText = leaf.view.editor.getValue()
+      fileRow = FileRow({ handle: fileHandle, ...parseMarkdown<"file">(fileText) })
       database.files.add(fileRow)
     }
 
@@ -143,7 +138,8 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
       newFileRow = newFileRowInDb
     else {
       // Create new FileRow
-      newFileRow = FileRow({ handle: newFileHandle, settings: getSettings(newFileHandle) })
+      const fileText = tabLeaf.view.editor.getValue()
+      newFileRow = FileRow({ handle: newFileHandle, ...parseMarkdown<"file">(fileText) })
       // Add it to the db
       database.files.add(newFileRow)
     }
@@ -178,7 +174,7 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
 
     // codeBlocks will each have their own delete events
   },
-  "codeBlock created": async codeBlock => {
+  "codeBlock created": codeBlock => {
     const tabRow = database.tabs.find(tab => tab.containerEl.contains(codeBlock.containerEl))
     
     if (!tabRow) {
@@ -192,7 +188,7 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
     tabRow.codeBlocks.add(codeBlockRow)
 
     const globalSettings = database.globalSettings
-    const fileSettings = await tabRow.file.settings
+    const fileSettings = tabRow.file.settings
     const isCurrent = tabRow.isCurrent
     const tabView = tabRow.view
 
