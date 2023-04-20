@@ -36,6 +36,13 @@ read -p "Continue? [y/N] " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
+
+  git checkout main
+  git fetch
+  git pull
+  git checkout -b "ops-upgrade-to-${NEW_VERSION}"
+
+  
   echo "Updating package.json"
   TEMP_FILE=$(mktemp)
   jq ".version |= \"${NEW_VERSION}\"" package.json > "$TEMP_FILE" || exit 1
@@ -51,18 +58,13 @@ then
   jq ". += {\"${NEW_VERSION}\": \"${MINIMUM_OBSIDIAN_VERSION}\"}" versions.json > "$TEMP_FILE" || exit 1
   mv "$TEMP_FILE" versions.json
 
-  read -p "Create git branch, commit, and push? [y/N] " -n 1 -r
-  echo
-  if [[ $REPLY =~ ^[Yy]$ ]]
-  then
-    git checkout main
-    git fetch
-    git pull
-    git checkout -b "ops-upgrade-to-${NEW_VERSION}"
-    git add -A .
-    git commit -m "ops: upgrade to version ${NEW_VERSION}"
-    git push origin "ops-upgrade-to-${NEW_VERSION}"
-    echo "After you've merged this branch with main, push the new tag with release-2.sh"
+
+  git add -A .
+  git commit -m "ops: upgrade to version ${NEW_VERSION}"
+  git push origin "ops-upgrade-to-${NEW_VERSION}"
+
+  
+  echo "After you've merged this branch with main, push the new tag with release-2.sh"
   fi
 else
   echo "Exiting."
