@@ -9,12 +9,13 @@ import { CodeBlock, FileTab } from "src/workspace/types"
 import { getOptions, parseMarkdown } from "src/rendering/renderer-common"
 import { renderCodeblocks$ } from "src/rendering/style-features"
 import Callbag, { flatMap, fromEvent, map, pairwise, takeUntil } from "src/utilities/callbag"
-import { CodeBlockSettingsDialog } from "src/settings/dialog-codeblock"
+import { CodeBlockSettingsDialog } from "src/settings/dialogs"
+import { isObjectEmpty } from "src/utilities/utilities"
+import { TabRow } from "src/workspace/db-schema"
 
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>;
-export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, globalSettings: GlobalSettings, fileSettings: FileSettings) {
-
+export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, globalSettings: GlobalSettings, fileSettings: FileSettings, tabRow: TabRow) {
   const { markdown, containerEl } = codeBlock;
 
   const { markmap, svg } = createMarkmap(containerEl)
@@ -30,7 +31,7 @@ export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, g
   SizeManager(containerEl, svg, settings)
 
   if (tabView.getMode() === "source")
-    SettingsDialog(containerEl, settings)
+    SettingsDialog(codeBlock, tabRow, codeBlockSettings, globalSettings)
 
   let hasFit = false
   function fit() {
@@ -80,7 +81,7 @@ class SettingsManager {
 
   constructor(
     private tabView: FileTab.View,
-    private codeBlock: CodeBlock,
+    private __codeBlock: CodeBlock,
     private settings: { global: GlobalSettings, file: FileSettings, codeBlock: CodeBlockSettings }
   ) {
     autoBind(this)
@@ -116,19 +117,9 @@ class SettingsManager {
     this.newHeight = undefined
   }
 
-  proxy = new Proxy(this.merged, {
-    get: (_, key) =>
-      this.merged[key],
-    set: (_, key: string, value) => {
-      this.settings.codeBlock[key] = value
-      this.updateFrontmatter(settings => settings[key] = value)
-      return true
-    }
-  })
-
   private updateFrontmatter(update: (settings: CodeBlockSettings) => void) {
     const editor = this.tabView.editor
-    const sectionInfo = this.codeBlock.getSectionInfo()
+    const sectionInfo = this.__codeBlock.getSectionInfo()
     const lineStart = EditorLine(sectionInfo.lineStart + 1)
     const lineEnd   = EditorLine(sectionInfo.lineEnd)
 
@@ -137,6 +128,7 @@ class SettingsManager {
     const gm = GrayMatter(text)
     gm.data.markmap ??= {}
     update(gm.data.markmap)
+    isObjectEmpty(gm.data.markmap) && delete gm.data.markmap
 
     editor.replaceRange(
       GrayMatter.stringify(gm.content, gm.data),
@@ -174,10 +166,60 @@ function SizeManager(containerEl: CodeBlock["containerEl"], svg: SVGSVGElement, 
   Callbag.subscribe(fromEvent(document, "mouseup"), settings.saveHeight)
 }
 
-function SettingsDialog(containerEl: CodeBlock["containerEl"], sm: SettingsManager) {
-  const dialog = new CodeBlockSettingsDialog(sm.proxy)
+function SettingsDialog(codeBlock: CodeBlock, tabRow: TabRow, codeBlockSettings: CodeBlockSettings, globalSettings: GlobalSettings) {
+  const fileSettings = new Proxy({} as FileSettings, {
+    get: (_, key) => tabRow.file.settings[key],
+    has: (_, key) => key in tabRow.file.settings,
+    set(_, key, value) {
+      tabRow.file.settings[key] = value
+      updateFileFrontmatter()
+      return true
+    },
+    deleteProperty(_, key) {
+      delete tabRow.file.settings[key]
+      updateFileFrontmatter()
+      return true
+    }
+  })
 
-  const button = new ButtonComponent(containerEl.parentElement!)
+  function updateFileFrontmatter() {
+    const frontmatter = isObjectEmpty(tabRow.file.settings) ? {} : { markmap: tabRow.file.settings }
+    tabRow.view.editor.setValue(GrayMatter.stringify(tabRow.file.body, frontmatter))
+  }
+
+  const codeBlockProxy = new Proxy(codeBlockSettings, {
+    set(_, key, newValue) {
+      codeBlockSettings[key] = newValue
+      updateCodeBlockFrontmatter()
+      return true
+    },
+    deleteProperty(_, key) {
+      delete codeBlockSettings[key]
+      updateCodeBlockFrontmatter()
+      return true
+    }
+  })
+
+  function updateCodeBlockFrontmatter() {
+    const editor = tabRow.view.editor
+    const sectionInfo = codeBlock.getSectionInfo()
+    const lineStart = EditorLine(sectionInfo.lineStart + 1)
+    const lineEnd   = EditorLine(sectionInfo.lineEnd)
+
+    const text = editor.getRange(lineStart, lineEnd)
+
+    const bodyText = GrayMatter(text).content
+    const frontmatter = isObjectEmpty(codeBlockSettings) ? {} : { markmap: codeBlockSettings }
+
+    editor.replaceRange(
+      GrayMatter.stringify(bodyText, frontmatter),
+      lineStart, lineEnd
+    )
+  }
+
+  const dialog = new CodeBlockSettingsDialog(globalSettings, fileSettings, codeBlockProxy)
+
+  const button = new ButtonComponent(codeBlock.containerEl.parentElement!)
     .setClass("edit-block-button")
     .setClass("codeblock-settings-button")
     .setIcon("sliders-horizontal")

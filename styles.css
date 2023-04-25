@@ -112,12 +112,63 @@
 
 .mmng-settings-modal .modal-content {
     overflow-y: auto;
-    padding: var(--size-4-8);
+}
+
+.mmng-settings-modal .modal {
+    height: var(--dialog-max-height)
 }
 
 .mmng-settings-modal .modal-content :first-child { border-top: 0 }
 
+.modal-close-button { z-index: 2 }
 
+.mmng-settings-tab {
+    padding: 0
+}
+.mmng-level-selector {
+    position: sticky;
+    top: 0;
+    background-color: var(--background-primary);
+    z-index: 1;
+
+    padding-top: var(--size-4-8);
+    padding-left: var(--size-4-12);
+    padding-right: var(--size-4-12);
+}
+
+.mmng-level-selector button.mmng-active {
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+}
+
+.mmng-level-selector .setting-item {
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.mmng-main {
+    padding-left: var(--size-4-12);
+    padding-right: var(--size-4-12);
+    padding-bottom: var(--size-4-16);
+}
+
+.mmng-main .setting-item:first-child {
+    padding-top: 0.75em
+}
+
+.setting-item.mmng-faded {
+    opacity: 40%
+}
+
+.setting-item-info.mmng-reset {
+    flex: none;
+}
+
+.mmng-settings-level-explanation {
+    padding-top: var(--size-4-16);
+    padding-left: var(--size-4-8);
+    padding-right: var(--size-4-8);
+}
+.mmng-settings-level-explanation .clickable-icon { display: inline-block }
 
 /* Toolbars */
 

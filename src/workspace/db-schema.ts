@@ -48,6 +48,7 @@ export type TabRow = {
 export type FileRow = {
   handle: TFile
   settings: FileSettings
+  body: string
   rootNode: INode
   tabs: DbSet<TabRow>
 }

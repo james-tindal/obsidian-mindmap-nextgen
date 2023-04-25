@@ -39,3 +39,10 @@ export const Stackable = {
     reject((x): x is void => !x),
   )
 }
+
+export function Resolve<T>(fn: (resolve: (v: T) => void) => void): T {
+  let result!: T
+  const resolve = (v: T) => result = v
+  fn(resolve)
+  return result
+}

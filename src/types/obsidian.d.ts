@@ -580,6 +580,8 @@ export interface CloseableComponent {
  */
 export class ColorComponent extends ValueComponent<string> {
 
+    colorPickerEl: HTMLInputElement
+
     /**
      * @public
      */
