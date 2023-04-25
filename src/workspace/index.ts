@@ -1,4 +1,4 @@
-import {  Editor, MarkdownPostProcessorContext, MarkdownRenderChild, TFile } from "obsidian"
+import { MarkdownPostProcessorContext, MarkdownRenderChild, TFile } from "obsidian"
 import GrayMatter from "gray-matter"
 
 import { FileSettings, GlobalSettings, globalSettings$ } from "src/settings/filesystem"
@@ -8,10 +8,11 @@ import { FileMap, getLayout } from "./get-layout"
 import { CodeBlockRow, createDb, Database, FileRow, TabRow } from "./db-schema"
 import { CodeBlock, FileTab } from "./types"
 import { CodeBlockRenderer } from "src/rendering/renderer-codeblock"
-import { nextTick } from "src/utilities/utilities"
+import { isObjectEmpty, nextTick } from "src/utilities/utilities"
 import { ExtractRecord, ExtractUnion, Matcher, Stackable, Tagged, match, tr, unionConstructors } from "./utilities"
 import { parseMarkdown } from "src/rendering/renderer-common"
-import { FileSettingsDialog } from "src/settings/dialog-file"
+import { FileSettingsDialog } from "src/settings/dialogs"
+
 
 
 const InputEvent = unionConstructors(
@@ -29,7 +30,7 @@ type InputEvent = ExtractUnion<typeof InputEvent>
 type InputEvents = ExtractRecord<typeof InputEvent>
 
 const CodeBlockEvent = unionConstructors(
-  Tagged("start",          tr as { codeBlock: CodeBlock, globalSettings: GlobalSettings, fileSettings: FileSettings, isCurrent: boolean, tabView: FileTab.View }),
+  Tagged("start",          tr as { codeBlock: CodeBlock, globalSettings: GlobalSettings, fileSettings: FileSettings, isCurrent: boolean, tabView: FileTab.View, tabRow: TabRow }),
   Tagged("current",        tr as { codeBlock: CodeBlock }),
   Tagged("globalSettings", tr as { codeBlock: CodeBlock, globalSettings: GlobalSettings }),
   Tagged("fileSettings",   tr as { codeBlock: CodeBlock, fileSettings: FileSettings }),
@@ -126,23 +127,27 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
     // as an external effect,
     // this should really be moved to after the matcher
     // --
-    const dialog = new FileSettingsDialog(new Proxy({} as FileSettings, {
-      get: (_, key) => ({ ...database.globalSettings, ...tabRow.file.settings } as FileSettings)[key],
-      set: (_, key, value) => {
-        updateFrontmatter(tabRow.view.editor, settings => settings[key] = value)
+    const fileSettingsProxy = new Proxy({} as FileSettings, {
+      get: (_, key) => tabRow.file.settings[key],
+      has: (_, key) => key in tabRow.file.settings,
+      set(_, key, value) {
+        tabRow.file.settings[key] = value
+        updateFrontmatter()
+        return true
+      },
+      deleteProperty(_, key) {
+        delete tabRow.file.settings[key]
+        updateFrontmatter()
         return true
       }
-    }))
+    })
+    const dialog = new FileSettingsDialog(database.globalSettings, fileSettingsProxy)
     tabRow.view.addAction("dot-network", "Edit mindmap settings", dialog.open)
 
-    function updateFrontmatter(editor: Editor, update: (settings: FileSettings) => void) {
-      const text = editor.getValue()
-
-      const gm = GrayMatter(text)
-      gm.data.markmap ??= {}
-      update(gm.data.markmap)
-
-      editor.setValue(GrayMatter.stringify(gm.content, gm.data))
+    function updateFrontmatter() {
+      const frontmatter = isObjectEmpty(tabRow.file.settings)
+        ? {} : { markmap: tabRow.file.settings }
+      tabRow.view.editor.setValue(GrayMatter.stringify(tabRow.file.body, frontmatter))
     }
     // --
 
@@ -219,7 +224,7 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
     const isCurrent = tabRow.isCurrent
     const tabView = tabRow.view
 
-    return CodeBlockEvent.start({ codeBlock, globalSettings, fileSettings, isCurrent, tabView })
+    return CodeBlockEvent.start({ codeBlock, globalSettings, fileSettings, isCurrent, tabView, tabRow })
 
   },
   "codeBlock deleted": codeBlock => {
@@ -236,11 +241,10 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
 
     return fileRow.tabs.flatMap(tabRow =>
       tabRow.codeBlocks.map(({ codeBlock }) =>
-        CodeBlockEvent.fileSettings({ codeBlock, fileSettings: settings})
+        CodeBlockEvent.fileSettings({ codeBlock, fileSettings: settings })
       ))
   },
   "globalSettings": globalSettings => {
-    database.globalSettings = globalSettings
     return database.codeBlocks.map(({ codeBlock }) =>
       CodeBlockEvent.globalSettings({ codeBlock, globalSettings }))
   }
@@ -263,8 +267,8 @@ const codeBlockEvent$ = Callbag.pipe(
 
 const renderers = new Map<CodeBlock, CodeBlockRenderer>()
 Callbag.subscribe(codeBlockEvent$, event => match(event, {
-  "start" ({ codeBlock, globalSettings, fileSettings, isCurrent, tabView }) {
-    const renderer = CodeBlockRenderer(codeBlock, tabView, globalSettings, fileSettings)
+  "start" ({ codeBlock, globalSettings, fileSettings, isCurrent, tabView, tabRow }) {
+    const renderer = CodeBlockRenderer(codeBlock, tabView, globalSettings, fileSettings, tabRow)
     if (isCurrent) renderer.fit()
     renderers.set(codeBlock, renderer)
   },

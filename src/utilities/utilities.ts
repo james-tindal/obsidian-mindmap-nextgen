@@ -6,6 +6,8 @@ type Path<EventName> = [EventName, number]
 export class LocalEvents<EventName extends string> {
   private listeners: Record<string, Function[]> = {};
 
+  constructor() { autoBind(this) }
+
   public emit(name: EventName, data?: any) {
     const listeners = this.listeners[name];
     if (!listeners) return
@@ -53,3 +55,6 @@ export class Map<K, V> extends globalThis.Map<K, V> {
     autoBind(this);
   }
 }
+
+export const isObjectEmpty = (object: Object) =>
+  Object.keys(object).length === 0

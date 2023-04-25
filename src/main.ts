@@ -1,7 +1,7 @@
 import { App, Plugin as ObsidianPlugin, PluginManifest } from "obsidian";
 
 import { FilesystemManager } from "src/settings/filesystem";
-import { GlobalSettingsDialog } from "src/settings/dialog-global"
+import { GlobalSettingsDialog } from "src/settings/dialogs"
 import { ViewManager } from "src/views/view-manager"
 import { LayoutManager } from "src/views/layout-manager"
 import { loadStyleFeatures } from "src/rendering/style-features"

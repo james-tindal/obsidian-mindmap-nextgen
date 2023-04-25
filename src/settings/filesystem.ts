@@ -1,7 +1,7 @@
 import type { Plugin_2, SplitDirection } from "obsidian";
 import { LocalEvents, PromiseSubject } from "../utilities/utilities"
 import { Layout } from "../views/layout-manager"
-import type { GlobalSettingsDialog } from "./dialog-global"
+import type { GlobalSettingsDialog } from "./dialogs"
 import Callbag from "../utilities/callbag"
 
 export enum ScreenshotBgStyle {
@@ -289,9 +289,7 @@ const { source: globalSettings$, push: pushSettings } = Callbag.subject<GlobalSe
 export { globalSettings$ }
 
 const events = new LocalEvents<keyof GlobalSettings>();
-export const settingChanges
- : { listen: typeof events.listen }
- = { listen: events.listen.bind(events) }
+export const settingChanges = { listen: events.listen }
 
 export type FilesystemManager = Awaited<ReturnType<typeof FilesystemManager>>;
 export async function FilesystemManager (
@@ -299,9 +297,7 @@ export async function FilesystemManager (
   saveData: Plugin_2["saveData"]
 ) {
   const fsd: FileSystemData = upgrade(await loadData());
-  pushSettings(fsd.settings);
   saveData(fsd);
-  resolveSettingsReady(fsd.settings);
 
   const get: Get = { get: (_, key) => fsd.settings[key] }
   const cantSet: Set = { set: () => false }
@@ -320,6 +316,10 @@ export async function FilesystemManager (
 
   const saveLayout = (layout: Layout) => { fsd.layout = layout; saveData(fsd) };
   const loadLayout = () => fsd.layout;
+
+  pushSettings(getterSetter);
+  resolveSettingsReady(getterSetter);
+
 
   return {
     settings: getter,

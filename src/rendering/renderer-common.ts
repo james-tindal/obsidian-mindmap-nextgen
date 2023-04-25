@@ -11,17 +11,18 @@ export const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin
 
 
 export function parseMarkdown<Type extends "file" | "codeBlock">(text: string) {
+  ;(GrayMatter as typeof GrayMatter & { clearCache: Function }).clearCache()
   const gm = GrayMatter(text)
   const content = removeUnrecognisedLanguageTags(gm.content)
   const frontmatter = gm.data
-    
+  
   const { root, features } = transformer.transform(content)
   loadAssets(features)
   updateInternalLinks(root)
 
   const settings = (frontmatter?.markmap || {}) as Type extends "file" ? FileSettings : CodeBlockSettings
 
-  return { rootNode: root, settings }
+  return { rootNode: root, settings, body: gm.content }
 }
 
 export function removeUnrecognisedLanguageTags(markdown: string) {
