@@ -65,7 +65,6 @@ then
 
   
   echo "After you've merged this branch with main, push the new tag with release-2.sh"
-  fi
 else
   echo "Exiting."
   exit 1
