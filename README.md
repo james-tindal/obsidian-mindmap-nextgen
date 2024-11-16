@@ -165,48 +165,19 @@ Take screenshots via the ["More options" menu](#more-options-menu).
 There is a section in the plugin settings for adjusting the shape and size of different parts of the mindmap. It might seem confusing at first. You'll have to fiddle around with different combinations of settings to get it the way you like.
 
 
-## Installing
+## Running in development
 
-Search for "Mindmap NextGen" in the Community Plugins section in your Obsidian settings.
+* Clone this repo into your vault plugins folder.
+  * This is at `<vault path>/.obsidian/plugins`
+  * Use [Manage Vaults](https://help.obsidian.md/Files+and+folders/Manage+vaults) to find the path to your vault.
+  * `cd <vault path>/.obsidian/plugins`
+  * `git clone https://github.com/james-tindal/obsidian-mindmap-nextgen`
+* Open the repo: `cd obsidian-mindmap-nextgen`
+* Install dependencies: `pnpm i`
+* Compile and watch for changes: `npm run dev`
 
-### Compatibility
-
-The obsidian version I have tested is **v1.0.3**, which is recommended to use at least version **v1.0.0**.
-
-### Manual installation
-
-1. Download the [latest release](https://github.com/MasterTuto/obsidian-mindmap-vb/releases/latest)
-2. Extract the obsidian-mindmap-nextgen folder from the zip to your vault's plugins folder: `<vault>/.obsidian/plugins/`  
-   Note: On some machines the `.obsidian` folder may be hidden. On MacOS you should be able to press `Command+Shift+Dot` to show the folder in Finder.
-3. Reload Obsidian
-4. If prompted about Safe Mode, you can disable safe mode and enable the plugin.
-
-### Nightly Installation
-
-Before anything you will need the following tools installed on your machine:
-* [NodeJS](https://nodejs.org/en/)
-* NPM (comes with NodeJS)
-* Git (optional)
-
-1. Open obsidian
-2. Go to `Settings` > `Community plugins`.
-3. On `Installed plugins` you can find a folder icon in the end, click on it:
-
-![Obsidian Open Plugin Folder Icon](https://user-images.githubusercontent.com/21978588/206907799-7a79e2fa-3535-4c51-9604-dc45cb5bd21e.png)
-
-4. Keep this folder open.
-5. You can directly click [HERE](https://github.com/AdrianSimionov/obsidian-mindmap-nextgen/archive/refs/heads/main.zip) to download the zip file. Or you can go to [this repo](https://github.com/AdrianSimionov/obsidian-mindmap-nextgen/) and click on the green icon "CODE" and then "Download ZIP".
-6. Go to your Downloads folder, or wherever you have downloaded it.
-7. Extract the zip file.
-8. Copy the extracted folder to the folder you have open on step 3.
-9. Go to that extracted folder and open it on terminal (On Windows you can `Shift + Right Click` and then "Open Command Prompt Here" or "Open Powershell Here", and on Linux just `Right Click` and click on "Open terminal here").
-10. Run `npm install`.
-11. Run `npm run dev`.
-12. Go to `Settings` > `Community plugins` on Obsidian.
-13. Reload the plugins folder, and then enable "Mindmap NextGen"
-
-## Contributing
-
-Pull requests and issues are both welcome and appreciated. 😀
-
-If you would like to contribute to the development of this plugin, please follow the guidelines provided in [CONTRIBUTING.md](CONTRIBUTING.md).
+&nbsp;
+* Go to Settings > Community plugins in Obsidian.
+* Ensure restricted mode is off
+* Click the reload plugins button
+* Enable Mindmap NextGen
