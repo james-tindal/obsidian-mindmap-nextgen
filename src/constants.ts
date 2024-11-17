@@ -1,4 +1,4 @@
-export const MM_VIEW_TYPE = 'mindmap';
+export const MM_VIEW_TYPE = 'mindmap-nextgen-plugin';
 export const MD_VIEW_TYPE = 'markdown'; 
 
 // https://regex101.com/r/gw85cc/2
