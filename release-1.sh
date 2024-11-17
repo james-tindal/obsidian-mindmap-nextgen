@@ -9,15 +9,15 @@ if [ ! $(which jq) ]; then
 fi
 
 if [ "$#" -ne 2 ]; then
-    echo "Must provide exactly two arguments."
-    echo "First one must be the new version number."
-    echo "Second one must be the minimum obsidian version for this release."
-    echo ""
-    echo "Example usage:"
-    echo "./release-1.sh 0.3.0 0.11.13"
-    echo "Exiting."
+  echo "Must provide exactly two arguments."
+  echo "First one must be the new version number."
+  echo "Second one must be the minimum obsidian version for this release."
+  echo ""
+  echo "Example usage:"
+  echo "./release-1.sh 0.3.0 0.11.13"
+  echo "Exiting."
 
-    exit 1
+  exit 1
 fi
 
 if [[ $(git status --porcelain) ]]; then
