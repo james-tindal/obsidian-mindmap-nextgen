@@ -165,7 +165,9 @@ Take screenshots via the ["More options" menu](#more-options-menu).
 There is a section in the plugin settings for adjusting the shape and size of different parts of the mindmap. It might seem confusing at first. You'll have to fiddle around with different combinations of settings to get it the way you like.
 
 
-## Running in development
+## Contributing
+
+### Running in development
 
 * Clone this repo into your vault plugins folder.
   * This is at `<vault path>/.obsidian/plugins`
@@ -181,3 +183,10 @@ There is a section in the plugin settings for adjusting the shape and size of di
 * Ensure restricted mode is off
 * Click the reload plugins button
 * Enable Mindmap NextGen
+
+### Releasing a new version
+
+* ensure dependency installed: jq
+* run release-1.sh
+* merge the created branch into main via pull request
+* run release-2.sh to create a tag which triggers a Github action to push the new release to the Obsidian plugins registry

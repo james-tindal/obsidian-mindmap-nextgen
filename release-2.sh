@@ -4,13 +4,13 @@ set -euo pipefail
 
 
 if [ "$#" -ne 1 ]; then
-    echo "Must provide exactly one argument, the new version number."
-    echo ""
-    echo "Example usage:"
-    echo "./release-2.sh 0.3.0 "
-    echo "Exiting."
+  echo "Must provide exactly one argument, the new version number."
+  echo ""
+  echo "Example usage:"
+  echo "./release-2.sh 0.3.0 "
+  echo "Exiting."
 
-    exit 1
+  exit 1
 fi
 
 NEW_VERSION=$1
