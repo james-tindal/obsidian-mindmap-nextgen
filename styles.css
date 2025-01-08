@@ -84,8 +84,13 @@
     cursor: row-resize;
 }
 
-.workspace-split.mod-root .workspace-leaf:last-child .block-language-markmap .workspace-leaf-resize-handle,
-                          .workspace-tabs:last-child .block-language-markmap .workspace-leaf-resize-handle
+/* display inline mindmap resize handle in editing mode */
+/* override a rule in the obsidian stylesheet which hides workspace-leaf-resize-handle */
+.workspace-split.mod-root
+.workspace-leaf:last-child
+.workspace-leaf-content[data-mode=source] /* editing mode */
+.block-language-markmap
+.workspace-leaf-resize-handle
 { display: block }
 
 
