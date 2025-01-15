@@ -40,7 +40,7 @@ export default class MindmapTabView extends ItemView {
     this.leaf.updateHeader();
   }
 
-  private onMoreOptionsMenu(menu: Menu) {
+  public onPaneMenu(menu: Menu, source: string) {
     const { collapseAll, toolbar, takeScreenshot } = this.renderer;
     menu
       .addItem((item) => item
@@ -64,6 +64,6 @@ export default class MindmapTabView extends ItemView {
         .onClick(toolbar.toggle)
       );
 
-    menu.showAtPosition({ x: 0, y: 0 });
+    super.onPaneMenu(menu, source)
   }
 }
