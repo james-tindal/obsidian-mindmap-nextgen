@@ -84,14 +84,17 @@
     cursor: row-resize;
 }
 
-/* display inline mindmap resize handle in editing mode */
+/* display inline mindmap resize handle */
 /* override a rule in the obsidian stylesheet which hides workspace-leaf-resize-handle */
 .workspace-split.mod-root
 .workspace-leaf:last-child
-.workspace-leaf-content[data-mode=source] /* editing mode */
+.workspace-leaf-content
 .block-language-markmap
 .workspace-leaf-resize-handle
 { display: block }
+
+/* keep resize handle inside block in reading mode */
+.block-language-markmap { position: relative }
 
 
 
