@@ -1,4 +1,4 @@
-import obsidian from "obsidian"
+import obsidian from 'obsidian'
 
 
 export class Setting extends obsidian.Setting {

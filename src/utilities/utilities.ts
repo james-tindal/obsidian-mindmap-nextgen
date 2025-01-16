@@ -1,15 +1,15 @@
-import autoBind from "auto-bind"
-import { curry } from "ramda"
+import autoBind from 'auto-bind'
+import { curry } from 'ramda'
 
 type Path<EventName> = [EventName, number]
 
 export class LocalEvents<EventName extends string> {
-  private listeners: Record<string, Function[]> = {};
+  private listeners: Record<string, Function[]> = {}
 
   constructor() { autoBind(this) }
 
   public emit(name: EventName, data?: any) {
-    const listeners = this.listeners[name];
+    const listeners = this.listeners[name]
     if (!listeners) return
     listeners.forEach(cb => cb(data))
   }
@@ -23,7 +23,7 @@ export class LocalEvents<EventName extends string> {
     else
       this.listeners[name] = [callback]
 
-    return this.unlisten(path);
+    return this.unlisten(path)
   })
 
   private unlisten([name, index]: Path<EventName>) {
@@ -32,7 +32,7 @@ export class LocalEvents<EventName extends string> {
 }
 
 export function PromiseSubject<T>(): [(value: T | PromiseLike<T>) => void, Promise<T>] {
-  let resolver;
+  let resolver
   const promise = new Promise<T>(resolve => resolver = resolve)
   return [ resolver, promise ]
 }
@@ -40,19 +40,19 @@ export function PromiseSubject<T>(): [(value: T | PromiseLike<T>) => void, Promi
 export const nextTick = () => new Promise<void>(setImmediate)
 
 export function* genLog<T>(message: string, generator: Generator<T>) {
-  let count = 0;
+  let count = 0
   for (const x of generator) {
-    console.info(message, count, x);
-    count++;
-    yield x;
+    console.info(message, count, x)
+    count++
+    yield x
   }
 }
 
 // Map constructor that binds all methods to the instance
 export class Map<K, V> extends globalThis.Map<K, V> {
   constructor(entries?: readonly (readonly [K, V])[] | null) {
-    super(entries);
-    autoBind(this);
+    super(entries)
+    autoBind(this)
   }
 }
 

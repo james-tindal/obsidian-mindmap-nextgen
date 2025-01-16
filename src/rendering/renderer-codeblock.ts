@@ -1,26 +1,26 @@
-import { Markmap } from "markmap-view";
-import { ButtonComponent, EditorPosition } from "obsidian"
-import autoBind from "auto-bind"
-import GrayMatter from "gray-matter"
+import { Markmap } from 'markmap-view'
+import { ButtonComponent, EditorPosition } from 'obsidian'
+import autoBind from 'auto-bind'
+import GrayMatter from 'gray-matter'
 
-import { CodeBlockSettings, FileSettings, GlobalSettings } from "src/settings/filesystem";
-import { cssClasses } from "src/constants";
-import { CodeBlock, FileTab } from "src/workspace/types"
-import { getOptions, parseMarkdown } from "src/rendering/renderer-common"
-import { renderCodeblocks$ } from "src/rendering/style-features"
-import Callbag, { flatMap, fromEvent, map, pairwise, takeUntil } from "src/utilities/callbag"
-import { CodeBlockSettingsDialog } from "src/settings/dialogs"
-import { isObjectEmpty } from "src/utilities/utilities"
-import { TabRow } from "src/workspace/db-schema"
+import { CodeBlockSettings, FileSettings, GlobalSettings } from 'src/settings/filesystem'
+import { cssClasses } from 'src/constants'
+import { CodeBlock, FileTab } from 'src/workspace/types'
+import { getOptions, parseMarkdown } from 'src/rendering/renderer-common'
+import { renderCodeblocks$ } from 'src/rendering/style-features'
+import Callbag, { flatMap, fromEvent, map, pairwise, takeUntil } from 'src/utilities/callbag'
+import { CodeBlockSettingsDialog } from 'src/settings/dialogs'
+import { isObjectEmpty } from 'src/utilities/utilities'
+import { TabRow } from 'src/workspace/db-schema'
 
 
-export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>;
+export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
 export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, globalSettings: GlobalSettings, fileSettings: FileSettings, tabRow: TabRow) {
-  const { markdown, containerEl } = codeBlock;
+  const { markdown, containerEl } = codeBlock
 
   const { markmap, svg } = createMarkmap(containerEl)
 
-  const { rootNode, settings: codeBlockSettings } = parseMarkdown<"codeBlock">(markdown)
+  const { rootNode, settings: codeBlockSettings } = parseMarkdown<'codeBlock'>(markdown)
 
   const settings = new SettingsManager(tabView, codeBlock, {
     global: globalSettings,
@@ -30,7 +30,7 @@ export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, g
 
   SizeManager(containerEl, svg, settings)
 
-  if (tabView.getMode() === "source")
+  if (tabView.getMode() === 'source')
     SettingsDialog(codeBlock, tabRow, codeBlockSettings, globalSettings)
 
   let hasFit = false
@@ -39,8 +39,8 @@ export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, g
     hasFit = true
   }
 
-  render();
-  Callbag.subscribe(renderCodeblocks$, render);
+  render()
+  Callbag.subscribe(renderCodeblocks$, render)
 
   return { render, fit, updateGlobalSettings, updateFileSettings }
 
@@ -56,7 +56,7 @@ export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, g
 
   function render() {
     const markmapOptions = getOptions(settings.merged)
-    markmap.setData(rootNode, markmapOptions);
+    markmap.setData(rootNode, markmapOptions)
 
     const { classList } = containerEl.parentElement!
     settings.merged.highlight
@@ -65,13 +65,13 @@ export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, g
   }
 }
 
-function createMarkmap(containerEl: CodeBlock["containerEl"]) {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  const markmap = Markmap.create(svg, {});
+function createMarkmap(containerEl: CodeBlock['containerEl']) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  const markmap = Markmap.create(svg, {})
 
-  containerEl.append(svg);
+  containerEl.append(svg)
 
-  return { svg, markmap };
+  return { svg, markmap }
 }
 
 
@@ -139,20 +139,20 @@ class SettingsManager {
 
 const EditorLine = (line: number): EditorPosition => ({ line, ch: 0 })
 
-function SizeManager(containerEl: CodeBlock["containerEl"], svg: SVGSVGElement, settings: SettingsManager) {
-  svg.style.height = settings.height + "px"
+function SizeManager(containerEl: CodeBlock['containerEl'], svg: SVGSVGElement, settings: SettingsManager) {
+  svg.style.height = settings.height + 'px'
 
-  const resizeHandle = document.createElement("hr")
+  const resizeHandle = document.createElement('hr')
   containerEl.prepend(resizeHandle)
-  resizeHandle.classList.add("workspace-leaf-resize-handle")
+  resizeHandle.classList.add('workspace-leaf-resize-handle')
 
   const yOffset$ = Callbag.pipe(
-    fromEvent(resizeHandle, "mousedown"),
+    fromEvent(resizeHandle, 'mousedown'),
     map(ev => ev.clientY),
     flatMap(startY => Callbag.pipe(
-      fromEvent(document, "mousemove"),
+      fromEvent(document, 'mousemove'),
       map(ev => (ev.preventDefault(), ev.clientY - startY)),
-      takeUntil(fromEvent(document, "mouseup")),
+      takeUntil(fromEvent(document, 'mouseup')),
       pairwise,
       map(([a, b]) => b - a),
     ))
@@ -160,10 +160,10 @@ function SizeManager(containerEl: CodeBlock["containerEl"], svg: SVGSVGElement, 
 
   Callbag.subscribe(yOffset$, offset => {
     settings.height += offset
-    svg.style.height = settings.height + "px"
+    svg.style.height = settings.height + 'px'
   })
 
-  Callbag.subscribe(fromEvent(document, "mouseup"), settings.saveHeight)
+  Callbag.subscribe(fromEvent(document, 'mouseup'), settings.saveHeight)
 }
 
 function SettingsDialog(codeBlock: CodeBlock, tabRow: TabRow, codeBlockSettings: CodeBlockSettings, globalSettings: GlobalSettings) {
@@ -220,10 +220,10 @@ function SettingsDialog(codeBlock: CodeBlock, tabRow: TabRow, codeBlockSettings:
   const dialog = new CodeBlockSettingsDialog(globalSettings, fileSettings, codeBlockProxy)
 
   const button = new ButtonComponent(codeBlock.containerEl.parentElement!)
-    .setClass("edit-block-button")
-    .setClass("codeblock-settings-button")
-    .setIcon("sliders-horizontal")
-    .setTooltip("Edit block settings")
+    .setClass('edit-block-button')
+    .setClass('codeblock-settings-button')
+    .setIcon('sliders-horizontal')
+    .setTooltip('Edit block settings')
 
   button.onClick(dialog.open)
 }

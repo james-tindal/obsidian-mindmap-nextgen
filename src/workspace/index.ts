@@ -1,45 +1,45 @@
-import { MarkdownPostProcessorContext, MarkdownRenderChild, TFile } from "obsidian"
-import GrayMatter from "gray-matter"
+import { MarkdownPostProcessorContext, MarkdownRenderChild, TFile } from 'obsidian'
+import GrayMatter from 'gray-matter'
 
-import { FileSettings, GlobalSettings, globalSettings$ } from "src/settings/filesystem"
-import Callbag, { filter, flatMap, map, merge, pairwise, Source, startWith, take } from "src/utilities/callbag"
-import { ImmutableSet } from "src/utilities/immutable-set"
-import { FileMap, getLayout } from "./get-layout"
-import { CodeBlockRow, createDb, Database, FileRow, TabRow } from "./db-schema"
-import { CodeBlock, FileTab } from "./types"
-import { CodeBlockRenderer } from "src/rendering/renderer-codeblock"
-import { isObjectEmpty, nextTick } from "src/utilities/utilities"
-import { ExtractRecord, ExtractUnion, Matcher, Stackable, Tagged, match, tr, unionConstructors } from "./utilities"
-import { parseMarkdown } from "src/rendering/renderer-common"
-import { FileSettingsDialog } from "src/settings/dialogs"
+import { FileSettings, GlobalSettings, globalSettings$ } from 'src/settings/filesystem'
+import Callbag, { filter, flatMap, map, merge, pairwise, Source, startWith, take } from 'src/utilities/callbag'
+import { ImmutableSet } from 'src/utilities/immutable-set'
+import { FileMap, getLayout } from './get-layout'
+import { CodeBlockRow, createDb, Database, FileRow, TabRow } from './db-schema'
+import { CodeBlock, FileTab } from './types'
+import { CodeBlockRenderer } from 'src/rendering/renderer-codeblock'
+import { isObjectEmpty, nextTick } from 'src/utilities/utilities'
+import { ExtractRecord, ExtractUnion, Matcher, Stackable, Tagged, match, tr, unionConstructors } from './utilities'
+import { parseMarkdown } from 'src/rendering/renderer-common'
+import { FileSettingsDialog } from 'src/settings/dialogs'
 
 
 
 const InputEvent = unionConstructors(
-  Tagged("codeBlock created", tr as CodeBlock),
-  Tagged("codeBlock deleted", tr as CodeBlock),
-  Tagged("tab opened",      tr as FileTab.Leaf),
-  Tagged("tab closed",      tr as FileTab.Leaf),
-  Tagged("tab current",     tr as FileTab.Leaf),
-  Tagged("tab not current", tr as FileTab.Leaf),
-  Tagged("tab changed file", tr as [ FileTab.Leaf, TFile ]),
-  Tagged("fileSettings",     tr as { file: TFile, settings: FileSettings }),
-  Tagged("globalSettings",   tr as GlobalSettings),
+  Tagged('codeBlock created', tr as CodeBlock),
+  Tagged('codeBlock deleted', tr as CodeBlock),
+  Tagged('tab opened',      tr as FileTab.Leaf),
+  Tagged('tab closed',      tr as FileTab.Leaf),
+  Tagged('tab current',     tr as FileTab.Leaf),
+  Tagged('tab not current', tr as FileTab.Leaf),
+  Tagged('tab changed file', tr as [ FileTab.Leaf, TFile ]),
+  Tagged('fileSettings',     tr as { file: TFile, settings: FileSettings }),
+  Tagged('globalSettings',   tr as GlobalSettings),
 )
 type InputEvent = ExtractUnion<typeof InputEvent>
 type InputEvents = ExtractRecord<typeof InputEvent>
 
 const CodeBlockEvent = unionConstructors(
-  Tagged("start",          tr as { codeBlock: CodeBlock, globalSettings: GlobalSettings, fileSettings: FileSettings, isCurrent: boolean, tabView: FileTab.View, tabRow: TabRow }),
-  Tagged("current",        tr as { codeBlock: CodeBlock }),
-  Tagged("globalSettings", tr as { codeBlock: CodeBlock, globalSettings: GlobalSettings }),
-  Tagged("fileSettings",   tr as { codeBlock: CodeBlock, fileSettings: FileSettings }),
-  Tagged("end",            tr as { codeBlock: CodeBlock }),
+  Tagged('start',          tr as { codeBlock: CodeBlock, globalSettings: GlobalSettings, fileSettings: FileSettings, isCurrent: boolean, tabView: FileTab.View, tabRow: TabRow }),
+  Tagged('current',        tr as { codeBlock: CodeBlock }),
+  Tagged('globalSettings', tr as { codeBlock: CodeBlock, globalSettings: GlobalSettings }),
+  Tagged('fileSettings',   tr as { codeBlock: CodeBlock, fileSettings: FileSettings }),
+  Tagged('end',            tr as { codeBlock: CodeBlock }),
 )
 type CodeBlockEvent = ExtractUnion<typeof CodeBlockEvent>
 
 
-const { source: codeBlock$, push: codeBlockEvent } = Callbag.subject<InputEvents[`codeBlock ${"created" | "deleted"}`]>()
+const { source: codeBlock$, push: codeBlockEvent } = Callbag.subject<InputEvents[`codeBlock ${'created' | 'deleted'}`]>()
 
 export async function codeBlockHandler(markdown: string, containerEl: HTMLDivElement, ctx: MarkdownPostProcessorContext) {
   const childComponent = new MarkdownRenderChild(containerEl)
@@ -51,16 +51,16 @@ export async function codeBlockHandler(markdown: string, containerEl: HTMLDivEle
   // this puts "codeBlock created" after "tab opened"
   await nextTick()
 
-  codeBlockEvent(InputEvent["codeBlock created"](codeBlock))
+  codeBlockEvent(InputEvent['codeBlock created'](codeBlock))
   childComponent.register(() =>
-    codeBlockEvent(InputEvent["codeBlock deleted"](codeBlock)))
+    codeBlockEvent(InputEvent['codeBlock deleted'](codeBlock)))
 }
 
 
 
 const layoutChange$ = Callbag.create<void>((next: () => void) => {
-  app.workspace.on("layout-change", next);
-  app.workspace.on("active-leaf-change", next);
+  app.workspace.on('layout-change', next)
+  app.workspace.on('active-leaf-change', next)
 })
 
 const layout$ = Callbag.pipe(
@@ -75,18 +75,18 @@ const layout$ = Callbag.pipe(
   })),
   flatMap(({ tabs, currentTabs, files }) =>
     Callbag.of(...[
-      ...       tabs.  added.map(InputEvent["tab opened"]),
-      ...       tabs.removed.map(InputEvent["tab closed"]),
-      ...currentTabs.  added.map(InputEvent["tab current"]),
-      ...currentTabs.removed.map(InputEvent["tab not current"]),
-      ...      files.changed.map(InputEvent["tab changed file"]),
+      ...       tabs.  added.map(InputEvent['tab opened']),
+      ...       tabs.removed.map(InputEvent['tab closed']),
+      ...currentTabs.  added.map(InputEvent['tab current']),
+      ...currentTabs.removed.map(InputEvent['tab not current']),
+      ...      files.changed.map(InputEvent['tab changed file']),
     ]))
 )
 
 
 const fileChange$: Source<{ file: TFile, bodyText: string }> =
   Callbag.create(next => {
-    app.workspace.on("editor-change", (editor, info) => next({ file: info.file!, bodyText: editor.getValue() }));
+    app.workspace.on('editor-change', (editor, info) => next({ file: info.file!, bodyText: editor.getValue() }))
     // app.vault.on("modify", (abstractFile) =>
     //   `search for the file in our set of open files. if found, push settings updates and renders. 
     //    This should go in a separate stream.`);
@@ -94,7 +94,7 @@ const fileChange$: Source<{ file: TFile, bodyText: string }> =
 
 const file$ = Callbag.pipe(
   fileChange$,
-  map(({ file, bodyText }) => ({ file, ...parseMarkdown<"file">(bodyText) }))
+  map(({ file, bodyText }) => ({ file, ...parseMarkdown<'file'>(bodyText) }))
 )
 
 const fileSettings$ = Callbag.pipe(file$, map(InputEvent.fileSettings))
@@ -106,7 +106,7 @@ const inputEvent$: Source<InputEvent> = Callbag.share(merge(layout$, codeBlock$,
 type EventMatcher = Matcher<InputEvent, Stackable<CodeBlockEvent>>
 
 const matcher = (database: Database): EventMatcher => { const matcher = {
-  "tab opened": leaf => {
+  'tab opened': leaf => {
     const fileHandle = leaf.view.file
     const fileRowInDb = database.files.find(row => row.handle === fileHandle)
     let fileRow: FileRow
@@ -115,7 +115,7 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
       fileRow = fileRowInDb
     else {
       const fileText = leaf.view.editor.getValue()
-      fileRow = FileRow({ handle: fileHandle, ...parseMarkdown<"file">(fileText) })
+      fileRow = FileRow({ handle: fileHandle, ...parseMarkdown<'file'>(fileText) })
       database.files.add(fileRow)
     }
 
@@ -142,7 +142,7 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
       }
     })
     const dialog = new FileSettingsDialog(database.globalSettings, fileSettingsProxy)
-    tabRow.view.addAction("dot-network", "Edit mindmap settings", dialog.open)
+    tabRow.view.addAction('dot-network', 'Edit mindmap settings', dialog.open)
 
     function updateFrontmatter() {
       const frontmatter = isObjectEmpty(tabRow.file.settings)
@@ -155,11 +155,11 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
       .filter(codeBlock => leaf.containerEl.contains(codeBlock.containerEl))
       .map(codeBlock => {
         database.codeBlocksWaiting.delete(codeBlock)
-        return matcher["codeBlock created"](codeBlock)
+        return matcher['codeBlock created'](codeBlock)
       })
   },
 
-  "tab changed file": ([tabLeaf, newFileHandle]) => {
+  'tab changed file': ([tabLeaf, newFileHandle]) => {
     const tabRow         = database.tabs.find(row => row.leaf === tabLeaf)!
     const oldFileHandle  = tabRow.file.handle
     const oldFileRow     = database.files.find(row => row.handle === oldFileHandle)!
@@ -171,7 +171,7 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
     else {
       // Create new FileRow
       const fileText = tabLeaf.view.editor.getValue()
-      newFileRow = FileRow({ handle: newFileHandle, ...parseMarkdown<"file">(fileText) })
+      newFileRow = FileRow({ handle: newFileHandle, ...parseMarkdown<'file'>(fileText) })
       // Add it to the db
       database.files.add(newFileRow)
     }
@@ -182,16 +182,16 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
     const old_file_is_not_in_use = ! database.tabs.find(row => row.file.handle === oldFileHandle)
     if (old_file_is_not_in_use) database.files.delete(oldFileRow)
   },
-  "tab current": tabLeaf => {
+  'tab current': tabLeaf => {
     const tabRow = database.tabs.find(row => row.leaf === tabLeaf)!
     tabRow.isCurrent = true
     return tabRow.codeBlocks.map(CodeBlockEvent.current)
   },
-  "tab not current": tabLeaf => {
+  'tab not current': tabLeaf => {
     const tabRow = database.tabs.find(row => row.leaf === tabLeaf)
     tabRow && (tabRow.isCurrent = false)
   },
-  "tab closed": tabLeaf => {
+  'tab closed': tabLeaf => {
     const tabRow = database.tabs.find(row => row.leaf === tabLeaf)!
     const fileRow = tabRow.file
 
@@ -206,7 +206,7 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
 
     // codeBlocks will each have their own delete events
   },
-  "codeBlock created": codeBlock => {
+  'codeBlock created': codeBlock => {
     const tabRow = database.tabs.find(tab => tab.containerEl.contains(codeBlock.containerEl))
     
     if (!tabRow) {
@@ -227,7 +227,7 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
     return CodeBlockEvent.start({ codeBlock, globalSettings, fileSettings, isCurrent, tabView, tabRow })
 
   },
-  "codeBlock deleted": codeBlock => {
+  'codeBlock deleted': codeBlock => {
     const codeBlockRow = database.codeBlocks.find(row => row.codeBlock === codeBlock)!
 
     database.codeBlocks.delete(codeBlockRow)
@@ -235,7 +235,7 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
 
     return CodeBlockEvent.end({ codeBlock })
   },
-  "fileSettings" ({ file, settings }) {
+  'fileSettings' ({ file, settings }) {
     const fileRow = database.files.find(row => row.handle === file)!
     fileRow.settings = settings
 
@@ -244,7 +244,7 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
         CodeBlockEvent.fileSettings({ codeBlock, fileSettings: settings })
       ))
   },
-  "globalSettings": globalSettings => {
+  'globalSettings': globalSettings => {
     return database.codeBlocks.map(({ codeBlock }) =>
       CodeBlockEvent.globalSettings({ codeBlock, globalSettings }))
   }
@@ -254,7 +254,7 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
 
 const codeBlockEvent$ = Callbag.pipe(
   inputEvent$,
-  filter((event): event is InputEvents["globalSettings"] => event.tag === "globalSettings"),
+  filter((event): event is InputEvents['globalSettings'] => event.tag === 'globalSettings'),
   take(1),
   flatMap(({ data: globalSettings }) => {
     const database = createDb(globalSettings)
@@ -267,21 +267,21 @@ const codeBlockEvent$ = Callbag.pipe(
 
 const renderers = new Map<CodeBlock, CodeBlockRenderer>()
 Callbag.subscribe(codeBlockEvent$, event => match(event, {
-  "start" ({ codeBlock, globalSettings, fileSettings, isCurrent, tabView, tabRow }) {
+  'start' ({ codeBlock, globalSettings, fileSettings, isCurrent, tabView, tabRow }) {
     const renderer = CodeBlockRenderer(codeBlock, tabView, globalSettings, fileSettings, tabRow)
     if (isCurrent) renderer.fit()
     renderers.set(codeBlock, renderer)
   },
-  "current" ({ codeBlock }) {
+  'current' ({ codeBlock }) {
     renderers.get(codeBlock)!.fit()
   },
-  "globalSettings" ({ codeBlock, globalSettings }) {
+  'globalSettings' ({ codeBlock, globalSettings }) {
     renderers.get(codeBlock)!.updateGlobalSettings(globalSettings)
   },
-  "fileSettings" ({ codeBlock, fileSettings }) {
+  'fileSettings' ({ codeBlock, fileSettings }) {
     renderers.get(codeBlock)!.updateFileSettings(fileSettings)
   },
-  "end" ({ codeBlock }) {
+  'end' ({ codeBlock }) {
     renderers.delete(codeBlock)
   }
 }))

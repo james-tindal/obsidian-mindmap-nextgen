@@ -1,5 +1,5 @@
-import autoBind from "auto-bind"
-import { curry } from "ramda"
+import autoBind from 'auto-bind'
+import { curry } from 'ramda'
 
 class BoundSet<T> extends Set<T> {
   constructor(...args: (Iterable<T> | null | undefined)[]) {
@@ -10,7 +10,7 @@ class BoundSet<T> extends Set<T> {
 
 export class ImmutableSet<T> {
   private readonly set: BoundSet<T>
-  public readonly tag = "ImmutableSet"
+  public readonly tag = 'ImmutableSet'
   constructor(...args: (Iterable<T> | null | undefined)[]) {
     this.set = new BoundSet(...args)
     autoBind(this)
@@ -109,7 +109,7 @@ export class ImmutableSet<T> {
 }
 
 function* union<T>(a: ImmutableSet<T>, b: ImmutableSet<T>) {
-  yield* a;
+  yield* a
   for (const x of b)
-    if (!a.has(x)) yield x;
+    if (!a.has(x)) yield x
 }

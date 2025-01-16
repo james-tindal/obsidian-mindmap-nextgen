@@ -1,28 +1,28 @@
-import create from "callbag-create";
-import filter from "callbag-filter";
-import flatMap from "callbag-flat-map";
-import fromEvent from "callbag-from-event";
-import map from "callbag-map";
-import merge from "callbag-merge";
-import of from "callbag-of";
-import pairwise from "callbag-pairwise";
-import pipe from "callbag-pipe";
-import reject from "callbag-reject";
-import share from "callbag-share";
-import startWith from "callbag-start-with";
-import subscribe from "callbag-subscribe";
-import take from "callbag-take";
-import takeUntil from "callbag-take-until";
+import create from 'callbag-create'
+import filter from 'callbag-filter'
+import flatMap from 'callbag-flat-map'
+import fromEvent from 'callbag-from-event'
+import map from 'callbag-map'
+import merge from 'callbag-merge'
+import of from 'callbag-of'
+import pairwise from 'callbag-pairwise'
+import pipe from 'callbag-pipe'
+import reject from 'callbag-reject'
+import share from 'callbag-share'
+import startWith from 'callbag-start-with'
+import subscribe from 'callbag-subscribe'
+import take from 'callbag-take'
+import takeUntil from 'callbag-take-until'
 
-import { Source, UnwrapSource } from "callbag";
+import { Source, UnwrapSource } from 'callbag'
 
 
 const subject = <T>(): { source: Source<T>, push: (v: T) => void } => {
-  let next: ((v: T) => void) | undefined;
+  let next: ((v: T) => void) | undefined
   return {
     source: share(create<T>(next_ => {next = next_})),
     push: (v: T) => next && next(v)
-  };
+  }
 }
 
 type Listener<T> = (data: T) => any

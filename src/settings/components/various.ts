@@ -1,4 +1,4 @@
-import { Setting } from "obsidian"
+import { Setting } from 'obsidian'
 
 
 export type Component = { node: Node }

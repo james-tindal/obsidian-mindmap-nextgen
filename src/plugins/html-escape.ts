@@ -1,5 +1,5 @@
-import { wrapFunction } from "markmap-common";
-import { ITransformPlugin } from "markmap-lib";
+import { wrapFunction } from 'markmap-common'
+import { ITransformPlugin } from 'markmap-lib'
 
 
 type TokenWithChildren = Remarkable.Remarkable.Token & {
@@ -8,35 +8,35 @@ type TokenWithChildren = Remarkable.Remarkable.Token & {
 }
 
 export const htmlEscapePlugin: ITransformPlugin = {
-  name: "htmlescape",
+  name: 'htmlescape',
   config: {
     version: {
-      htmlescape: "1.0",
+      htmlescape: '1.0',
     },
   },
-  transform: (transformHooks) => {
-    transformHooks.afterParse.tap((md) => {
+  transform: transformHooks => {
+    transformHooks.afterParse.tap(md => {
       md.parse = wrapFunction(md.parse, {
         after: function (ctx) {
           const escapeAll = (token: TokenWithChildren) => {
-            if (token.type === "htmltag" && token.content) {
+            if (token.type === 'htmltag' && token.content) {
               token.content = token.content
-                .replace("<", "&lt;")
-                .replace(">", "&gt;");
+                .replace('<', '&lt;')
+                .replace('>', '&gt;')
             }
 
             if (token.children) {
-              token.children = token.children.map(escapeAll);
+              token.children = token.children.map(escapeAll)
             }
 
-            return token;
-          };
+            return token
+          }
 
-          ctx.result = ctx.result!.map(escapeAll);
+          ctx.result = ctx.result!.map(escapeAll)
         },
-      });
-    });
+      })
+    })
 
-    return { styles: void 0, scripts: void 0 };
+    return { styles: void 0, scripts: void 0 }
   },
-};
+}

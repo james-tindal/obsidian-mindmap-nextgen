@@ -1,20 +1,20 @@
-import { PluginSettingTab, Modal } from "obsidian"
-import autoBind from "auto-bind"
+import { PluginSettingTab, Modal } from 'obsidian'
+import autoBind from 'auto-bind'
 
-import Plugin from "src/main"
-import { GlobalSettings } from "./filesystem"
-import { PageSelector } from "./components/PageSelector"
-import { CodeBlockPage, FilePage, GlobalPage } from "./components/pages"
+import Plugin from 'src/main'
+import { GlobalSettings } from './filesystem'
+import { PageSelector } from './components/PageSelector'
+import { CodeBlockPage, FilePage, GlobalPage } from './components/pages'
 
 
 export class GlobalSettingsDialog extends PluginSettingTab {
   constructor(settings: GlobalSettings) {
     super(app, Plugin.instance)
 
-    this.containerEl.addClass("mmng-settings-tab")
+    this.containerEl.addClass('mmng-settings-tab')
 
     const appendContent =
-      PageSelector("global", {
+      PageSelector('global', {
         global: GlobalPage(settings),
         file: FileDoc,
         codeBlock: CodeBlockDoc
@@ -30,17 +30,17 @@ export class GlobalSettingsDialog extends PluginSettingTab {
 }
 
 
-import { FileSettings } from "./filesystem"
+import { FileSettings } from './filesystem'
 
 export class FileSettingsDialog extends Modal {
   constructor(globalSettings: GlobalSettings, fileSettings: Partial<FileSettings>) {
     super(app)
     autoBind(this)
 
-    this.containerEl.classList.add("mmng-settings-modal")
+    this.containerEl.classList.add('mmng-settings-modal')
 
     const appendContent =
-      PageSelector("file", {
+      PageSelector('file', {
         global: GlobalPage(globalSettings),
         file: FilePage(globalSettings, fileSettings),
         codeBlock: CodeBlockDoc
@@ -52,8 +52,8 @@ export class FileSettingsDialog extends Modal {
 }
 
 
-import { CodeBlockSettings } from "./filesystem"
-import { CodeBlockDoc, FileDoc } from "./components/explanations"
+import { CodeBlockSettings } from './filesystem'
+import { CodeBlockDoc, FileDoc } from './components/explanations'
 
 export class CodeBlockSettingsDialog extends Modal {
   constructor(globalSettings: GlobalSettings, fileSettings: Partial<FileSettings>, codeBlockSettings: Partial<CodeBlockSettings>) {
@@ -65,10 +65,10 @@ export class CodeBlockSettingsDialog extends Modal {
       set: () => false
     })
 
-    this.containerEl.classList.add("mmng-settings-modal")
+    this.containerEl.classList.add('mmng-settings-modal')
 
     const appendContent =
-      PageSelector("codeBlock", {
+      PageSelector('codeBlock', {
         global: GlobalPage(globalSettings),
         file: FilePage(globalSettings, fileSettings),
         codeBlock: CodeBlockPage(inheritSettings, codeBlockSettings)

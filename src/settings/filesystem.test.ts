@@ -1,4 +1,4 @@
-import { defaults, FilesystemManager, ScreenshotBgStyle, v1_0, v1_1, v2 } from "./filesystem"
+import { defaults, FilesystemManager, ScreenshotBgStyle, v1_0, v1_1, v2 } from './filesystem'
 
 const loader = (data: any) => async () => data
 const saver = (callback?: Function) =>
@@ -6,29 +6,29 @@ const saver = (callback?: Function) =>
     { callback && callback(data) }
 
 const defaults2_0 = {
-  version: "2.0",
+  version: '2.0',
   layout: [],
   settings: defaults
 }
 
 
-describe("Filesystem Settings Manager", () => {
-  test("Upgrade v1.0 to v2.0", async () => {
+describe('Filesystem Settings Manager', () => {
+  test('Upgrade v1.0 to v2.0', async () => {
 
     const input: v1_0 = {
-      color1: "blarg",
-      color1Thickness: "yad",
-      color2: "opo",
-      color2Thickness: "qwe",
-      color3: "oi",
-      color3Thickness: "asd",
-      defaultColorThickness: "iuoi",
+      color1: 'blarg',
+      color1Thickness: 'yad',
+      color2: 'opo',
+      color2Thickness: 'qwe',
+      color3: 'oi',
+      color3Thickness: 'asd',
+      defaultColorThickness: 'iuoi',
     
-      defaultColor: "wrew",
+      defaultColor: 'wrew',
     
-      splitDirection: "vertical",
+      splitDirection: 'vertical',
       nodeMinHeight: 30,
-      lineHeight: "27",
+      lineHeight: '27',
       spacingVertical: 88,
       spacingHorizontal: 6,
       paddingX: 0,
@@ -55,7 +55,7 @@ describe("Filesystem Settings Manager", () => {
         depth3Color: 'oi',
         depth3Thickness: 'asd',
         defaultThickness: 'iuoi',
-        screenshotTextColor: "#fdf6e3",
+        screenshotTextColor: '#fdf6e3',
         screenshotTextColorEnabled: false,
         coloring: 'single',
         colorFreezeLevel: 0,
@@ -70,45 +70,45 @@ describe("Filesystem Settings Manager", () => {
     }
 
     const testCb = (actual: any) => {
-      expect(actual).toStrictEqual(expected);
+      expect(actual).toStrictEqual(expected)
     }
 
-    const loadData = loader(input);
-    const saveData = saver(testCb);
-    await FilesystemManager(loadData, saveData);
-  });
+    const loadData = loader(input)
+    const saveData = saver(testCb)
+    await FilesystemManager(loadData, saveData)
+  })
 
-  test("Upgrade v1.1 to v2.0", async () => {
+  test('Upgrade v1.1 to v2.0', async () => {
 
     const input: v1_1 = {
-      color1: "blarg",
-      color1Thickness: "yad",
-      color2: "opo",
-      color2Thickness: "qwe",
-      color3: "oi",
-      color3Thickness: "asd",
-      defaultColorThickness: "iuoi",
+      color1: 'blarg',
+      color1Thickness: 'yad',
+      color2: 'opo',
+      color2Thickness: 'qwe',
+      color3: 'oi',
+      color3Thickness: 'asd',
+      defaultColorThickness: 'iuoi',
     
-      defaultColor: "wrew",
+      defaultColor: 'wrew',
     
-      splitDirection: "vertical",
+      splitDirection: 'vertical',
       nodeMinHeight: 30,
-      lineHeight: "27",
+      lineHeight: '27',
       spacingVertical: 88,
       spacingHorizontal: 6,
       paddingX: 0,
       initialExpandLevel: 234,
       onlyUseDefaultColor: true,
     
-      coloring: "branch",
+      coloring: 'branch',
       colorFreezeLevel: 50,
       animationDuration: 9000,
       maxWidth: 99,
       highlight: false,
-      screenshotBgColor: "r6t7y",
+      screenshotBgColor: 'r6t7y',
       screenshotBgStyle: ScreenshotBgStyle.Theme,
       screenshotTransparentBg: false,
-      screenshotFgColor: "sdfsdaf",
+      screenshotFgColor: 'sdfsdaf',
       screenshotFgColorEnabled: true,
     }
 
@@ -146,15 +146,15 @@ describe("Filesystem Settings Manager", () => {
     }
 
     const testCb = (actual: any) => {
-      expect(actual).toStrictEqual(expected);
+      expect(actual).toStrictEqual(expected)
     }
 
-    const loadData = loader(input);
-    const saveData = saver(testCb);
-    await FilesystemManager(loadData, saveData);
+    const loadData = loader(input)
+    const saveData = saver(testCb)
+    await FilesystemManager(loadData, saveData)
   })
 
-  test("Use defaults for missing keys", async () => {
+  test('Use defaults for missing keys', async () => {
     const input = {
       version: '2.0',
       settings: {
@@ -200,7 +200,7 @@ describe("Filesystem Settings Manager", () => {
         depth3Color: 'oi',
         depth3Thickness: 'asd',
         defaultThickness: 'iuoi',
-        screenshotTextColor: "#fdf6e3",
+        screenshotTextColor: '#fdf6e3',
         screenshotTextColorEnabled: true,
         coloring: 'depth',
         colorFreezeLevel: 50,
@@ -215,20 +215,20 @@ describe("Filesystem Settings Manager", () => {
     }
 
     const testCb = (actual: any) => {
-      expect(actual).toStrictEqual(expected);
+      expect(actual).toStrictEqual(expected)
     }
 
-    const loadData = loader(input);
-    const saveData = saver(testCb);
-    await FilesystemManager(loadData, saveData);
+    const loadData = loader(input)
+    const saveData = saver(testCb)
+    await FilesystemManager(loadData, saveData)
   })
 
-  test("Use defaults if no data", async () => {
+  test('Use defaults if no data', async () => {
     const testFn = (actual: any) =>
-      expect(actual).toStrictEqual(defaults2_0);
+      expect(actual).toStrictEqual(defaults2_0)
 
-    const loadData = loader(undefined);
-    const saveData = saver(testFn);
-    await FilesystemManager(loadData, saveData);
+    const loadData = loader(undefined)
+    const saveData = saver(testFn)
+    await FilesystemManager(loadData, saveData)
   })
-});
+})
