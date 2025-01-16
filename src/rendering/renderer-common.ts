@@ -43,7 +43,7 @@ export function loadAssets(features: IFeatures) {
   if (scripts) loadJS(scripts)
   if (styles) loadCSS(styles.filter(s =>
     // @ts-expect-error
-    !s.data?.href.contains('prismjs') ))
+    !s.data?.href.contains('@highlightjs') ))
 }
 
 export function getOptions(settings: CodeBlockSettings): Partial<IMarkmapOptions> {
