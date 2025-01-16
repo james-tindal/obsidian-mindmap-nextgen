@@ -1,5 +1,9 @@
 import { ITransformPlugin } from 'markmap-lib'
 
+/*
+ *  Display Obsidian checkboxes in the mindmap
+ *  https://github.com/james-tindal/obsidian-mindmap-nextgen#checkboxes
+ */
 export const checkBoxPlugin: ITransformPlugin = {
   name: 'checkbox',
   config: {
