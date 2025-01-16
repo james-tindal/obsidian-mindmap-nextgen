@@ -1,7 +1,7 @@
 import { Markmap } from 'markmap-view'
 import { TFile } from 'obsidian'
 import { Toolbar } from 'markmap-toolbar'
-import { IMarkmapOptions, INode } from 'markmap-common'
+import { IMarkmapOptions, IPureNode } from 'markmap-common'
 
 import { FileSettings, GlobalSettings } from 'src/settings/filesystem'
 import { ScreenshotColors, takeScreenshot } from 'src/rendering/screenshot'
@@ -67,7 +67,7 @@ export function TabRenderer(containerEl: MindmapTab.View['containerEl'], globalS
     state.markmapOptions = markmapOptions
   }
 
-  function addTitleToRootNode(root: INode, title: string) {
+  function addTitleToRootNode(root: IPureNode, title: string) {
     if (root.content == '') root.content = title
     else root = { content: title, children: [root], type: 'heading', depth: 0 }
   }
@@ -76,7 +76,7 @@ export function TabRenderer(containerEl: MindmapTab.View['containerEl'], globalS
 function createMarkmap(containerEl: MindmapTab.View['containerEl']) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
   const markmap = Markmap.create(svg, {})
-  const toolbar = Toolbar.create(markmap) as HTMLDivElement
+  const toolbar = Toolbar.create(markmap).el
 
   const contentEl = containerEl.children[1]
   contentEl.append(svg, toolbar)

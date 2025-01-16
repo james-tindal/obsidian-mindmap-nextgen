@@ -1,7 +1,7 @@
-import { INode } from 'markmap-common'
+import { IPureNode } from 'markmap-common'
 
 
-const recurseChildren = (fn: (node: INode) => void) => (node: INode) => {
+const recurseChildren = (fn: (node: IPureNode) => void) => (node: IPureNode) => {
   fn(node)
   node.children?.forEach(recurseChildren(fn))
 }

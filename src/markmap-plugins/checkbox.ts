@@ -29,7 +29,7 @@ const parser: InlineParsingRule = state => {
 export const checkBoxPlugin: ITransformPlugin = {
   name: 'checkbox',
   config: {
-    version: {
+    versions: {
       checkbox: '1.0'
     }
   },

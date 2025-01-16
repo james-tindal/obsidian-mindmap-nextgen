@@ -3,7 +3,7 @@ import { TFile } from 'obsidian'
 import { FileSettings, GlobalSettings } from 'src/settings/filesystem'
 import { CodeBlock } from './types'
 import { FileTab } from './types'
-import { INode } from 'markmap-common'
+import { IPureNode } from 'markmap-common'
 
 
 export class DbSet<T> extends Set<T> {
@@ -49,7 +49,7 @@ export type FileRow = {
   handle: TFile
   settings: FileSettings
   body: string
-  rootNode: INode
+  rootNode: IPureNode
   tabs: DbSet<TabRow>
 }
 

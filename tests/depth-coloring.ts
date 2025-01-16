@@ -1,4 +1,4 @@
-import { walkTree } from 'markmap-common'
+import { INode, IPureNode, walkTree } from 'markmap-common'
 import { Transformer } from 'markmap-lib'
 import { Markmap } from 'markmap-view'
 import { depthColoring } from 'src/rendering/renderer-common'
@@ -66,6 +66,8 @@ test('depth coloring', () => {
 
   const colours: string[] = []
   walkTree(rootNode, (node, next) => {
+    // not totally sure what to do about INode vs IPureNode
+    if (!hasDepth(node)) throw 'node has no depth'
     colours.push(depthColoring(settings)(node))
     next()
   })
@@ -76,3 +78,5 @@ test('depth coloring', () => {
     settings.depth3Color
   ])
 })
+
+const hasDepth = (x: IPureNode): x is INode => 'depth' in x
