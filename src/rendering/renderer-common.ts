@@ -5,7 +5,7 @@ import { pick } from 'ramda'
 import GrayMatter from 'gray-matter'
 
 import { CodeBlockSettings, FileSettings } from 'src/settings/filesystem'
-import { htmlEscapePlugin, checkBoxPlugin } from 'src/plugins'
+import { htmlEscapePlugin, checkBoxPlugin } from 'src/markmap-plugins'
 import { updateInternalLinks } from './internal-links'
 export const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin ])
 
