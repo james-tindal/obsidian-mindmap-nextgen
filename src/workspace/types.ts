@@ -1,5 +1,5 @@
-import { WorkspaceLeaf, ItemView, MarkdownView, MarkdownSectionInformation } from "obsidian"
-import MindmapTabView from "src/views/view"
+import { WorkspaceLeaf, ItemView, MarkdownView, MarkdownSectionInformation } from 'obsidian'
+import MindmapTabView from 'src/views/view'
 
 
 export namespace Tab {

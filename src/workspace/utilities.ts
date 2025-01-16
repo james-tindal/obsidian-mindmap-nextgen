@@ -1,5 +1,5 @@
-import { Source } from "callbag"
-import Callbag, { flatMap, reject } from "src/utilities/callbag"
+import { Source } from 'callbag'
+import Callbag, { flatMap, reject } from 'src/utilities/callbag'
 
 export interface Tagged<Tag extends string, Data> { tag: Tag, data: Data }
 export const Tagged = <const Tag extends string, const Data>(tag: Tag, data: Data): Tagged<Tag, Data> => ({ tag, data })
@@ -12,7 +12,7 @@ export type ExtractRecord<Constructors extends Record<string, (data: any) => Tag
 
 export function unionConstructors<Members extends readonly Tagged<string, any>[]>(...members: Members) {
   return Object.fromEntries(members.map(({ tag, data }) => [tag, (data: any) => Tagged(tag, data)])) as
-    { [ Member in Members[number] as Member["tag"] ]: (data: Member["data"]) => Member }
+    { [ Member in Members[number] as Member['tag'] ]: (data: Member['data']) => Member }
 }
 
 const type_representative: unknown = undefined
@@ -20,9 +20,9 @@ export const tr = type_representative
 
 
 type _Matcher<Event extends Tagged<string, any>, Return = any> = {
-  [Data in Event["data"] as Event["tag"]]: (data: Data) => Return
+  [Data in Event['data'] as Event['tag']]: (data: Data) => Return
 }
-export type Matcher<In extends Tagged<string, any>, Out = any> = In extends any ? _Matcher<In, Out> : never;
+export type Matcher<In extends Tagged<string, any>, Out = any> = In extends any ? _Matcher<In, Out> : never
 
 export const match = <Event extends Tagged<string, any>, Return>
   (event: Event, matcher: Matcher<Event, Return>) =>

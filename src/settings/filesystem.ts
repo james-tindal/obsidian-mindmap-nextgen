@@ -1,13 +1,13 @@
-import type { Plugin_2, SplitDirection } from "obsidian";
-import { LocalEvents, PromiseSubject } from "../utilities/utilities"
-import { Layout } from "../views/layout-manager"
-import type { GlobalSettingsDialog } from "./dialogs"
-import Callbag from "../utilities/callbag"
+import type { Plugin_2, SplitDirection } from 'obsidian'
+import { LocalEvents, PromiseSubject } from '../utilities/utilities'
+import { Layout } from '../views/layout-manager'
+import type { GlobalSettingsDialog } from './dialogs'
+import Callbag from '../utilities/callbag'
 
 export enum ScreenshotBgStyle {
-  Transparent = "transparent",
-  Color = "color",
-  Theme = "theme",
+  Transparent = 'transparent',
+  Color = 'color',
+  Theme = 'theme',
 }
 
 /**
@@ -17,10 +17,10 @@ export enum ScreenshotBgStyle {
  */
 
 // Default settings
-export const defaults: v2["settings"] = {
-  splitDirection: "horizontal",
+export const defaults: v2['settings'] = {
+  splitDirection: 'horizontal',
   nodeMinHeight: 16,
-  lineHeight: "1em",
+  lineHeight: '1em',
   spacingVertical: 5,
   spacingHorizontal: 80,
   paddingX: 8,
@@ -30,19 +30,19 @@ export const defaults: v2["settings"] = {
   maxWidth: 0,
   highlight: true,
 
-  coloring: "depth",
-  depth1Color: "#cb4b16",
-  depth1Thickness: "3",
-  depth2Color: "#6c71c4",
-  depth2Thickness: "1.5",
-  depth3Color: "#859900",
-  depth3Thickness: "1",
-  defaultColor: "#b58900",
-  defaultThickness: "1",
+  coloring: 'depth',
+  depth1Color: '#cb4b16',
+  depth1Thickness: '3',
+  depth2Color: '#6c71c4',
+  depth2Thickness: '1.5',
+  depth3Color: '#859900',
+  depth3Thickness: '1',
+  defaultColor: '#b58900',
+  defaultThickness: '1',
 
-  screenshotBgColor: "#002b36",
+  screenshotBgColor: '#002b36',
   screenshotBgStyle: ScreenshotBgStyle.Color,
-  screenshotTextColor: "#fdf6e3",
+  screenshotTextColor: '#fdf6e3',
   screenshotTextColorEnabled: false,
   titleAsRootNode: true,
   useThemeFont: false,
@@ -74,7 +74,7 @@ const defaultsV1: v1_1 = {
   screenshotFgColor:        defaults.screenshotTextColor,
   screenshotFgColorEnabled: defaults.screenshotTextColorEnabled,
 
-  coloring: "depth",
+  coloring: 'depth',
   onlyUseDefaultColor: false,
   screenshotTransparentBg: false
 }
@@ -104,7 +104,7 @@ export type v1_0 = {
 //  Version 1.1
 
 export type v1_1 = v1_0 & {
-  coloring: "depth" | "branch";
+  coloring: 'depth' | 'branch';
   colorFreezeLevel: number;
   animationDuration: number;
   maxWidth: number;
@@ -125,7 +125,7 @@ const upgrade1_1 = (data: v1_0): v1_1 => ({
 
 //  Version 2.0
 
-export type Coloring = "depth" | "branch" | "single"
+export type Coloring = 'depth' | 'branch' | 'single'
 
 type SettingsV2 = {
   splitDirection: SplitDirection
@@ -159,13 +159,13 @@ type SettingsV2 = {
 }
 
 export type v2 = {
-  version: "2.0"
+  version: '2.0'
   settings: SettingsV2,
   layout: Layout
 }
 
 const upgrade2_0 = (data: v1_1): v2 => {
-  const removed = ["onlyUseDefaultColor", "screenshotTransparentBg"];
+  const removed = ['onlyUseDefaultColor', 'screenshotTransparentBg']
 
   const unchanged = {
     splitDirection:     data.splitDirection,
@@ -182,7 +182,7 @@ const upgrade2_0 = (data: v1_1): v2 => {
     highlight:          data.highlight,
     screenshotBgColor:  data.screenshotBgColor,
     screenshotBgStyle:  data.screenshotBgStyle
-  };
+  }
 
   const renamed = {
     depth1Color:                data.color1,
@@ -194,15 +194,15 @@ const upgrade2_0 = (data: v1_1): v2 => {
     defaultThickness:           data.defaultColorThickness,
     screenshotTextColor:        data.screenshotFgColor,
     screenshotTextColorEnabled: data.screenshotFgColorEnabled,
-  };
+  }
 
   const transformed = {
     coloring:
-      data.onlyUseDefaultColor ? "single" : data.coloring as Coloring
-  };
+      data.onlyUseDefaultColor ? 'single' : data.coloring as Coloring
+  }
 
   return {
-    version: "2.0",
+    version: '2.0',
     layout: [],
     settings: {
       ...defaults,
@@ -214,14 +214,14 @@ const upgrade2_0 = (data: v1_1): v2 => {
 }
 
 const defaultsV2 = (): v2 => ({
-  version: "2.0",
+  version: '2.0',
   layout: [],
   settings: defaults
 })
 
 const useDefaultsForMissingKeys =
 (data: any): v2 => ({
-  version: "2.0",
+  version: '2.0',
   layout: data.layout || [],
   settings: {
     ...defaults,
@@ -230,47 +230,47 @@ const useDefaultsForMissingKeys =
 })
 
 type OmitFromFileSettings =
-| "splitDirection"
-| "useThemeFont"
-| "screenshotTextColor"
-| "screenshotTextColorEnabled"
-| "screenshotBgStyle"
-| "screenshotBgColor"
+| 'splitDirection'
+| 'useThemeFont'
+| 'screenshotTextColor'
+| 'screenshotTextColorEnabled'
+| 'screenshotBgStyle'
+| 'screenshotBgColor'
 
-export type GlobalSettings = v2["settings"];
+export type GlobalSettings = v2['settings']
 export type FileSettings = Omit<GlobalSettings, OmitFromFileSettings> & { color?: string[] }
-export type CodeBlockSettings = Omit<FileSettings, "titleAsRootNode"> & { height?: number }
+export type CodeBlockSettings = Omit<FileSettings, 'titleAsRootNode'> & { height?: number }
 
-type FileSystemData = v2;
-const latestVersion = "2.0";
+type FileSystemData = v2
+const latestVersion = '2.0'
 
-const isObject = (x: any) => typeof x === "object" && x !== null;
+const isObject = (x: any) => typeof x === 'object' && x !== null
 
-type Version = "" | "1.0" | "1.1" | "2.0";
+type Version = '' | '1.0' | '1.1' | '2.0'
 
 const detectVersion = (data: any) =>
-  !isObject(data)    ? "" :
-  "version"  in data ? data.version as Version :
-  "coloring" in data ? "1.1" :
-  "color1"   in data ? "1.0"
-                     : "";
+  !isObject(data)    ? '' :
+  'version'  in data ? data.version as Version :
+  'coloring' in data ? '1.1' :
+  'color1'   in data ? '1.0'
+                     : ''
 
 const upgrades = {
-  "1.0": upgrade1_1,
-  "1.1": upgrade2_0,
-  "2.0": useDefaultsForMissingKeys,
-  ""   : defaultsV2,
+  '1.0': upgrade1_1,
+  '1.1': upgrade2_0,
+  '2.0': useDefaultsForMissingKeys,
+  ''   : defaultsV2,
 }
 
 function upgrade(data: any): FileSystemData {
-  let accumulator = data;
-  let version;
+  let accumulator = data
+  let version
   for (;;) {
-    version = detectVersion(accumulator);
+    version = detectVersion(accumulator)
     if (version !== latestVersion)
       accumulator = upgrades[version](accumulator)
     else
-      return upgrades[latestVersion](accumulator);
+      return upgrades[latestVersion](accumulator)
   }
 }
 
@@ -282,43 +282,43 @@ type Get = {
   get: <K extends keyof GlobalSettings>(_: any, key: K) => GlobalSettings[K];
 }
 
-const [ resolveSettingsReady, settingsReady ] = PromiseSubject<GlobalSettings>();
-export { settingsReady };
+const [ resolveSettingsReady, settingsReady ] = PromiseSubject<GlobalSettings>()
+export { settingsReady }
 
-const { source: globalSettings$, push: pushSettings } = Callbag.subject<GlobalSettings>();
+const { source: globalSettings$, push: pushSettings } = Callbag.subject<GlobalSettings>()
 export { globalSettings$ }
 
-const events = new LocalEvents<keyof GlobalSettings>();
+const events = new LocalEvents<keyof GlobalSettings>()
 export const settingChanges = { listen: events.listen }
 
-export type FilesystemManager = Awaited<ReturnType<typeof FilesystemManager>>;
+export type FilesystemManager = Awaited<ReturnType<typeof FilesystemManager>>
 export async function FilesystemManager (
-  loadData: Plugin_2["loadData"],
-  saveData: Plugin_2["saveData"]
+  loadData: Plugin_2['loadData'],
+  saveData: Plugin_2['saveData']
 ) {
-  const fsd: FileSystemData = upgrade(await loadData());
-  saveData(fsd);
+  const fsd: FileSystemData = upgrade(await loadData())
+  saveData(fsd)
 
   const get: Get = { get: (_, key) => fsd.settings[key] }
   const cantSet: Set = { set: () => false }
   const set: Set = {
     set(_, key, value) {
-      fsd.settings[key] = value;
+      fsd.settings[key] = value
       events.emit(key, value)
-      pushSettings(fsd.settings);
-      saveData(fsd);
-      return true;
+      pushSettings(fsd.settings)
+      saveData(fsd)
+      return true
     }
   }
 
-  const getterSetter = new Proxy<GlobalSettings>(fsd.settings, { ...get, ...set });
-  const getter       = new Proxy<GlobalSettings>(fsd.settings, { ...get, ...cantSet });
+  const getterSetter = new Proxy<GlobalSettings>(fsd.settings, { ...get, ...set })
+  const getter       = new Proxy<GlobalSettings>(fsd.settings, { ...get, ...cantSet })
 
-  const saveLayout = (layout: Layout) => { fsd.layout = layout; saveData(fsd) };
-  const loadLayout = () => fsd.layout;
+  const saveLayout = (layout: Layout) => { fsd.layout = layout; saveData(fsd) }
+  const loadLayout = () => fsd.layout
 
-  pushSettings(getterSetter);
-  resolveSettingsReady(getterSetter);
+  pushSettings(getterSetter)
+  resolveSettingsReady(getterSetter)
 
 
   return {
@@ -326,6 +326,6 @@ export async function FilesystemManager (
     createSettingsTab: (Constructor: typeof GlobalSettingsDialog) => new Constructor(getterSetter),
     saveLayout,
     loadLayout
-  };
+  }
 }
 

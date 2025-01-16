@@ -1,7 +1,7 @@
-import { Extension, StateField } from '@codemirror/state';
-import { EditorView, ViewPlugin } from '@codemirror/view';
-import * as CodeMirror from 'codemirror';
-import * as Moment from 'moment';
+import { Extension, StateField } from '@codemirror/state'
+import { EditorView, ViewPlugin } from '@codemirror/view'
+import * as CodeMirror from 'codemirror'
+import * as Moment from 'moment'
 
 declare global {
     interface ObjectConstructor {
@@ -108,9 +108,9 @@ declare global {
         setCssStyles(styles: Partial<CSSStyleDeclaration>): void;
         setCssProps(props: Record<string, string>): void;
     }
-    function isBoolean(obj: any): obj is boolean;
-    function fish(selector: string): HTMLElement | null;
-    function fishAll(selector: string): HTMLElement[];
+    function isBoolean(obj: any): obj is boolean
+    function fish(selector: string): HTMLElement | null
+    function fishAll(selector: string): HTMLElement[]
     interface Element extends Node {
         find(selector: string): Element | null;
         findAll(selector: string): HTMLElement[];
@@ -180,11 +180,11 @@ declare global {
         createSpan(o?: DomElementInfo | string, callback?: (el: HTMLSpanElement) => void): HTMLSpanElement;
         createSvg<K extends keyof SVGElementTagNameMap>(tag: K, o?: SvgElementInfo | string, callback?: (el: SVGElementTagNameMap[K]) => void): SVGElementTagNameMap[K];
     }
-    function createEl<K extends keyof HTMLElementTagNameMap>(tag: K, o?: DomElementInfo | string, callback?: (el: HTMLElementTagNameMap[K]) => void): HTMLElementTagNameMap[K];
-    function createDiv(o?: DomElementInfo | string, callback?: (el: HTMLDivElement) => void): HTMLDivElement;
-    function createSpan(o?: DomElementInfo | string, callback?: (el: HTMLSpanElement) => void): HTMLSpanElement;
-    function createSvg<K extends keyof SVGElementTagNameMap>(tag: K, o?: SvgElementInfo | string, callback?: (el: SVGElementTagNameMap[K]) => void): SVGElementTagNameMap[K];
-    function createFragment(callback?: (el: DocumentFragment) => void): DocumentFragment;
+    function createEl<K extends keyof HTMLElementTagNameMap>(tag: K, o?: DomElementInfo | string, callback?: (el: HTMLElementTagNameMap[K]) => void): HTMLElementTagNameMap[K]
+    function createDiv(o?: DomElementInfo | string, callback?: (el: HTMLDivElement) => void): HTMLDivElement
+    function createSpan(o?: DomElementInfo | string, callback?: (el: HTMLSpanElement) => void): HTMLSpanElement
+    function createSvg<K extends keyof SVGElementTagNameMap>(tag: K, o?: SvgElementInfo | string, callback?: (el: SVGElementTagNameMap[K]) => void): SVGElementTagNameMap[K]
+    function createFragment(callback?: (el: DocumentFragment) => void): DocumentFragment
     interface EventListenerInfo {
         selector: string;
         listener: Function;
@@ -241,21 +241,21 @@ declare global {
         withCredentials?: boolean;
         req?: XMLHttpRequest;
     }
-    function ajax(options: AjaxOptions): void;
-    function ajaxPromise(options: AjaxOptions): Promise<any>;
-    function ready(fn: () => any): void;
-    function sleep(ms: number): Promise<void>;
-    function nextFrame(): Promise<void>;
+    function ajax(options: AjaxOptions): void
+    function ajaxPromise(options: AjaxOptions): Promise<any>
+    function ready(fn: () => any): void
+    function sleep(ms: number): Promise<void>
+    function nextFrame(): Promise<void>
     /**
      * The actively focused Window object. This is usually the same as `window` but
      * it will be different when using popout windows.
      */
-    let activeWindow: Window;
+    let activeWindow: Window
     /**
      * The actively focused Document object. This is usually the same as `document` but
      * it will be different when using popout windows.
      */
-    let activeDocument: Document;
+    let activeDocument: Document
     interface Window extends EventTarget, AnimationFrameProvider, GlobalEventHandlers, WindowEventHandlers, WindowLocalStorage, WindowOrWorkerGlobalScope, WindowSessionStorage {
         /**
          * The actively focused Window object. This is usually the same as `window` but
@@ -283,36 +283,36 @@ export class AbstractTextComponent<T extends HTMLInputElement | HTMLTextAreaElem
     /**
      * @public
      */
-    inputEl: T;
+    inputEl: T
 
     /**
      * @public
      */
-    constructor(inputEl: T);
+    constructor(inputEl: T)
     /**
      * @public
      */
-    setDisabled(disabled: boolean): this;
+    setDisabled(disabled: boolean): this
     /**
      * @public
      */
-    getValue(): string;
+    getValue(): string
     /**
      * @public
      */
-    setValue(value: string): this;
+    setValue(value: string): this
     /**
      * @public
      */
-    setPlaceholder(placeholder: string): this;
+    setPlaceholder(placeholder: string): this
     /**
      * @public
      */
-    onChanged(): void;
+    onChanged(): void
     /**
      * @public
      */
-    onChange(callback: (value: string) => any): this;
+    onChange(callback: (value: string) => any): this
 }
 
 /**
@@ -321,14 +321,14 @@ export class AbstractTextComponent<T extends HTMLInputElement | HTMLTextAreaElem
  * @param svgContent - the content of the SVG.
  * @public
  */
-export function addIcon(iconId: string, svgContent: string): void;
+export function addIcon(iconId: string, svgContent: string): void
 
 /**
  * This is the API version of the app, which follows the release cycle of the desktop app.
  * Example: "0.13.21"
  * @public
  */
-export let apiVersion: string;
+export let apiVersion: string
 
 /**
  * @public
@@ -351,7 +351,7 @@ export class App {
     /**
      * The last known user interaction event, to help commands find out what modifier keys are pressed.
      */
-    lastEvent: UserEvent | null;
+    lastEvent: UserEvent | null
     loadProgress: any
     metadataCache: MetadataCache
     mobileNavbar: any
@@ -416,29 +416,29 @@ export class App {
 }
 
 /** @public */
-export function arrayBufferToBase64(buffer: ArrayBuffer): string;
+export function arrayBufferToBase64(buffer: ArrayBuffer): string
 
 /** @public */
-export function arrayBufferToHex(data: ArrayBuffer): string;
+export function arrayBufferToHex(data: ArrayBuffer): string
 
 /** @public */
-export function base64ToArrayBuffer(base64: string): ArrayBuffer;
+export function base64ToArrayBuffer(base64: string): ArrayBuffer
 
 /**
  * @public
  */
 export abstract class BaseComponent {
     /** @public */
-    disabled: boolean;
+    disabled: boolean
     /**
      * Facilitates chaining
      * @public
      */
-    then(cb: (component: this) => any): this;
+    then(cb: (component: this) => any): this
     /**
      * @public
      */
-    setDisabled(disabled: boolean): this;
+    setDisabled(disabled: boolean): this
 }
 
 /**
@@ -474,48 +474,48 @@ export class ButtonComponent extends BaseComponent {
     /**
      * @public
      */
-    buttonEl: HTMLButtonElement;
+    buttonEl: HTMLButtonElement
 
     /**
      * @public
      */
-    constructor(containerEl: HTMLElement);
+    constructor(containerEl: HTMLElement)
     /**
      * @public
      */
-    setDisabled(disabled: boolean): this;
+    setDisabled(disabled: boolean): this
     /**
      * @public
      */
-    setCta(): this;
+    setCta(): this
     /**
      * @public
      */
-    removeCta(): this;
+    removeCta(): this
     /**
      * @public
      */
-    setWarning(): this;
+    setWarning(): this
     /**
      * @public
      */
-    setTooltip(tooltip: string, options?: TooltipOptions): this;
+    setTooltip(tooltip: string, options?: TooltipOptions): this
     /**
      * @public
      */
-    setButtonText(name: string): this;
+    setButtonText(name: string): this
     /**
      * @public
      */
-    setIcon(icon: IconName): this;
+    setIcon(icon: IconName): this
     /**
      * @public
      */
-    setClass(cls: string): this;
+    setClass(cls: string): this
     /**
      * @public
      */
-    onClick(callback: (evt: MouseEvent) => any): this;
+    onClick(callback: (evt: MouseEvent) => any): this
 }
 
 /**
@@ -585,37 +585,37 @@ export class ColorComponent extends ValueComponent<string> {
     /**
      * @public
      */
-    constructor(containerEl: HTMLElement);
+    constructor(containerEl: HTMLElement)
     /**
      * @public
      */
-    getValue(): HexString;
+    getValue(): HexString
     /**
      * @public
      */
-    getValueRgb(): RGB;
+    getValueRgb(): RGB
     /**
      * @public
      */
-    getValueHsl(): HSL;
+    getValueHsl(): HSL
 
     /**
      * @public
      */
-    setValue(value: HexString): this;
+    setValue(value: HexString): this
     /**
      * @public
      */
-    setValueRgb(rgb: RGB): this;
+    setValueRgb(rgb: RGB): this
     /**
      * @public
      */
-    setValueHsl(hsl: HSL): this;
+    setValueHsl(hsl: HSL): this
 
     /**
      * @public
      */
-    onChange(callback: (value: string) => any): this;
+    onChange(callback: (value: string) => any): this
 }
 
 /**
@@ -693,81 +693,81 @@ export class Component {
      * Load this component and its children
      * @public
      */
-    load(): void;
+    load(): void
     /**
      * Override this to load your component
      * @public
      * @virtual
      */
-    onload(): void;
+    onload(): void
     /**
      * Unload this component and its children
      * @public
      */
-    unload(): void;
+    unload(): void
     /**
      * Override this to unload your component
      * @public
      * @virtual
      */
-    onunload(): void;
+    onunload(): void
     /**
      * Adds a child component, loading it if this component is loaded
      * @public
      */
-    addChild<T extends Component>(component: T): T;
+    addChild<T extends Component>(component: T): T
     /**
      * Removes a child component, unloading it
      * @public
      */
-    removeChild<T extends Component>(component: T): T;
+    removeChild<T extends Component>(component: T): T
     /**
      * Registers a callback to be called when unloading
      * @public
      */
-    register(cb: () => any): void;
+    register(cb: () => any): void
     /**
      * Registers an event to be detached when unloading
      * @public
      */
-    registerEvent(eventRef: EventRef): void;
+    registerEvent(eventRef: EventRef): void
     /**
      * Registers an DOM event to be detached when unloading
      * @public
      */
-    registerDomEvent<K extends keyof WindowEventMap>(el: Window, type: K, callback: (this: HTMLElement, ev: WindowEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+    registerDomEvent<K extends keyof WindowEventMap>(el: Window, type: K, callback: (this: HTMLElement, ev: WindowEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void
     /**
      * Registers an DOM event to be detached when unloading
      * @public
      */
-    registerDomEvent<K extends keyof DocumentEventMap>(el: Document, type: K, callback: (this: HTMLElement, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+    registerDomEvent<K extends keyof DocumentEventMap>(el: Document, type: K, callback: (this: HTMLElement, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void
     /**
      * Registers an DOM event to be detached when unloading
      * @public
      */
-    registerDomEvent<K extends keyof HTMLElementEventMap>(el: HTMLElement, type: K, callback: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+    registerDomEvent<K extends keyof HTMLElementEventMap>(el: HTMLElement, type: K, callback: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void
     /**
      * Registers an key event to be detached when unloading
      * @public
      */
-    registerScopeEvent(keyHandler: KeymapEventHandler): void;
+    registerScopeEvent(keyHandler: KeymapEventHandler): void
     /**
      * Registers an interval (from setInterval) to be cancelled when unloading
      * Use {@link window.setInterval} instead of {@link setInterval} to avoid TypeScript confusing between NodeJS vs Browser API
      * @public
      */
-    registerInterval(id: number): number;
+    registerInterval(id: number): number
 }
 
 /** @public */
-export type Constructor<T> = abstract new (...args: any[]) => T;
+export type Constructor<T> = abstract new (...args: any[]) => T
 
 export class CustomCss extends Component {
     // Properties
     app: App
     boundRaw()
     csscache: Map<any, any>
-    enabledSnippets: Set<any>;
+    enabledSnippets: Set<any>
     extraStyleEls: HTMLStyleElement[]
     oldThemes: Theme[]
     queue: any
@@ -926,7 +926,7 @@ export interface DataWriteOptions {
  * @returns a debounced function that takes the same parameter as the original function.
  * @public
  */
-export function debounce<T extends unknown[], V>(cb: (...args: [...T]) => V, timeout?: number, resetTimer?: boolean): Debouncer<T, V>;
+export function debounce<T extends unknown[], V>(cb: (...args: [...T]) => V, timeout?: number, resetTimer?: boolean): Debouncer<T, V>
 
 /** @public */
 export interface Debouncer<T extends unknown[], V> {
@@ -944,36 +944,36 @@ export class DropdownComponent extends ValueComponent<string> {
     /**
      * @public
      */
-    selectEl: HTMLSelectElement;
+    selectEl: HTMLSelectElement
 
     /**
      * @public
      */
-    constructor(containerEl: HTMLElement);
+    constructor(containerEl: HTMLElement)
     /**
      * @public
      */
-    setDisabled(disabled: boolean): this;
+    setDisabled(disabled: boolean): this
     /**
      * @public
      */
-    addOption(value: string, display: string): this;
+    addOption(value: string, display: string): this
     /**
      * @public
      */
-    addOptions(options: Record<string, string>): this;
+    addOptions(options: Record<string, string>): this
     /**
      * @public
      */
-    getValue(): string;
+    getValue(): string
     /**
      * @public
      */
-    setValue(value: string): this;
+    setValue(value: string): this
     /**
      * @public
      */
-    onChange(callback: (value: string) => any): this;
+    onChange(callback: (value: string) => any): this
 }
 
 /**
@@ -990,81 +990,81 @@ export abstract class EditableFileView extends FileView {
 export abstract class Editor {
 
     /** @public */
-    getDoc(): this;
+    getDoc(): this
     /** @public */
-    abstract refresh(): void;
+    abstract refresh(): void
     /** @public */
-    abstract getValue(): string;
+    abstract getValue(): string
     /** @public */
-    abstract setValue(content: string): void;
+    abstract setValue(content: string): void
     /**
      * Get the text at line (0-indexed)
      * @public
      */
-    abstract getLine(line: number): string;
+    abstract getLine(line: number): string
     /** @public */
-    setLine(n: number, text: string): void;
+    setLine(n: number, text: string): void
     /**
      * Gets the number of lines in the document
      * @public
      */
-    abstract lineCount(): number;
+    abstract lineCount(): number
     /** @public */
-    abstract lastLine(): number;
+    abstract lastLine(): number
     /** @public */
-    abstract getSelection(): string;
+    abstract getSelection(): string
     /** @public */
-    somethingSelected(): boolean;
+    somethingSelected(): boolean
     /** @public */
-    abstract getRange(from: EditorPosition, to: EditorPosition): string;
+    abstract getRange(from: EditorPosition, to: EditorPosition): string
     /** @public */
-    abstract replaceSelection(replacement: string, origin?: string): void;
+    abstract replaceSelection(replacement: string, origin?: string): void
     /** @public */
-    abstract replaceRange(replacement: string, from: EditorPosition, to?: EditorPosition, origin?: string): void;
+    abstract replaceRange(replacement: string, from: EditorPosition, to?: EditorPosition, origin?: string): void
     /** @public */
-    abstract getCursor(string?: 'from' | 'to' | 'head' | 'anchor'): EditorPosition;
+    abstract getCursor(string?: 'from' | 'to' | 'head' | 'anchor'): EditorPosition
     /** @public */
-    abstract listSelections(): EditorSelection[];
+    abstract listSelections(): EditorSelection[]
     /** @public */
-    setCursor(pos: EditorPosition | number, ch?: number): void;
+    setCursor(pos: EditorPosition | number, ch?: number): void
     /** @public */
-    abstract setSelection(anchor: EditorPosition, head?: EditorPosition): void;
+    abstract setSelection(anchor: EditorPosition, head?: EditorPosition): void
     /** @public */
-    abstract setSelections(ranges: EditorSelectionOrCaret[], main?: number): void;
+    abstract setSelections(ranges: EditorSelectionOrCaret[], main?: number): void
     /** @public */
-    abstract focus(): void;
+    abstract focus(): void
     /** @public */
-    abstract blur(): void;
+    abstract blur(): void
     /** @public */
-    abstract hasFocus(): boolean;
+    abstract hasFocus(): boolean
     /** @public */
     abstract getScrollInfo(): {
         /** @public */
         top: number;
         /** @public */
         left: number;
-    };
+    }
     /** @public */
-    abstract scrollTo(x?: number | null, y?: number | null): void;
+    abstract scrollTo(x?: number | null, y?: number | null): void
     /** @public */
-    abstract scrollIntoView(range: EditorRange, center?: boolean): void;
+    abstract scrollIntoView(range: EditorRange, center?: boolean): void
     /** @public */
-    abstract undo(): void;
+    abstract undo(): void
     /** @public */
-    abstract redo(): void;
+    abstract redo(): void
     /** @public */
-    abstract exec(command: EditorCommandName): void;
+    abstract exec(command: EditorCommandName): void
     /** @public */
-    abstract transaction(tx: EditorTransaction, origin?: string): void;
+    abstract transaction(tx: EditorTransaction, origin?: string): void
     /** @public */
-    abstract wordAt(pos: EditorPosition): EditorRange | null;
+    abstract wordAt(pos: EditorPosition): EditorRange | null
     /** @public */
-    abstract posToOffset(pos: EditorPosition): number;
+    abstract posToOffset(pos: EditorPosition): number
     /** @public */
-    abstract offsetToPos(offset: number): EditorPosition;
+    abstract offsetToPos(offset: number): EditorPosition
 
     /** @public */
-    processLines<T>(read: (line: number, lineText: string) => T | null, write: (line: number, lineText: string, value: T | null) => EditorChange | void, ignoreEmpty?: boolean): void;
+    processLines<T>(read: (line: number, lineText: string) => T | null, write: (line: number, lineText: string, value: T | null) => EditorChange | void, ignoreEmpty?: boolean): void
 
 }
 
@@ -1075,25 +1075,25 @@ export interface EditorChange extends EditorRangeOrCaret {
 }
 
 /** @public */
-export type EditorCommandName = 'goUp' | 'goDown' | 'goLeft' | 'goRight' | 'goStart' | 'goEnd' | 'goWordLeft' | 'goWordRight' | 'indentMore' | 'indentLess' | 'newlineAndIndent' | 'swapLineUp' | 'swapLineDown' | 'deleteLine' | 'toggleFold' | 'foldAll' | 'unfoldAll';
+export type EditorCommandName = 'goUp' | 'goDown' | 'goLeft' | 'goRight' | 'goStart' | 'goEnd' | 'goWordLeft' | 'goWordRight' | 'indentMore' | 'indentLess' | 'newlineAndIndent' | 'swapLineUp' | 'swapLineDown' | 'deleteLine' | 'toggleFold' | 'foldAll' | 'unfoldAll'
 
 /**
  * Use this StateField to get a reference to the EditorView
  * @public
  */
-export const editorEditorField: StateField<EditorView>;
+export const editorEditorField: StateField<EditorView>
 
 /**
  * Use this StateField to get information about this markdown editor, such as the associated file, or the Editor.
  * @public
  */
-export const editorInfoField: StateField<MarkdownFileInfo>;
+export const editorInfoField: StateField<MarkdownFileInfo>
 
 /**
  * Use this StateField to check whether Live Preview is active
  * @public
  */
-export const editorLivePreviewField: StateField<boolean>;
+export const editorLivePreviewField: StateField<boolean>
 
 /** @public */
 export interface EditorPosition {
@@ -1158,18 +1158,18 @@ export abstract class EditorSuggest<T> extends PopoverSuggest<T> {
      * This will be null any time the EditorSuggest is not supposed to run.
      * @public
      */
-    context: EditorSuggestContext | null;
+    context: EditorSuggestContext | null
     /**
      * Override this to use a different limit for suggestion items
      * @public
      */
-    limit: number;
+    limit: number
     /** @public */
-    constructor(app: App);
+    constructor(app: App)
     /**
      * @public
      */
-    setInstructions(instructions: Instruction[]): void;
+    setInstructions(instructions: Instruction[]): void
 
     /**
      * Based on the editor line and cursor position, determine if this EditorSuggest should be triggered at this moment.
@@ -1180,13 +1180,13 @@ export abstract class EditorSuggest<T> extends PopoverSuggest<T> {
      * Keep it simple, and return null as early as possible if you determine that it is not the right time.
      * @public
      */
-    abstract onTrigger(cursor: EditorPosition, editor: Editor, file: TFile): EditorSuggestTriggerInfo | null;
+    abstract onTrigger(cursor: EditorPosition, editor: Editor, file: TFile): EditorSuggestTriggerInfo | null
     /**
      * Generate suggestion items based on this context. Can be async, but preferably sync.
      * When generating async suggestions, you should pass the context along.
      * @public
      */
-    abstract getSuggestions(context: EditorSuggestContext): T[] | Promise<T[]>;
+    abstract getSuggestions(context: EditorSuggestContext): T[] | Promise<T[]>
 
 }
 
@@ -1239,7 +1239,7 @@ export interface EditorTransaction {
  * @public
  * @deprecated
  */
-export const editorViewField: StateField<MarkdownView>;
+export const editorViewField: StateField<MarkdownView>
 
 /**
  * @public
@@ -1262,23 +1262,23 @@ export class Events {
     /**
      * @public
      */
-    on(name: string, callback: (...data: any) => any, ctx?: any): EventRef;
+    on(name: string, callback: (...data: any) => any, ctx?: any): EventRef
     /**
      * @public
      */
-    off(name: string, callback: (...data: any) => any): void;
+    off(name: string, callback: (...data: any) => any): void
     /**
      * @public
      */
-    offref(ref: EventRef): void;
+    offref(ref: EventRef): void
     /**
      * @public
      */
-    trigger(name: string, ...data: any[]): void;
+    trigger(name: string, ...data: any[]): void
     /**
      * @public
      */
-    tryTrigger(evt: EventRef, args: any[]): void;
+    tryTrigger(evt: EventRef, args: any[]): void
 }
 
 /**
@@ -1288,28 +1288,28 @@ export class ExtraButtonComponent extends BaseComponent {
     /**
      * @public
      */
-    extraSettingsEl: HTMLElement;
+    extraSettingsEl: HTMLElement
 
     /**
      * @public
      */
-    constructor(containerEl: HTMLElement);
+    constructor(containerEl: HTMLElement)
     /**
      * @public
      */
-    setDisabled(disabled: boolean): this;
+    setDisabled(disabled: boolean): this
     /**
      * @public
      */
-    setTooltip(tooltip: string, options?: TooltipOptions): this;
+    setTooltip(tooltip: string, options?: TooltipOptions): this
     /**
      * @public
      */
-    setIcon(icon: IconName): this;
+    setIcon(icon: IconName): this
     /**
      * @public
      */
-    onClick(callback: () => any): this;
+    onClick(callback: () => any): this
 }
 
 /**
@@ -1325,7 +1325,7 @@ export class FileManager {
      * Use an empty string if there is no active file.
      * @public
      */
-    getNewFileParent(sourcePath: string): TFolder;
+    getNewFileParent(sourcePath: string): TFolder
 
     /**
      * Rename or move a file safely, and update all links to it depending on the user's preferences.
@@ -1333,7 +1333,7 @@ export class FileManager {
      * @param newPath - the new path for the file
      * @public
      */
-    renameFile(file: TAbstractFile, newPath: string): Promise<void>;
+    renameFile(file: TAbstractFile, newPath: string): Promise<void>
 
     /**
      * Generate a markdown link based on the user's preferences.
@@ -1343,7 +1343,7 @@ export class FileManager {
      * @param alias - The display text if it's to be different than the file name. Pass empty string to use file name.
      * @public
      */
-    generateMarkdownLink(file: TFile, sourcePath: string, subpath?: string, alias?: string): string;
+    generateMarkdownLink(file: TFile, sourcePath: string, subpath?: string, alias?: string): string
 
     /**
      * Atomically read, modify, and save the frontmatter of a note.
@@ -1357,7 +1357,7 @@ export class FileManager {
      * @throws any errors that your callback function throws
      * @public
      */
-    processFrontMatter(file: TFile, fn: (frontMatter: any) => void): Promise<void>;
+    processFrontMatter(file: TFile, fn: (frontMatter: any) => void): Promise<void>
 
 }
 
@@ -1381,102 +1381,102 @@ export class FileSystemAdapter implements DataAdapter {
     /**
      * @public
      */
-    getName(): string;
+    getName(): string
     /**
      * @public
      */
-    getBasePath(): string;
+    getBasePath(): string
 
     /**
      * @public
      */
-    mkdir(normalizedPath: string): Promise<void>;
+    mkdir(normalizedPath: string): Promise<void>
     /**
      * @public
      */
-    trashSystem(normalizedPath: string): Promise<boolean>;
+    trashSystem(normalizedPath: string): Promise<boolean>
     /**
      * @public
      */
-    trashLocal(normalizedPath: string): Promise<void>;
+    trashLocal(normalizedPath: string): Promise<void>
     /**
      * @public
      */
-    rmdir(normalizedPath: string, recursive: boolean): Promise<void>;
+    rmdir(normalizedPath: string, recursive: boolean): Promise<void>
     /**
      * @public
      */
-    read(normalizedPath: string): Promise<string>;
+    read(normalizedPath: string): Promise<string>
     /**
      * @public
      */
-    readBinary(normalizedPath: string): Promise<ArrayBuffer>;
+    readBinary(normalizedPath: string): Promise<ArrayBuffer>
     /**
      * @public
      */
-    write(normalizedPath: string, data: string, options?: DataWriteOptions): Promise<void>;
+    write(normalizedPath: string, data: string, options?: DataWriteOptions): Promise<void>
     /**
      * @public
      */
-    writeBinary(normalizedPath: string, data: ArrayBuffer, options?: DataWriteOptions): Promise<void>;
+    writeBinary(normalizedPath: string, data: ArrayBuffer, options?: DataWriteOptions): Promise<void>
     /**
      * @public
      */
-    append(normalizedPath: string, data: string, options?: DataWriteOptions): Promise<void>;
+    append(normalizedPath: string, data: string, options?: DataWriteOptions): Promise<void>
     /**
      * @public
      */
-    process(normalizedPath: string, fn: (data: string) => string, options?: DataWriteOptions): Promise<string>;
+    process(normalizedPath: string, fn: (data: string) => string, options?: DataWriteOptions): Promise<string>
 
     /**
      * @public
      */
-    getResourcePath(normalizedPath: string): string;
+    getResourcePath(normalizedPath: string): string
     /**
      * Returns the file:// path of this file
      * @public
      */
-    getFilePath(normalizedPath: string): string;
+    getFilePath(normalizedPath: string): string
     /**
      * @public
      */
-    remove(normalizedPath: string): Promise<void>;
+    remove(normalizedPath: string): Promise<void>
 
     /**
      * @public
      */
-    rename(normalizedPath: string, normalizedNewPath: string): Promise<void>;
+    rename(normalizedPath: string, normalizedNewPath: string): Promise<void>
     /**
      * @public
      */
-    copy(normalizedPath: string, normalizedNewPath: string): Promise<void>;
+    copy(normalizedPath: string, normalizedNewPath: string): Promise<void>
     /**
      * @public
      */
-    exists(normalizedPath: string, sensitive?: boolean): Promise<boolean>;
+    exists(normalizedPath: string, sensitive?: boolean): Promise<boolean>
 
     /**
      * @public
      */
-    stat(normalizedPath: string): Promise<Stat | null>;
+    stat(normalizedPath: string): Promise<Stat | null>
     /**
      * @public
      */
-    list(normalizedPath: string): Promise<ListedFiles>;
+    list(normalizedPath: string): Promise<ListedFiles>
 
     /**
      * @public
      */
-    getFullPath(normalizedPath: string): string;
+    getFullPath(normalizedPath: string): string
 
     /**
      * @public
      */
-    static readLocalFile(path: string): Promise<ArrayBuffer>;
+    static readLocalFile(path: string): Promise<ArrayBuffer>
     /**
      * @public
      */
-    static mkdir(path: string): Promise<void>;
+    static mkdir(path: string): Promise<void>
 }
 
 /**
@@ -1486,64 +1486,64 @@ export abstract class FileView extends ItemView {
     /**
      * @public
      */
-    allowNoFile: boolean;
+    allowNoFile: boolean
     /**
      * @public
      */
-    file: TFile;
+    file: TFile
     /**
      * File views can be navigated by default.
      * @inheritDoc
      * @public
      */
-    navigation: boolean;
+    navigation: boolean
     /**
      * @public
      */
-    constructor(leaf: WorkspaceLeaf);
+    constructor(leaf: WorkspaceLeaf)
 
     /**
      * @public
      */
-    getDisplayText(): string;
+    getDisplayText(): string
     /**
      * @public
      */
-    onload(): void;
+    onload(): void
     /**
      * @public
      */
-    getState(): any;
+    getState(): any
 
     /**
      * @public
      */
-    setState(state: any, result: ViewStateResult): Promise<void>;
+    setState(state: any, result: ViewStateResult): Promise<void>
 
     /**
      * @public
      */
-    onLoadFile(file: TFile): Promise<void>;
+    onLoadFile(file: TFile): Promise<void>
     /**
      * @public
      */
-    onUnloadFile(file: TFile): Promise<void>;
+    onUnloadFile(file: TFile): Promise<void>
     /**
      * @public
      */
-    onRename(file: TFile): Promise<void>;
+    onRename(file: TFile): Promise<void>
 
     /**
      * @public
      */
-    canAcceptExtension(extension: string): boolean;
+    canAcceptExtension(extension: string): boolean
 }
 
 /**
  * Flush the MathJax stylesheet.
  * @public
  */
-export function finishRenderMath(): Promise<void>;
+export function finishRenderMath(): Promise<void>
 
 /**
  * @public
@@ -1568,7 +1568,7 @@ export interface FuzzyMatch<T> {
 /**
  * @public
  */
-export function fuzzySearch(q: PreparedQuery, text: string): SearchResult | null;
+export function fuzzySearch(q: PreparedQuery, text: string): SearchResult | null
 
 /**
  * @public
@@ -1577,54 +1577,54 @@ export abstract class FuzzySuggestModal<T> extends SuggestModal<FuzzyMatch<T>> {
     /**
      * @public
      */
-    getSuggestions(query: string): FuzzyMatch<T>[];
+    getSuggestions(query: string): FuzzyMatch<T>[]
     /**
      * @public
      */
-    renderSuggestion(item: FuzzyMatch<T>, el: HTMLElement): void;
+    renderSuggestion(item: FuzzyMatch<T>, el: HTMLElement): void
     /**
      * @public
      */
-    onChooseSuggestion(item: FuzzyMatch<T>, evt: MouseEvent | KeyboardEvent): void;
+    onChooseSuggestion(item: FuzzyMatch<T>, evt: MouseEvent | KeyboardEvent): void
     /**
      * @public
      */
-    abstract getItems(): T[];
+    abstract getItems(): T[]
     /**
      * @public
      */
-    abstract getItemText(item: T): string;
+    abstract getItemText(item: T): string
     /**
      * @public
      */
-    abstract onChooseItem(item: T, evt: MouseEvent | KeyboardEvent): void;
+    abstract onChooseItem(item: T, evt: MouseEvent | KeyboardEvent): void
 }
 
 /**
  * @public
  */
-export function getAllTags(cache: CachedMetadata): string[] | null;
+export function getAllTags(cache: CachedMetadata): string[] | null
 
 /** @public */
-export function getBlobArrayBuffer(blob: Blob): Promise<ArrayBuffer>;
+export function getBlobArrayBuffer(blob: Blob): Promise<ArrayBuffer>
 
 /**
  * Create an SVG from an iconId. Returns null if no icon associated with the iconId.
  * @param iconId - the icon ID
  * @public
  */
-export function getIcon(iconId: string): SVGSVGElement | null;
+export function getIcon(iconId: string): SVGSVGElement | null
 
 /**
  * Get the list of registered icons
  * @public
  */
-export function getIconIds(): IconName[];
+export function getIconIds(): IconName[]
 
 /**
  * @public
  */
-export function getLinkpath(linktext: string): string;
+export function getLinkpath(linktext: string): string
 
 /**
  * @public
@@ -1663,10 +1663,10 @@ export interface HeadingSubpathResult extends SubpathResult {
  * Example: #ffffff
  * @public
  */
-export type HexString = string;
+export type HexString = string
 
 /** @public */
-export function hexToArrayBuffer(hex: string): ArrayBuffer;
+export function hexToArrayBuffer(hex: string): ArrayBuffer
 
 /**
  * @public
@@ -1711,16 +1711,16 @@ export class HoverPopover extends Component {
     /**
      * @public
      */
-    hoverEl: HTMLElement;
+    hoverEl: HTMLElement
     /**
      * @public
      */
-    state: PopoverState;
+    state: PopoverState
 
     /**
      * @public
      */
-    constructor(parent: HoverParent, targetEl: HTMLElement | null, waitTime?: number);
+    constructor(parent: HoverParent, targetEl: HTMLElement | null, waitTime?: number)
 
 }
 
@@ -1749,7 +1749,7 @@ export interface HSL {
  * Converts HTML to Markdown using Turndown Service.
  * @public
  */
-export function htmlToMarkdown(html: string): string;
+export function htmlToMarkdown(html: string): string
 
 /**
  * @public
@@ -1784,17 +1784,17 @@ export interface ISuggestOwner<T> {
 export abstract class ItemView extends View {
 
     /** @public */
-    contentEl: HTMLElement;
+    contentEl: HTMLElement
 
     /**
      * @public
      */
-    constructor(leaf: WorkspaceLeaf);
+    constructor(leaf: WorkspaceLeaf)
 
     /**
      * @public
      */
-    addAction(icon: IconName, title: string, callback: (evt: MouseEvent) => any): HTMLElement;
+    addAction(icon: IconName, title: string, callback: (evt: MouseEvent) => any): HTMLElement
 
 }
 
@@ -1803,27 +1803,27 @@ export abstract class ItemView extends View {
  * @returns true if callback ever returns true, false otherwise.
  * @public
  */
-export function iterateCacheRefs(cache: CachedMetadata, cb: (ref: ReferenceCache) => boolean | void): boolean;
+export function iterateCacheRefs(cache: CachedMetadata, cb: (ref: ReferenceCache) => boolean | void): boolean
 
 /**
  * @returns true if callback ever returns true, false otherwise.
  * @public
  */
-export function iterateRefs(refs: ReferenceCache[], cb: (ref: ReferenceCache) => boolean | void): boolean;
+export function iterateRefs(refs: ReferenceCache[], cb: (ref: ReferenceCache) => boolean | void): boolean
 
 /** @public */
 export class Keymap {
 
     /** @public */
-    pushScope(scope: Scope): void;
+    pushScope(scope: Scope): void
     /** @public */
-    popScope(scope: Scope): void;
+    popScope(scope: Scope): void
 
     /**
      * Checks whether the modifier key is pressed during this event
      * @public
      */
-    static isModifier(evt: MouseEvent | TouchEvent | KeyboardEvent, modifier: Modifier): boolean;
+    static isModifier(evt: MouseEvent | TouchEvent | KeyboardEvent, modifier: Modifier): boolean
 
     /**
      * Translates an event into the type of pane that should open.
@@ -1832,7 +1832,7 @@ export class Keymap {
      * Returns 'window' if Cmd/Ctrl+Alt+Shift is pressed.
      * @public
      * */
-    static isModEvent(evt?: UserEvent | null): PaneType | boolean;
+    static isModEvent(evt?: UserEvent | null): PaneType | boolean
 }
 
 /**
@@ -1856,7 +1856,7 @@ export interface KeymapEventHandler extends KeymapInfo {
  * Return `false` to automatically preventDefault
  * @public
  */
-export type KeymapEventListener = (evt: KeyboardEvent, ctx: KeymapContext) => false | any;
+export type KeymapEventListener = (evt: KeyboardEvent, ctx: KeymapContext) => false | any
 
 /**
  * @public
@@ -1928,34 +1928,34 @@ export interface LivePreviewState {
 /**
  * @public
  */
-export const livePreviewState: ViewPlugin<LivePreviewState>;
+export const livePreviewState: ViewPlugin<LivePreviewState>
 
 /**
  * Load MathJax.
  * @public
  */
-export function loadMathJax(): Promise<void>;
+export function loadMathJax(): Promise<void>
 
 /**
  * Load Mermaid and return a promise to the global mermaid object.
  * Can also use `mermaid` after this promise resolves to get the same reference.
  * @public
  */
-export function loadMermaid(): Promise<any>;
+export function loadMermaid(): Promise<any>
 
 /**
  * Load PDF.js and return a promise to the global pdfjsLib object.
  * Can also use `window.pdfjsLib` after this promise resolves to get the same reference.
  * @public
  */
-export function loadPdfJs(): Promise<any>;
+export function loadPdfJs(): Promise<any>
 
 /**
  * Load Prism.js and return a promise to the global Prism object.
  * Can also use `Prism` after this promise resolves to get the same reference.
  * @public
  */
-export function loadPrism(): Promise<any>;
+export function loadPrism(): Promise<any>
 
 /**
  * @public
@@ -1982,45 +1982,45 @@ export interface Loc {
 export class MarkdownEditView implements MarkdownSubView, HoverParent, MarkdownFileInfo {
 
     /** @public */
-    app: App;
+    app: App
 
     /** @public */
-    hoverPopover: HoverPopover;
+    hoverPopover: HoverPopover
 
     /**
      * @public
      */
-    constructor(view: MarkdownView);
+    constructor(view: MarkdownView)
 
     /**
      * @public
      */
-    clear(): void;
+    clear(): void
     /**
      * @public
      */
-    get(): string;
+    get(): string
     /**
      * @public
      */
-    set(data: string, clear: boolean): void;
+    set(data: string, clear: boolean): void
 
     /** @public */
-    get file(): TFile;
+    get file(): TFile
 
     /**
      * @public
      */
-    getSelection(): string;
+    getSelection(): string
 
     /**
      * @public
      */
-    getScroll(): number;
+    getScroll(): number
     /**
      * @public
      */
-    applyScroll(scroll: number): void;
+    applyScroll(scroll: number): void
 
 }
 
@@ -2109,16 +2109,16 @@ export class MarkdownPreviewRenderer {
     /**
      * @public
      */
-    static registerPostProcessor(postProcessor: MarkdownPostProcessor, sortOrder?: number): void;
+    static registerPostProcessor(postProcessor: MarkdownPostProcessor, sortOrder?: number): void
     /**
      * @public
      */
-    static unregisterPostProcessor(postProcessor: MarkdownPostProcessor): void;
+    static unregisterPostProcessor(postProcessor: MarkdownPostProcessor): void
 
     /**
      * @public
      */
-    static createCodeBlockPostProcessor(language: string, handler: (source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) => Promise<any> | void): (el: HTMLElement, ctx: MarkdownPostProcessorContext) => void;
+    static createCodeBlockPostProcessor(language: string, handler: (source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) => Promise<any> | void): (el: HTMLElement, ctx: MarkdownPostProcessorContext) => void
 
 }
 
@@ -2130,39 +2130,39 @@ export class MarkdownPreviewView extends MarkdownRenderer implements MarkdownSub
     /**
      * @public
      */
-    containerEl: HTMLElement;
+    containerEl: HTMLElement
 
     /**
      * @public
      */
-    get file(): TFile;
+    get file(): TFile
 
     /**
      * @public
      */
-    get(): string;
+    get(): string
     /**
      * @public
      */
-    set(data: string, clear: boolean): void;
+    set(data: string, clear: boolean): void
     /**
      * @public
      */
-    clear(): void;
+    clear(): void
 
     /**
      * @public
      */
-    rerender(full?: boolean): void;
+    rerender(full?: boolean): void
 
     /**
      * @public
      */
-    getScroll(): number;
+    getScroll(): number
     /**
      * @public
      */
-    applyScroll(scroll: number): void;
+    applyScroll(scroll: number): void
 
 }
 
@@ -2171,7 +2171,7 @@ export class MarkdownPreviewView extends MarkdownRenderer implements MarkdownSub
  */
 export class MarkdownRenderChild extends Component {
     /** @public */
-    containerEl: HTMLElement;
+    containerEl: HTMLElement
     /**
      * @param containerEl - This HTMLElement will be used to test whether this component is still alive.
      * It should be a child of the markdown preview sections, and when it's no longer attached
@@ -2179,7 +2179,7 @@ export class MarkdownRenderChild extends Component {
      * this component will be unloaded.
      * @public
      */
-    constructor(containerEl: HTMLElement);
+    constructor(containerEl: HTMLElement)
 }
 
 /**
@@ -2187,13 +2187,13 @@ export class MarkdownRenderChild extends Component {
  */
 export abstract class MarkdownRenderer extends MarkdownRenderChild implements MarkdownPreviewEvents, HoverParent {
     /** @public */
-    app: App;
+    app: App
 
     /** @public */
-    hoverPopover: HoverPopover;
+    hoverPopover: HoverPopover
 
     /** @public */
-    abstract get file(): TFile;
+    abstract get file(): TFile
 
     /**
      * Renders markdown string to an HTML element.
@@ -2203,7 +2203,7 @@ export abstract class MarkdownRenderer extends MarkdownRenderChild implements Ma
      * @param component - A parent component to manage the lifecycle of the rendered child components, if any
      * @public
      */
-    static renderMarkdown(markdown: string, el: HTMLElement, sourcePath: string, component: Component): Promise<void>;
+    static renderMarkdown(markdown: string, el: HTMLElement, sourcePath: string, component: Component): Promise<void>
 }
 
 /** @public */
@@ -2222,7 +2222,7 @@ export interface MarkdownSectionInformation {
 export class MarkdownSourceView implements MarkdownSubView, HoverParent, MarkdownFileInfo {
 
     /** @public */
-    app: App;
+    app: App
     /**
      * @deprecated - Please use {@link MarkdownView#editor} instead.
      * If you have to use this because you're augmenting specific CodeMirror 5 implementations,
@@ -2230,45 +2230,45 @@ export class MarkdownSourceView implements MarkdownSubView, HoverParent, Markdow
      * not work on Mobile, or once WYSIWYG mode is released.
      * @public
      */
-    cmEditor: CodeMirror.Editor;
+    cmEditor: CodeMirror.Editor
 
     /** @public */
-    hoverPopover: HoverPopover;
+    hoverPopover: HoverPopover
 
     /**
      * @public
      */
-    constructor(view: MarkdownView);
+    constructor(view: MarkdownView)
 
     /**
      * @public
      */
-    clear(): void;
+    clear(): void
     /**
      * @public
      */
-    get(): string;
+    get(): string
     /**
      * @public
      */
-    set(data: string, clear: boolean): void;
+    set(data: string, clear: boolean): void
 
     /** @public */
-    get file(): TFile;
+    get file(): TFile
 
     /**
      * @public
      */
-    getSelection(): string;
+    getSelection(): string
 
     /**
      * @public
      */
-    getScroll(): number;
+    getScroll(): number
     /**
      * @public
      */
-    applyScroll(scroll: number): void;
+    applyScroll(scroll: number): void
 
 }
 
@@ -2303,56 +2303,56 @@ export interface MarkdownSubView {
 export class MarkdownView extends TextFileView implements MarkdownFileInfo {
 
     /** @public */
-    editor: Editor;
+    editor: Editor
 
     /** @public */
-    previewMode: MarkdownPreviewView;
+    previewMode: MarkdownPreviewView
 
     /** @public */
-    currentMode: MarkdownSubView;
+    currentMode: MarkdownSubView
 
     /** @public */
-    hoverPopover: HoverPopover | null;
+    hoverPopover: HoverPopover | null
     /**
      * @public
      */
-    constructor(leaf: WorkspaceLeaf);
+    constructor(leaf: WorkspaceLeaf)
 
     /**
      * @public
      */
-    getViewType(): string;
+    getViewType(): string
 
     /**
      * @public
      */
-    getMode(): MarkdownViewModeType;
+    getMode(): MarkdownViewModeType
 
     /**
      * @public
      */
-    getViewData(): string;
+    getViewData(): string
     /**
      * @public
      */
-    clear(): void;
+    clear(): void
 
     /**
      * @public
      */
-    setViewData(data: string, clear: boolean): void;
+    setViewData(data: string, clear: boolean): void
 
     /**
      * @public
      */
-    showSearch(replace?: boolean): void;
+    showSearch(replace?: boolean): void
 
 }
 
 /**
  * @public
  */
-export type MarkdownViewModeType = 'source' | 'preview';
+export type MarkdownViewModeType = 'source' | 'preview'
 
 /**
  * @public
@@ -2362,47 +2362,47 @@ export class Menu extends Component implements CloseableComponent {
     /**
      * @public
      */
-    constructor();
+    constructor()
 
     /**
      * @public
      */
-    setNoIcon(): this;
+    setNoIcon(): this
     /**
      * Force this menu to use native or DOM.
      * (Only works on the desktop app)
      * @public
      */
-    setUseNativeMenu(useNativeMenu: boolean): this;
+    setUseNativeMenu(useNativeMenu: boolean): this
     /**
      * Adds a menu item. Only works when menu is not shown yet.
      * @public
      */
-    addItem(cb: (item: MenuItem) => any): this;
+    addItem(cb: (item: MenuItem) => any): this
     /**
      * Adds a separator. Only works when menu is not shown yet.
      * @public
      */
-    addSeparator(): this;
+    addSeparator(): this
 
     /**
      * @public
      */
-    showAtMouseEvent(evt: MouseEvent): this;
+    showAtMouseEvent(evt: MouseEvent): this
     /**
      * @public
      */
-    showAtPosition(position: MenuPositionDef, doc?: Document): this;
+    showAtPosition(position: MenuPositionDef, doc?: Document): this
     /**
      * @public
      */
-    hide(): this;
+    hide(): this
     /** @public */
-    close(): void;
+    close(): void
     /**
      * @public
      */
-    onHide(callback: () => any): void;
+    onHide(callback: () => any): void
 
 }
 
@@ -2415,34 +2415,34 @@ export class MenuItem {
      * Private constructor. Use {@link Menu.addItem} instead.
      * @public
      */
-    private constructor();
+    private constructor()
     /**
      * @public
      */
-    setTitle(title: string | DocumentFragment): this;
+    setTitle(title: string | DocumentFragment): this
     /**
      * @public
      */
-    setIcon(icon: IconName | null): this;
+    setIcon(icon: IconName | null): this
 
     /**
      * @public
      */
-    setChecked(checked: boolean | null): this;
+    setChecked(checked: boolean | null): this
     /**
      * @public
      */
-    setDisabled(disabled: boolean): this;
+    setDisabled(disabled: boolean): this
 
     /**
      * @public
      */
-    setIsLabel(isLabel: boolean): this;
+    setIsLabel(isLabel: boolean): this
 
     /**
      * @public
      */
-    onClick(callback: (evt: MouseEvent | KeyboardEvent) => any): this;
+    onClick(callback: (evt: MouseEvent | KeyboardEvent) => any): this
 
     /**
      * Sets the section this menu item should belong in.
@@ -2450,7 +2450,7 @@ export class MenuItem {
      * to see their `data-section` attribute.
      * @public
      */
-    setSection(section: string): this;
+    setSection(section: string): this
 
 }
 
@@ -2489,16 +2489,16 @@ export class MetadataCache extends Events {
      * Get the best match for a linkpath.
      * @public
      */
-    getFirstLinkpathDest(linkpath: string, sourcePath: string): TFile | null;
+    getFirstLinkpathDest(linkpath: string, sourcePath: string): TFile | null
 
     /**
      * @public
      */
-    getFileCache(file: TFile): CachedMetadata | null;
+    getFileCache(file: TFile): CachedMetadata | null
     /**
      * @public
      */
-    getCache(path: string): CachedMetadata | null;
+    getCache(path: string): CachedMetadata | null
 
     /**
      * Generates a linktext for a file.
@@ -2507,20 +2507,20 @@ export class MetadataCache extends Events {
      * If not unique, use full path.
      * @public
      */
-    fileToLinktext(file: TFile, sourcePath: string, omitMdExtension?: boolean): string;
+    fileToLinktext(file: TFile, sourcePath: string, omitMdExtension?: boolean): string
 
     /**
      * Contains all resolved links. This object maps each source file's path to an object of destination file paths with the link count.
      * Source and destination paths are all vault absolute paths that comes from `TFile.path` and can be used with `Vault.getAbstractFileByPath(path)`.
      * @public
      */
-    resolvedLinks: Record<string, Record<string, number>>;
+    resolvedLinks: Record<string, Record<string, number>>
     /**
      * Contains all unresolved links. This object maps each source file to an object of unknown destinations with count.
      * Source paths are all vault absolute paths, similar to `resolvedLinks`.
      * @public
      */
-    unresolvedLinks: Record<string, Record<string, number>>;
+    unresolvedLinks: Record<string, Record<string, number>>
 
     /**
      * Called when a file has been indexed, and its (updated) cache is now available.
@@ -2530,25 +2530,25 @@ export class MetadataCache extends Events {
      * (Details: https://github.com/obsidianmd/obsidian-api/issues/77)
      * @public
      */
-    on(name: 'changed', callback: (file: TFile, data: string, cache: CachedMetadata) => any, ctx?: any): EventRef;
+    on(name: 'changed', callback: (file: TFile, data: string, cache: CachedMetadata) => any, ctx?: any): EventRef
     /**
      * Called when a file has been deleted. A best-effort previous version of the cached metadata is presented,
      * but it could be null in case the file was not successfully cached previously.
      * @public
      */
-    on(name: 'deleted', callback: (file: TFile, prevCache: CachedMetadata | null) => any, ctx?: any): EventRef;
+    on(name: 'deleted', callback: (file: TFile, prevCache: CachedMetadata | null) => any, ctx?: any): EventRef
 
     /**
      * Called when a file has been resolved for `resolvedLinks` and `unresolvedLinks`.
      * This happens sometimes after a file has been indexed.
      * @public
      */
-    on(name: 'resolve', callback: (file: TFile) => any, ctx?: any): EventRef;
+    on(name: 'resolve', callback: (file: TFile) => any, ctx?: any): EventRef
     /**
      * Called when all files has been resolved. This will be fired each time files get modified after the initial load.
      * @public
      */
-    on(name: 'resolved', callback: () => any, ctx?: any): EventRef;
+    on(name: 'resolved', callback: () => any, ctx?: any): EventRef
 }
 
 /**
@@ -2558,59 +2558,59 @@ export class Modal implements CloseableComponent {
     /**
      * @public
      */
-    app: App;
+    app: App
     /**
      * @public
      */
-    scope: Scope;
+    scope: Scope
     /**
      * @public
      */
-    containerEl: HTMLElement;
+    containerEl: HTMLElement
     /**
      * @public
      */
-    modalEl: HTMLElement;
+    modalEl: HTMLElement
     /**
      * @public
      */
-    titleEl: HTMLElement;
+    titleEl: HTMLElement
     /**
      * @public
      */
-    contentEl: HTMLElement;
+    contentEl: HTMLElement
 
     /**
      * @public
      */
-    shouldRestoreSelection: boolean;
+    shouldRestoreSelection: boolean
 
     /**
      * @public
      */
-    constructor(app: App);
+    constructor(app: App)
     /**
      * @public
      */
-    open(): void;
+    open(): void
     /**
      * @public
      */
-    close(): void;
+    close(): void
     /**
      * @public
      */
-    onOpen(): void;
+    onOpen(): void
     /**
      * @public
      */
-    onClose(): void;
+    onClose(): void
 
-    onEscapeKey(): void;
+    onEscapeKey(): void
 
-    setContent(content: any): void;
+    setContent(content: any): void
 
-    setDimBackground(dimBackground: boolean): void;
+    setDimBackground(dimBackground: boolean): void
 
 }
 
@@ -2620,10 +2620,10 @@ export class Modal implements CloseableComponent {
  * Meta = Cmd on MacOS and Win key on other OS
  * @public
  */
-export type Modifier = 'Mod' | 'Ctrl' | 'Meta' | 'Shift' | 'Alt';
+export type Modifier = 'Mod' | 'Ctrl' | 'Meta' | 'Shift' | 'Alt'
 
 /** @public */
-export const moment_2: typeof Moment;
+export const moment_2: typeof Moment
 export { moment_2 as moment }
 
 /**
@@ -2633,35 +2633,35 @@ export class MomentFormatComponent extends TextComponent {
     /**
      * @public
      */
-    sampleEl: HTMLElement;
+    sampleEl: HTMLElement
 
     /**
      * Sets the default format when input is cleared. Also used for placeholder.
      * @public
      */
-    setDefaultFormat(defaultFormat: string): this;
+    setDefaultFormat(defaultFormat: string): this
     /**
      * @public
      */
-    setSampleEl(sampleEl: HTMLElement): this;
+    setSampleEl(sampleEl: HTMLElement): this
     /**
      * @public
      */
-    setValue(value: string): this;
+    setValue(value: string): this
     /**
      * @public
      */
-    onChanged(): void;
+    onChanged(): void
     /**
      * @public
      */
-    updateSample(): void;
+    updateSample(): void
 }
 
 /**
  * @public
  */
-export function normalizePath(path: string): string;
+export function normalizePath(path: string): string
 
 /**
  * @public
@@ -2671,16 +2671,16 @@ export class Notice {
     /**
      * @public
      */
-    constructor(message: string | DocumentFragment, timeout?: number);
+    constructor(message: string | DocumentFragment, timeout?: number)
     /**
      * Change the message of this notice.
      * @public
      */
-    setMessage(message: string | DocumentFragment): this;
+    setMessage(message: string | DocumentFragment): this
     /**
      * @public
      */
-    hide(): void;
+    hide(): void
 }
 
 /**
@@ -2696,7 +2696,7 @@ export interface ObsidianProtocolData {
 /**
  * @public
  */
-export type ObsidianProtocolHandler = (params: ObsidianProtocolData) => any;
+export type ObsidianProtocolHandler = (params: ObsidianProtocolData) => any
 
 /**
  * @public
@@ -2715,27 +2715,27 @@ export interface OpenViewState {
 /**
  * @public
  */
-export type PaneType = 'tab' | 'split' | 'window';
+export type PaneType = 'tab' | 'split' | 'window'
 
 /**
  * @public
  */
-export function parseFrontMatterAliases(frontmatter: any | null): string[] | null;
+export function parseFrontMatterAliases(frontmatter: any | null): string[] | null
 
 /**
  * @public
  */
-export function parseFrontMatterEntry(frontmatter: any | null, key: string | RegExp): any | null;
+export function parseFrontMatterEntry(frontmatter: any | null, key: string | RegExp): any | null
 
 /**
  * @public
  */
-export function parseFrontMatterStringArray(frontmatter: any | null, key: string | RegExp, nospaces?: boolean): string[] | null;
+export function parseFrontMatterStringArray(frontmatter: any | null, key: string | RegExp, nospaces?: boolean): string[] | null
 
 /**
  * @public
  */
-export function parseFrontMatterTags(frontmatter: any | null): string[] | null;
+export function parseFrontMatterTags(frontmatter: any | null): string[] | null
 
 /**
  * @public
@@ -2749,10 +2749,10 @@ export function parseLinktext(linktext: string): {
      * @public
      */
     subpath: string;
-};
+}
 
 /** @public */
-export function parseYaml(yaml: string): any;
+export function parseYaml(yaml: string): any
 
 /** @public */
 export const Platform: {
@@ -2801,7 +2801,7 @@ export const Platform: {
      */
     isSafari: boolean;
 
-};
+}
 
 /**
  * @public
@@ -2810,15 +2810,15 @@ export abstract class Plugin_2 extends Component {
     /**
      * @public
      */
-    app: App;
+    app: App
     /**
      * @public
      */
-    manifest: PluginManifest;
+    manifest: PluginManifest
     /**
      * @public
      */
-    constructor(app: App, manifest: PluginManifest);
+    constructor(app: App, manifest: PluginManifest)
     /**
      * Adds a ribbon icon to the left bar.
      * @param icon - The icon name to be used. See {@link addIcon}
@@ -2826,50 +2826,50 @@ export abstract class Plugin_2 extends Component {
      * @param callback - The `click` callback.
      * @public
      */
-    addRibbonIcon(icon: IconName, title: string, callback: (evt: MouseEvent) => any): HTMLElement;
+    addRibbonIcon(icon: IconName, title: string, callback: (evt: MouseEvent) => any): HTMLElement
     /**
      * @public
      */
-    addStatusBarItem(): HTMLElement;
+    addStatusBarItem(): HTMLElement
     /**
      * Register a command globally. The command id and name will be automatically prefixed with this plugin's id and name.
      * @public
      */
-    addCommand(command: Command): Command;
+    addCommand(command: Command): Command
     /**
      * @public
      */
-    addSettingTab(settingTab: PluginSettingTab): void;
+    addSettingTab(settingTab: PluginSettingTab): void
     /**
      * @public
      */
-    registerView(type: string, viewCreator: ViewCreator): void;
+    registerView(type: string, viewCreator: ViewCreator): void
     /**
      * Register your view with the 'Page preview' core plugin as an emitter of the 'hover-link' on the event.
      * @public
      */
-    registerHoverLinkSource(id: string, info: HoverLinkSource): void;
+    registerHoverLinkSource(id: string, info: HoverLinkSource): void
     /**
      * @public
      */
-    registerExtensions(extensions: string[], viewType: string): void;
+    registerExtensions(extensions: string[], viewType: string): void
     /**
      * @public
      */
-    registerMarkdownPostProcessor(postProcessor: MarkdownPostProcessor, sortOrder?: number): MarkdownPostProcessor;
+    registerMarkdownPostProcessor(postProcessor: MarkdownPostProcessor, sortOrder?: number): MarkdownPostProcessor
     /**
      * Register a special post processor that handles fenced code given a language and a handler.
      * This special post processor takes care of removing the <pre><code> and create a <div> that
      * will be passed to your handler, and is expected to be filled with your custom elements.
      * @public
      */
-    registerMarkdownCodeBlockProcessor(language: string, handler: (source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) => Promise<any> | void, sortOrder?: number): MarkdownPostProcessor;
+    registerMarkdownCodeBlockProcessor(language: string, handler: (source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) => Promise<any> | void, sortOrder?: number): MarkdownPostProcessor
     /**
      * Runs callback on all currently loaded instances of CodeMirror,
      * then registers the callback for all future CodeMirror instances.
      * @public
      */
-    registerCodeMirror(callback: (cm: CodeMirror.Editor) => any): void;
+    registerCodeMirror(callback: (cm: CodeMirror.Editor) => any): void
     /**
      * Registers a CodeMirror 6 extension.
      * To reconfigure cm6 extensions for your plugin on the fly, you can pass an array here and dynamically
@@ -2877,7 +2877,7 @@ export abstract class Plugin_2 extends Component {
      * @param extension - must be a CodeMirror 6 `Extension`, or an array of Extensions.
      * @public
      */
-    registerEditorExtension(extension: Extension): void;
+    registerEditorExtension(extension: Extension): void
     /**
      * Register a handler for obsidian:// URLs.
      * @param action - the action string. For example, "open" corresponds to `obsidian://open`.
@@ -2885,20 +2885,20 @@ export abstract class Plugin_2 extends Component {
      *                  For example, `obsidian://open?key=value` would generate `{"action": "open", "key": "value"}`.
      * @public
      */
-    registerObsidianProtocolHandler(action: string, handler: ObsidianProtocolHandler): void;
+    registerObsidianProtocolHandler(action: string, handler: ObsidianProtocolHandler): void
     /**
      * Register an EditorSuggest which can provide live suggestions while the user is typing.
      * @public
      */
-    registerEditorSuggest(editorSuggest: EditorSuggest<any>): void;
+    registerEditorSuggest(editorSuggest: EditorSuggest<any>): void
     /**
      * @public
      */
-    loadData(): Promise<any>;
+    loadData(): Promise<any>
     /**
      * @public
      */
-    saveData(data: any): Promise<void>;
+    saveData(data: any): Promise<void>
 
 }
 export { Plugin_2 as Plugin }
@@ -2950,18 +2950,18 @@ export interface PluginManifest {
  * @public
  */
 export abstract class PluginSettingTab extends SettingTab {
-    app: App;
-    setting: SettingModal;
+    app: App
+    setting: SettingModal
     
 
     /**
      * @public
      */
-    constructor(app: App, plugin: Plugin_2);
+    constructor(app: App, plugin: Plugin_2)
 }
 
 export abstract class CorePluginSettingTab extends SettingTab {
-    instance: Command;
+    instance: Command
 }
 
 
@@ -2990,22 +2990,22 @@ export enum PopoverState {
 export abstract class PopoverSuggest<T> implements ISuggestOwner<T>, CloseableComponent {
 
     /** @public */
-    constructor(app: App, scope?: Scope);
+    constructor(app: App, scope?: Scope)
     /** @public */
-    open(): void;
+    open(): void
     /** @public */
-    close(): void;
+    close(): void
 
     /**
      * @inheritDoc
      * @public
      */
-    abstract renderSuggestion(value: T, el: HTMLElement): void;
+    abstract renderSuggestion(value: T, el: HTMLElement): void
     /**
      * @inheritDoc
      * @public
      */
-    abstract selectSuggestion(value: T, evt: MouseEvent | KeyboardEvent): void;
+    abstract selectSuggestion(value: T, evt: MouseEvent | KeyboardEvent): void
 }
 
 /**
@@ -3042,12 +3042,12 @@ export interface PreparedQuery {
  * @return fn - the callback function to apply the search on.
  * @public
  */
-export function prepareFuzzySearch(query: string): (text: string) => SearchResult | null;
+export function prepareFuzzySearch(query: string): (text: string) => SearchResult | null
 
 /**
  * @public
  */
-export function prepareQuery(query: string): PreparedQuery;
+export function prepareQuery(query: string): PreparedQuery
 
 /**
  * Construct a simple search callback that runs on a target string.
@@ -3055,7 +3055,7 @@ export function prepareQuery(query: string): PreparedQuery;
  * @return fn - the callback function to apply the search on
  * @public
  */
-export function prepareSimpleSearch(query: string): (text: string) => SearchResult | null;
+export function prepareSimpleSearch(query: string): (text: string) => SearchResult | null
 
 /**
  * @public
@@ -3081,37 +3081,37 @@ export interface ReferenceCache extends CacheItem {
  * @param iconId - the icon ID
  * @public
  */
-export function removeIcon(iconId: string): void;
+export function removeIcon(iconId: string): void
 
 /**
  * @public
  */
-export function renderMatches(el: HTMLElement | DocumentFragment, text: string, matches: SearchMatches | null, offset?: number): void;
+export function renderMatches(el: HTMLElement | DocumentFragment, text: string, matches: SearchMatches | null, offset?: number): void
 
 /**
  * Render some LaTeX math using the MathJax engine. Returns an HTMLElement.
  * Requires calling `finishRenderMath` when rendering is all done to flush the MathJax stylesheet.
  * @public
  */
-export function renderMath(source: string, display: boolean): HTMLElement;
+export function renderMath(source: string, display: boolean): HTMLElement
 
 /**
  * @public
  */
-export function renderResults(el: HTMLElement, text: string, result: SearchResult, offset?: number): void;
+export function renderResults(el: HTMLElement, text: string, result: SearchResult, offset?: number): void
 
 /**
  * Similar to `fetch()`, request a URL using HTTP/HTTPS, without any CORS restrictions.
  * Returns the text value of the response.
  * @public
  */
-export function request(request: RequestUrlParam | string): Promise<string>;
+export function request(request: RequestUrlParam | string): Promise<string>
 
 /**
  * Similar to `fetch()`, request a URL using HTTP/HTTPS, without any CORS restrictions.
  * @public
  */
-export function requestUrl(request: RequestUrlParam | string): RequestUrlResponsePromise;
+export function requestUrl(request: RequestUrlParam | string): RequestUrlResponsePromise
 
 /** @public */
 export interface RequestUrlParam {
@@ -3163,12 +3163,12 @@ export interface RequestUrlResponsePromise extends Promise<RequestUrlResponse> {
  * crashing on older Obsidian builds.
  * @public
  */
-export function requireApiVersion(version: string): boolean;
+export function requireApiVersion(version: string): boolean
 
 /**
  * @public
  */
-export function resolveSubpath(cache: CachedMetadata, subpath: string): HeadingSubpathResult | BlockSubpathResult;
+export function resolveSubpath(cache: CachedMetadata, subpath: string): HeadingSubpathResult | BlockSubpathResult
 
 /**
  * @public
@@ -3192,20 +3192,20 @@ export interface RGB {
 }
 
 /** @public */
-export function sanitizeHTMLToDom(html: string): DocumentFragment;
+export function sanitizeHTMLToDom(html: string): DocumentFragment
 
 /**
  * @public
  */
 export class Scope {
-    keys: KeyBinding[];
-    parent?: any;
-    tabFocusContainerEl: HTMLElement;
+    keys: KeyBinding[]
+    parent?: any
+    tabFocusContainerEl: HTMLElement
 
     /**
      * @public
      */
-    constructor(parent?: Scope);
+    constructor(parent?: Scope)
 
     /**
      * @public
@@ -3213,15 +3213,15 @@ export class Scope {
      * @param key - Keycode from https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values
      * @param func - the callback
      */
-    register(modifiers: Modifier[], key: string | null, func: KeymapEventListener): KeymapEventHandler;
+    register(modifiers: Modifier[], key: string | null, func: KeymapEventListener): KeymapEventHandler
     /**
      * @public
      */
-    unregister(handler: KeymapEventHandler): void;
+    unregister(handler: KeymapEventHandler): void
 
-    handleKey: Function;
-    registerKey: Function;
-    setTabFocusContainerEl: Function;
+    handleKey: Function
+    registerKey: Function
+    setTabFocusContainerEl: Function
 }
 
 /**
@@ -3231,28 +3231,28 @@ export class SearchComponent extends AbstractTextComponent<HTMLInputElement> {
     /**
      * @public
      */
-    clearButtonEl: HTMLElement;
+    clearButtonEl: HTMLElement
 
     /**
      * @public
      */
-    constructor(containerEl: HTMLElement);
+    constructor(containerEl: HTMLElement)
     /**
      * @public
      */
-    onChanged(): void;
+    onChanged(): void
 
 }
 
 /**
  * @public
  */
-export type SearchMatches = SearchMatchPart[];
+export type SearchMatches = SearchMatchPart[]
 
 /**
  * @public
  */
-export type SearchMatchPart = [number, number];
+export type SearchMatchPart = [number, number]
 
 /**
  * @public
@@ -3294,102 +3294,102 @@ export interface SectionCache extends CacheItem {
  * @param iconId - the icon ID
  * @public
  */
-export function setIcon(parent: HTMLElement, iconId: IconName): void;
+export function setIcon(parent: HTMLElement, iconId: IconName): void
 
 /**
  * @public
  */
 export class Setting {
     /** @public */
-    settingEl: HTMLElement;
+    settingEl: HTMLElement
     /** @public */
-    infoEl: HTMLElement;
+    infoEl: HTMLElement
     /** @public */
-    nameEl: HTMLElement;
+    nameEl: HTMLElement
     /** @public */
-    descEl: HTMLElement;
+    descEl: HTMLElement
     /** @public */
-    controlEl: HTMLElement;
+    controlEl: HTMLElement
     /** @public */
-    components: BaseComponent[];
+    components: BaseComponent[]
     /**
      * @public
      */
-    constructor(containerEl: Node);
+    constructor(containerEl: Node)
     /**
      * @public
      */
-    setName(name: string | DocumentFragment): this;
+    setName(name: string | DocumentFragment): this
     /**
      * @public
      */
-    setDesc(desc: string | DocumentFragment): this;
+    setDesc(desc: string | DocumentFragment): this
     /**
      * @public
      */
-    setClass(cls: string): this;
+    setClass(cls: string): this
     /**
      * @public
      */
-    setTooltip(tooltip: string, options?: TooltipOptions): this;
+    setTooltip(tooltip: string, options?: TooltipOptions): this
     /**
      * @public
      */
-    setHeading(): this;
+    setHeading(): this
     /**
      * @public
      */
-    setDisabled(disabled: boolean): this;
+    setDisabled(disabled: boolean): this
 
     /**
      * @public
      */
-    addButton(cb: (component: ButtonComponent) => any): this;
+    addButton(cb: (component: ButtonComponent) => any): this
     /**
      * @public
      */
-    addExtraButton(cb: (component: ExtraButtonComponent) => any): this;
+    addExtraButton(cb: (component: ExtraButtonComponent) => any): this
     /**
      * @public
      */
-    addToggle(cb: (component: ToggleComponent) => any): this;
+    addToggle(cb: (component: ToggleComponent) => any): this
     /**
      * @public
      */
-    addText(cb: (component: TextComponent) => any): this;
+    addText(cb: (component: TextComponent) => any): this
     /**
      * @public
      */
-    addSearch(cb: (component: SearchComponent) => any): this;
+    addSearch(cb: (component: SearchComponent) => any): this
     /**
      * @public
      */
-    addTextArea(cb: (component: TextAreaComponent) => any): this;
+    addTextArea(cb: (component: TextAreaComponent) => any): this
     /**
      * @public
      */
-    addMomentFormat(cb: (component: MomentFormatComponent) => any): this;
+    addMomentFormat(cb: (component: MomentFormatComponent) => any): this
     /**
      * @public
      */
-    addDropdown(cb: (component: DropdownComponent) => any): this;
+    addDropdown(cb: (component: DropdownComponent) => any): this
     /**
      * @public
      */
-    addColorPicker(cb: (component: ColorComponent) => any): this;
+    addColorPicker(cb: (component: ColorComponent) => any): this
     /**
      * @public
      */
-    addSlider(cb: (component: SliderComponent) => any): this;
+    addSlider(cb: (component: SliderComponent) => any): this
     /**
      * Facilitates chaining
      * @public
      */
-    then(cb: (setting: this) => any): this;
+    then(cb: (setting: this) => any): this
     /**
      * @public
      */
-    clear(): this;
+    clear(): this
 
 }
 
@@ -3397,89 +3397,89 @@ export class Setting {
  * @private
  */
 export class KeyBinding {
-    func: Function;
-    key: string;
-    modifiers: string;
-    scope: Scope;
+    func: Function
+    key: string
+    modifiers: string
+    scope: Scope
 }
 
 /**
  * @private
  */
 export class Selection {
-    focusEl?: HTMLElement;
-    range?: any;
-    win: Window;
+    focusEl?: HTMLElement
+    range?: any
+    win: Window
 }
 
 /**
  * @private
  */
 export class SettingModal extends Modal {
-    activeTab: SettingTab;
-    app: App;
-    bgEl: HTMLElement;
-    communityPluginTabContainer: HTMLElement;
-    communityPluginTabHeaderGroup: HTMLElement;
-    containerEl: HTMLElement;
-    contentEl: HTMLElement;
-    corePluginTabContainer: HTMLElement;
-    corePluginTabHeaderGroup: HTMLElement;
-    dimBackground: boolean;
-    lastTabId: string;
-    modalEl: HTMLElement;
+    activeTab: SettingTab
+    app: App
+    bgEl: HTMLElement
+    communityPluginTabContainer: HTMLElement
+    communityPluginTabHeaderGroup: HTMLElement
+    containerEl: HTMLElement
+    contentEl: HTMLElement
+    corePluginTabContainer: HTMLElement
+    corePluginTabHeaderGroup: HTMLElement
+    dimBackground: boolean
+    lastTabId: string
+    modalEl: HTMLElement
     /**
      * Setting tabs under the headings "Core plugins" and "Community plugins"
      */
-    pluginTabs: PluginSettingTab[];
-    selection: Selection;
+    pluginTabs: PluginSettingTab[]
+    selection: Selection
     /**
      * Setting tabs under the "Options" heading
      */
-    settingTabs: SettingTab[];
-    shouldRestoreSelection: boolean;
-    tabContainer: HTMLElement;
-    tabContentContainer: HTMLElement;
-    tabHeadersEl: HTMLElement;
-    titleEl: HTMLElement;
+    settingTabs: SettingTab[]
+    shouldRestoreSelection: boolean
+    tabContainer: HTMLElement
+    tabContentContainer: HTMLElement
+    tabHeadersEl: HTMLElement
+    titleEl: HTMLElement
     
-    addSettingTab(a: any): any;
-    closeActiveTab(): any;
+    addSettingTab(a: any): any
+    closeActiveTab(): any
     constructor(a: any)
-    isPluginSettingTab(a: any): any;
-    openTab(a: any): any;
-    openTabById(a: any): any;
-    removeSettingTab(a: any): any;
-    updateModalTitle(a: any): any;
-    updatePluginSection(): any;
+    isPluginSettingTab(a: any): any
+    openTab(a: any): any
+    openTabById(a: any): any
+    removeSettingTab(a: any): any
+    updateModalTitle(a: any): any
+    updatePluginSection(): any
 }
 
 /**
  * @public
  */
 export abstract class SettingTab {
-    id: string;
-    name: string;
-    navEl: HTMLElement;
+    id: string
+    name: string
+    navEl: HTMLElement
 
     /**
      * @public
      */
-    app: App;
+    app: App
 
     /**
      * @public
      */
-    containerEl: HTMLElement;
+    containerEl: HTMLElement
 
     /**
      * @public
      */
-    abstract display(): any;
+    abstract display(): any
     /**
      * @public
      */
-    hide(): any;
+    hide(): any
 
     constructor(app: App, plugin: Plugin_2)
 }
@@ -3491,55 +3491,55 @@ export class SliderComponent extends ValueComponent<number> {
     /**
      * @public
      */
-    sliderEl: HTMLInputElement;
+    sliderEl: HTMLInputElement
 
     /**
      * @public
      */
-    constructor(containerEl: HTMLElement);
+    constructor(containerEl: HTMLElement)
     /**
      * @public
      */
-    setDisabled(disabled: boolean): this;
+    setDisabled(disabled: boolean): this
     /**
      * @public
      */
-    setLimits(min: number, max: number, step: number | 'any'): this;
+    setLimits(min: number, max: number, step: number | 'any'): this
     /**
      * @public
      */
-    getValue(): number;
+    getValue(): number
     /**
      * @public
      */
-    setValue(value: number): this;
+    setValue(value: number): this
     /**
      * @public
      */
-    getValuePretty(): string;
+    getValuePretty(): string
     /**
      * @public
      */
-    setDynamicTooltip(): this;
+    setDynamicTooltip(): this
     /**
      * @public
      */
-    showTooltip(): void;
+    showTooltip(): void
     /**
      * @public
      */
-    onChange(callback: (value: number) => any): this;
+    onChange(callback: (value: number) => any): this
 }
 
 /**
  * @public
  */
-export function sortSearchResults(results: SearchResultContainer[]): void;
+export function sortSearchResults(results: SearchResultContainer[]): void
 
 /**
  * @public
  */
-export type SplitDirection = 'vertical' | 'horizontal';
+export type SplitDirection = 'vertical' | 'horizontal'
 
 /** @public */
 export interface Stat {
@@ -3554,19 +3554,19 @@ export interface Stat {
 }
 
 /** @public */
-export function stringifyYaml(obj: any): string;
+export function stringifyYaml(obj: any): string
 
 /**
  * This function normalizes headings for link matching by stripping out special characters and shrinking consecutive spaces.
  * @public
  */
-export function stripHeading(heading: string): string;
+export function stripHeading(heading: string): string
 
 /**
  * This function prepares headings for linking. It strips out some bad combinations of special characters that could break links.
  * @public
  */
-export function stripHeadingForLink(heading: string): string;
+export function stripHeadingForLink(heading: string): string
 
 /**
  * @public
@@ -3589,54 +3589,54 @@ export abstract class SuggestModal<T> extends Modal implements ISuggestOwner<T> 
     /**
      * @public
      */
-    limit: number;
+    limit: number
     /**
      * @public
      */
-    emptyStateText: string;
+    emptyStateText: string
 
     /**
      * @public
      */
-    inputEl: HTMLInputElement;
+    inputEl: HTMLInputElement
 
     /**
      * @public
      */
-    resultContainerEl: HTMLElement;
+    resultContainerEl: HTMLElement
     /**
      * @public
      */
-    constructor(app: App);
+    constructor(app: App)
     /**
      * @public
      */
-    setPlaceholder(placeholder: string): void;
+    setPlaceholder(placeholder: string): void
     /**
      * @public
      */
-    setInstructions(instructions: Instruction[]): void;
+    setInstructions(instructions: Instruction[]): void
 
     /**
      * @public
      */
-    onNoSuggestion(): void;
+    onNoSuggestion(): void
     /**
      * @public
      */
-    selectSuggestion(value: T, evt: MouseEvent | KeyboardEvent): void;
+    selectSuggestion(value: T, evt: MouseEvent | KeyboardEvent): void
     /**
      * @public
      */
-    abstract getSuggestions(query: string): T[] | Promise<T[]>;
+    abstract getSuggestions(query: string): T[] | Promise<T[]>
     /**
      * @public
      */
-    abstract renderSuggestion(value: T, el: HTMLElement): any;
+    abstract renderSuggestion(value: T, el: HTMLElement): any
     /**
      * @public
      */
-    abstract onChooseSuggestion(item: T, evt: MouseEvent | KeyboardEvent): any;
+    abstract onChooseSuggestion(item: T, evt: MouseEvent | KeyboardEvent): any
 }
 
 /**
@@ -3647,19 +3647,19 @@ export abstract class TAbstractFile {
     /**
      * @public
      */
-    vault: Vault;
+    vault: Vault
     /**
      * @public
      */
-    path: string;
+    path: string
     /**
      * @public
      */
-    name: string;
+    name: string
     /**
      * @public
      */
-    parent: TFolder;
+    parent: TFolder
 
 }
 
@@ -3681,19 +3681,19 @@ export class Tasks {
     /**
      * @public
      */
-    add(callback: () => Promise<any>): void;
+    add(callback: () => Promise<any>): void
     /**
      * @public
      */
-    addPromise(promise: Promise<any>): void;
+    addPromise(promise: Promise<any>): void
     /**
      * @public
      */
-    isEmpty(): boolean;
+    isEmpty(): boolean
     /**
      * @public
      */
-    promise(): Promise<any>;
+    promise(): Promise<any>
 }
 
 /**
@@ -3703,7 +3703,7 @@ export class TextAreaComponent extends AbstractTextComponent<HTMLTextAreaElement
     /**
      * @public
      */
-    constructor(containerEl: HTMLElement);
+    constructor(containerEl: HTMLElement)
 }
 
 /**
@@ -3713,7 +3713,7 @@ export class TextComponent extends AbstractTextComponent<HTMLInputElement> {
     /**
      * @public
      */
-    constructor(containerEl: HTMLElement);
+    constructor(containerEl: HTMLElement)
 }
 
 /**
@@ -3729,36 +3729,36 @@ export abstract class TextFileView extends EditableFileView {
      * In memory data
      * @public
      */
-    data: string;
+    data: string
     /**
      * Debounced save in 2 seconds from now
      * @public
      */
-    requestSave: () => void;
+    requestSave: () => void
 
     /**
      * @public
      */
-    constructor(leaf: WorkspaceLeaf);
+    constructor(leaf: WorkspaceLeaf)
 
     /**
      * @public
      */
-    onUnloadFile(file: TFile): Promise<void>;
+    onUnloadFile(file: TFile): Promise<void>
     /**
      * @public
      */
-    onLoadFile(file: TFile): Promise<void>;
+    onLoadFile(file: TFile): Promise<void>
     /**
      * @public
      */
-    save(clear?: boolean): Promise<void>;
+    save(clear?: boolean): Promise<void>
 
     /**
      * Gets the data from the editor. This will be called to save the editor contents to the file.
      * @public
      */
-    abstract getViewData(): string;
+    abstract getViewData(): string
     /**
      * Set the data to the editor. This is used to load the file contents.
      *
@@ -3767,14 +3767,14 @@ export abstract class TextFileView extends EditableFileView {
      * clearing mechanism given the new data to be set.
      * @public
      */
-    abstract setViewData(data: string, clear: boolean): void;
+    abstract setViewData(data: string, clear: boolean): void
     /**
      * Clear the editor. This is usually called when we're about to open a completely
      * different file, so it's best to clear any editor states like undo-redo history,
      * and any caches/indexes associated with the previous file contents.
      * @public
      */
-    abstract clear(): void;
+    abstract clear(): void
 }
 
 /**
@@ -3784,15 +3784,15 @@ export class TFile extends TAbstractFile {
     /**
      * @public
      */
-    stat: FileStats;
+    stat: FileStats
     /**
      * @public
      */
-    basename: string;
+    basename: string
     /**
      * @public
      */
-    extension: string;
+    extension: string
 
 }
 
@@ -3803,12 +3803,12 @@ export class TFolder extends TAbstractFile {
     /**
      * @public
      */
-    children: TAbstractFile[];
+    children: TAbstractFile[]
 
     /**
      * @public
      */
-    isRoot(): boolean;
+    isRoot(): boolean
 
 }
 
@@ -3819,37 +3819,37 @@ export class ToggleComponent extends ValueComponent<boolean> {
     /**
      * @public
      */
-    toggleEl: HTMLElement;
+    toggleEl: HTMLElement
 
     /**
      * @public
      */
-    constructor(containerEl: HTMLElement);
+    constructor(containerEl: HTMLElement)
     /**
      * @public
      */
-    setDisabled(disabled: boolean): this;
+    setDisabled(disabled: boolean): this
     /**
      * @public
      */
-    getValue(): boolean;
+    getValue(): boolean
     /**
      * @public
      */
-    setValue(on: boolean): this;
+    setValue(on: boolean): this
 
     /**
      * @public
      */
-    setTooltip(tooltip: string, options?: TooltipOptions): this;
+    setTooltip(tooltip: string, options?: TooltipOptions): this
     /**
      * @public
      */
-    onClick(): void;
+    onClick(): void
     /**
      * @public
      */
-    onChange(callback: (value: boolean) => any): this;
+    onChange(callback: (value: boolean) => any): this
 }
 
 /** @public */
@@ -3860,10 +3860,10 @@ export interface TooltipOptions {
 }
 
 /** @public */
-export type TooltipPlacement = 'bottom' | 'right' | 'left' | 'top';
+export type TooltipPlacement = 'bottom' | 'right' | 'left' | 'top'
 
 /** @public */
-export type UserEvent = MouseEvent | KeyboardEvent | TouchEvent | PointerEvent;
+export type UserEvent = MouseEvent | KeyboardEvent | TouchEvent | PointerEvent
 
 /**
  * @public
@@ -3872,15 +3872,15 @@ export abstract class ValueComponent<T> extends BaseComponent {
     /**
      * @public
      */
-    registerOptionListener(listeners: Record<string, (value?: T) => T>, key: string): this;
+    registerOptionListener(listeners: Record<string, (value?: T) => T>, key: string): this
     /**
      * @public
      */
-    abstract getValue(): T;
+    abstract getValue(): T
     /**
      * @public
      */
-    abstract setValue(value: T): this;
+    abstract setValue(value: T): this
 }
 
 /**
@@ -3890,89 +3890,89 @@ export class Vault extends Events {
     /**
      * @public
      */
-    adapter: DataAdapter;
+    adapter: DataAdapter
 
     /**
      * Gets the path to the config folder.
      * This value is typically `.obsidian` but it could be different.
      * @public
      */
-    configDir: string;
+    configDir: string
 
     /**
      * Gets the name of the vault
      * @public
      */
-    getName(): string;
+    getName(): string
 
     /**
      * @public
      */
-    getAbstractFileByPath(path: string): TAbstractFile | null;
+    getAbstractFileByPath(path: string): TAbstractFile | null
 
     /**
      * @public
      */
-    getRoot(): TFolder;
+    getRoot(): TFolder
 
     /**
      * @public
      */
-    create(path: string, data: string, options?: DataWriteOptions): Promise<TFile>;
+    create(path: string, data: string, options?: DataWriteOptions): Promise<TFile>
     /**
      * @public
      */
-    createBinary(path: string, data: ArrayBuffer, options?: DataWriteOptions): Promise<TFile>;
+    createBinary(path: string, data: ArrayBuffer, options?: DataWriteOptions): Promise<TFile>
     /**
      * @public
      */
-    createFolder(path: string): Promise<void>;
+    createFolder(path: string): Promise<void>
     /**
      * @public
      */
-    read(file: TFile): Promise<string>;
+    read(file: TFile): Promise<string>
     /**
      * @public
      */
-    cachedRead(file: TFile): Promise<string>;
+    cachedRead(file: TFile): Promise<string>
     /**
      * @public
      */
-    readBinary(file: TFile): Promise<ArrayBuffer>;
+    readBinary(file: TFile): Promise<ArrayBuffer>
 
     /**
      * @public
      */
-    getResourcePath(file: TFile): string;
+    getResourcePath(file: TFile): string
     /**
      * @param file - The file or folder to be deleted
      * @param force  - Should attempt to delete folder even if it has hidden children
      * @public
      */
-    delete(file: TAbstractFile, force?: boolean): Promise<void>;
+    delete(file: TAbstractFile, force?: boolean): Promise<void>
     /**
      * Tries to move to system trash. If that isn't successful/allowed, use local trash
      * @param file - The file or folder to be deleted
      * @param system - Should move to system trash
      * @public
      */
-    trash(file: TAbstractFile, system: boolean): Promise<void>;
+    trash(file: TAbstractFile, system: boolean): Promise<void>
     /**
      * @public
      */
-    rename(file: TAbstractFile, newPath: string): Promise<void>;
+    rename(file: TAbstractFile, newPath: string): Promise<void>
     /**
      * @public
      */
-    modify(file: TFile, data: string, options?: DataWriteOptions): Promise<void>;
+    modify(file: TFile, data: string, options?: DataWriteOptions): Promise<void>
     /**
      * @public
      */
-    modifyBinary(file: TFile, data: ArrayBuffer, options?: DataWriteOptions): Promise<void>;
+    modifyBinary(file: TFile, data: ArrayBuffer, options?: DataWriteOptions): Promise<void>
     /**
      * @public
      */
-    append(file: TFile, data: string, options?: DataWriteOptions): Promise<void>;
+    append(file: TFile, data: string, options?: DataWriteOptions): Promise<void>
     /**
      * Atomically read, modify, and save the contents of a note.
      * @param file - the file to be read and modified.
@@ -3981,50 +3981,50 @@ export class Vault extends Events {
      * @returns string - the text value of the note that was written.
      * @public
      */
-    process(file: TFile, fn: (data: string) => string, options?: DataWriteOptions): Promise<string>;
+    process(file: TFile, fn: (data: string) => string, options?: DataWriteOptions): Promise<string>
     /**
      * @public
      */
-    copy(file: TFile, newPath: string): Promise<TFile>;
+    copy(file: TFile, newPath: string): Promise<TFile>
     /**
      * @public
      */
-    getAllLoadedFiles(): TAbstractFile[];
+    getAllLoadedFiles(): TAbstractFile[]
 
     /**
      * @public
      */
-    static recurseChildren(root: TFolder, cb: (file: TAbstractFile) => any): void;
+    static recurseChildren(root: TFolder, cb: (file: TAbstractFile) => any): void
     /**
      * @public
      */
-    getMarkdownFiles(): TFile[];
+    getMarkdownFiles(): TFile[]
     /**
      * @public
      */
-    getFiles(): TFile[];
+    getFiles(): TFile[]
 
     /**
      * @public
      */
-    on(name: 'create', callback: (file: TAbstractFile) => any, ctx?: any): EventRef;
+    on(name: 'create', callback: (file: TAbstractFile) => any, ctx?: any): EventRef
     /**
      * @public
      */
-    on(name: 'modify', callback: (file: TAbstractFile) => any, ctx?: any): EventRef;
+    on(name: 'modify', callback: (file: TAbstractFile) => any, ctx?: any): EventRef
     /**
      * @public
      */
-    on(name: 'delete', callback: (file: TAbstractFile) => any, ctx?: any): EventRef;
+    on(name: 'delete', callback: (file: TAbstractFile) => any, ctx?: any): EventRef
     /**
      * @public
      */
-    on(name: 'rename', callback: (file: TAbstractFile, oldPath: string) => any, ctx?: any): EventRef;
+    on(name: 'rename', callback: (file: TAbstractFile, oldPath: string) => any, ctx?: any): EventRef
 
     /**
      * @public
      */
-    on(name: 'closed', callback: () => any, ctx?: any): EventRef;
+    on(name: 'closed', callback: () => any, ctx?: any): EventRef
 
 }
 
@@ -4035,11 +4035,11 @@ export abstract class View extends Component {
     /**
      * @public
      */
-    app: App;
+    app: App
     /**
      * @public
      */
-    icon: IconName;
+    icon: IconName
     /**
      * Whether or not the view is intended for navigation.
      * If your view is a static view that is not intended to be navigated away, set this to false.
@@ -4049,58 +4049,58 @@ export abstract class View extends Component {
      *
      * @public
      */
-    navigation: boolean;
+    navigation: boolean
     /**
      * @public
      */
-    leaf: WorkspaceLeaf;
+    leaf: WorkspaceLeaf
     /**
      * @public
      */
-    containerEl: HTMLElement;
+    containerEl: HTMLElement
 
     /**
      * @public
      */
-    constructor(leaf: WorkspaceLeaf);
+    constructor(leaf: WorkspaceLeaf)
 
     /**
      * @public
      */
-    protected onOpen(): Promise<void>;
+    protected onOpen(): Promise<void>
     /**
      * @public
      */
-    protected onClose(): Promise<void>;
+    protected onClose(): Promise<void>
     /**
      * @public
      */
-    abstract getViewType(): string;
+    abstract getViewType(): string
     /**
      * @public
      */
-    getState(): any;
+    getState(): any
     /**
      * @public
      */
-    setState(state: any, result: ViewStateResult): Promise<void>;
+    setState(state: any, result: ViewStateResult): Promise<void>
     /**
      * @public
      */
-    getEphemeralState(): any;
+    getEphemeralState(): any
     /**
      * @public
      */
-    setEphemeralState(state: any): void;
+    setEphemeralState(state: any): void
     /**
      * @public
      */
-    getIcon(): IconName;
+    getIcon(): IconName
     /**
      * Called when the size of this view is changed.
      * @public
      */
-    onResize(): void;
+    onResize(): void
     /**
      * Called:
      * Once: After constructor, after onload, before onOpen.
@@ -4108,21 +4108,21 @@ export abstract class View extends Component {
      * 
      * @public
      */
-    abstract getDisplayText(): string;
+    abstract getDisplayText(): string
     /**
      * Populates the pane menu.
      *
      * (Replaces the previously removed `onHeaderMenu` and `onMoreOptionsMenu`)
      * @public
      */
-    onPaneMenu(menu: Menu, source: 'more-options' | 'tab-header' | string): void;
+    onPaneMenu(menu: Menu, source: 'more-options' | 'tab-header' | string): void
 
 }
 
 /**
  * @public
  */
-export type ViewCreator = (leaf: WorkspaceLeaf) => View;
+export type ViewCreator = (leaf: WorkspaceLeaf) => View
 
 /**
  * @public
@@ -4168,7 +4168,7 @@ export class Workspace extends Events {
      * if the active view has no editor.
      * @public
      */
-    activeEditor: MarkdownFileInfo | null;
+    activeEditor: MarkdownFileInfo | null
 
     /**
      * Indicates the currently focused leaf, if one exists.
@@ -4183,97 +4183,97 @@ export class Workspace extends Events {
      * @public
      * @deprecated - The use of this field is discouraged.
      */
-    activeLeaf: WorkspaceLeaf | null;
+    activeLeaf: WorkspaceLeaf | null
 
-    activeTabGroup: WorkspaceTabs | null;
+    activeTabGroup: WorkspaceTabs | null
 
     /**
      * @public
      */
-    leftSplit: WorkspaceSidedock | WorkspaceMobileDrawer;
+    leftSplit: WorkspaceSidedock | WorkspaceMobileDrawer
     /**
      * @public
      */
-    rightSplit: WorkspaceSidedock | WorkspaceMobileDrawer;
+    rightSplit: WorkspaceSidedock | WorkspaceMobileDrawer
     /**
      * @public
      */
-    leftRibbon: WorkspaceRibbon;
+    leftRibbon: WorkspaceRibbon
     /**
      * @public
      */
-    rightRibbon: WorkspaceRibbon;
+    rightRibbon: WorkspaceRibbon
     /**
      * @public
      */
-    rootSplit: WorkspaceRoot;
+    rootSplit: WorkspaceRoot
     /**
      * @public
      */
-    containerEl: HTMLElement;
+    containerEl: HTMLElement
     /**
      * @public
      */
-    layoutReady: boolean;
+    layoutReady: boolean
 
-    layoutItemQueue: [];
+    layoutItemQueue: []
     /**
      * @public
      */
-    requestSaveLayout: Debouncer<[], Promise<void>>;
+    requestSaveLayout: Debouncer<[], Promise<void>>
 
     /**
      * Runs the callback function right away if layout is already ready,
      * or push it to a queue to be called later when layout is ready.
      * @public
      * */
-    onLayoutReady(callback: () => any): void;
+    onLayoutReady(callback: () => any): void
     /**
      * @public
      */
-    changeLayout(workspace: any): Promise<void>;
+    changeLayout(workspace: any): Promise<void>
 
     /**
      * @public
      */
-    getLayout(): any;
+    getLayout(): any
 
     /**
      * @public
      */
-    createLeafInParent(parent: WorkspaceParent, index: number): WorkspaceLeaf;
+    createLeafInParent(parent: WorkspaceParent, index: number): WorkspaceLeaf
 
     /**
      * The index does nothing. It always adds tabs on the right.
      * Use createLeafInParent if you need to place tabs at a specific index.
      * @public
      */
-    createLeafInTabGroup(parent: WorkspaceTabs, index: number): WorkspaceLeaf;
+    createLeafInTabGroup(parent: WorkspaceTabs, index: number): WorkspaceLeaf
 
     /**
      * @public
      */
-    createLeafBySplit(leaf: WorkspaceLeaf, direction?: SplitDirection, before?: boolean): WorkspaceLeaf;
+    createLeafBySplit(leaf: WorkspaceLeaf, direction?: SplitDirection, before?: boolean): WorkspaceLeaf
     /**
      * @public
      * @deprecated - You should use {@link getLeaf|getLeaf(true)} instead which does the same thing.
      */
-    splitActiveLeaf(direction?: SplitDirection): WorkspaceLeaf;
+    splitActiveLeaf(direction?: SplitDirection): WorkspaceLeaf
 
     /**
      * @public
      * @deprecated
      */
-    duplicateLeaf(leaf: WorkspaceLeaf, direction?: SplitDirection): Promise<WorkspaceLeaf>;
+    duplicateLeaf(leaf: WorkspaceLeaf, direction?: SplitDirection): Promise<WorkspaceLeaf>
     /**
      * @public
      */
-    duplicateLeaf(leaf: WorkspaceLeaf, leafType: PaneType | boolean, direction?: SplitDirection): Promise<WorkspaceLeaf>;
+    duplicateLeaf(leaf: WorkspaceLeaf, leafType: PaneType | boolean, direction?: SplitDirection): Promise<WorkspaceLeaf>
     /**
      * @public
      * @deprecated - You should use {@link getLeaf|getLeaf(false)} instead which does the same thing.
      */
-    getUnpinnedLeaf(type?: string): WorkspaceLeaf;
+    getUnpinnedLeaf(type?: string): WorkspaceLeaf
     /**
      * Creates a new leaf in a leaf adjacent to the currently active leaf.
      * If direction is `'vertical'`, the leaf will appear to the right.
@@ -4281,7 +4281,7 @@ export class Workspace extends Events {
      *
      * @public
      */
-    getLeaf(newLeaf?: 'split', direction?: SplitDirection): WorkspaceLeaf;
+    getLeaf(newLeaf?: 'split', direction?: SplitDirection): WorkspaceLeaf
     /**
      * If newLeaf is false (or not set) then an existing leaf which can be navigated
      * is returned, or a new leaf will be created if there was no leaf available.
@@ -4295,25 +4295,25 @@ export class Workspace extends Events {
      *
      * @public
      */
-    getLeaf(newLeaf?: PaneType | boolean): WorkspaceLeaf;
+    getLeaf(newLeaf?: PaneType | boolean): WorkspaceLeaf
 
     /**
      * Migrates this leaf to a new popout window.
      * Only works on the desktop app.
      * @public
      */
-    moveLeafToPopout(leaf: WorkspaceLeaf, data?: WorkspaceWindowInitData): WorkspaceWindow;
+    moveLeafToPopout(leaf: WorkspaceLeaf, data?: WorkspaceWindowInitData): WorkspaceWindow
 
     /**
      * Open a new popout window with a single new leaf and return that leaf.
      * Only works on the desktop app.
      * @public
      */
-    openPopoutLeaf(data?: WorkspaceWindowInitData): WorkspaceLeaf;
+    openPopoutLeaf(data?: WorkspaceWindowInitData): WorkspaceLeaf
     /**
      * @public
      */
-    openLinkText(linktext: string, sourcePath: string, newLeaf?: PaneType | boolean, openViewState?: OpenViewState): Promise<void>;
+    openLinkText(linktext: string, sourcePath: string, newLeaf?: PaneType | boolean, openViewState?: OpenViewState): Promise<void>
     /**
      * Sets the active leaf
      * @param leaf - The new active leaf
@@ -4323,39 +4323,39 @@ export class Workspace extends Events {
     setActiveLeaf(leaf: WorkspaceLeaf, params?: {
         /** @public */
         focus?: boolean;
-    }): void;
+    }): void
     /**
      * @deprecated - function signature changed. Use other form instead
      * @public
      */
-    setActiveLeaf(leaf: WorkspaceLeaf, pushHistory: boolean, focus: boolean): void;
+    setActiveLeaf(leaf: WorkspaceLeaf, pushHistory: boolean, focus: boolean): void
 
     /**
      * @public
      */
-    getLeafById(id: string): WorkspaceLeaf;
+    getLeafById(id: string): WorkspaceLeaf
     /**
      * @public
      */
-    getGroupLeaves(group: string): WorkspaceLeaf[];
+    getGroupLeaves(group: string): WorkspaceLeaf[]
 
     /**
      * @public
      */
-    getMostRecentLeaf(root?: WorkspaceParent): WorkspaceLeaf | null;
+    getMostRecentLeaf(root?: WorkspaceParent): WorkspaceLeaf | null
     /**
      * @public
      */
-    getLeftLeaf(split: boolean): WorkspaceLeaf;
+    getLeftLeaf(split: boolean): WorkspaceLeaf
     /**
      * @public
      */
-    getRightLeaf(split: boolean): WorkspaceLeaf;
+    getRightLeaf(split: boolean): WorkspaceLeaf
 
     /**
      * @public
      */
-    getActiveViewOfType<T extends View>(type: Constructor<T>): T | null;
+    getActiveViewOfType<T extends View>(type: Constructor<T>): T | null
 
     /**
      * Returns the file for the current view if it's a FileView.
@@ -4364,126 +4364,126 @@ export class Workspace extends Events {
      *
      * @public
      */
-    getActiveFile(): TFile | null;
+    getActiveFile(): TFile | null
 
     /**
      * Iterate through all leaves in the main area of the workspace.
      * @public
      */
-    iterateRootLeaves(callback: (leaf: WorkspaceLeaf) => any): void;
+    iterateRootLeaves(callback: (leaf: WorkspaceLeaf) => any): void
     /**
      * Iterate through all leaves, including main area leaves, floating leaves, and sidebar leaves.
      * @public
      */
-    iterateAllLeaves(callback: (leaf: WorkspaceLeaf) => any): void;
+    iterateAllLeaves(callback: (leaf: WorkspaceLeaf) => any): void
     /**
      * @public
      */
-    getLeavesOfType(viewType: string): WorkspaceLeaf[];
+    getLeavesOfType(viewType: string): WorkspaceLeaf[]
     /**
      * @public
      */
-    detachLeavesOfType(viewType: string): void;
+    detachLeavesOfType(viewType: string): void
 
     /**
      * @public
      */
-    revealLeaf(leaf: WorkspaceLeaf): void;
+    revealLeaf(leaf: WorkspaceLeaf): void
     /**
      * @public
      */
-    getLastOpenFiles(): string[];
+    getLastOpenFiles(): string[]
     /**
      * Calling this function will update/reconfigure the options of all markdown panes.
      * It is fairly expensive, so it should not be called frequently.
      * @public
      */
-    updateOptions(): void;
+    updateOptions(): void
 
     /**
      * @public
      */
-    iterateCodeMirrors(callback: (cm: CodeMirror.Editor) => any): void;
+    iterateCodeMirrors(callback: (cm: CodeMirror.Editor) => any): void
 
     /**
      * @public
      */
-    on(name: 'quick-preview', callback: (file: TFile, data: string) => any, ctx?: any): EventRef;
+    on(name: 'quick-preview', callback: (file: TFile, data: string) => any, ctx?: any): EventRef
     /**
      * @public
      */
-    on(name: 'resize', callback: () => any, ctx?: any): EventRef;
+    on(name: 'resize', callback: () => any, ctx?: any): EventRef
     /**
      * @public
      */
-    on(name: 'click', callback: (evt: MouseEvent) => any, ctx?: any): EventRef;
+    on(name: 'click', callback: (evt: MouseEvent) => any, ctx?: any): EventRef
     /**
      * @public
      */
-    on(name: 'active-leaf-change', callback: (leaf: WorkspaceLeaf | null) => any, ctx?: any): EventRef;
+    on(name: 'active-leaf-change', callback: (leaf: WorkspaceLeaf | null) => any, ctx?: any): EventRef
 
     /* file is null when an empty tab is opened. */
-    on(name: 'file-open', callback: (file: TFile | null) => any, ctx?: any): EventRef;
+    on(name: 'file-open', callback: (file: TFile | null) => any, ctx?: any): EventRef
 
     /**
      * @public
      */
-    on(name: 'layout-change', callback: () => any, ctx?: any): EventRef;
+    on(name: 'layout-change', callback: () => any, ctx?: any): EventRef
     /**
      * @public
      */
-    on(name: 'window-open', callback: (win: WorkspaceWindow, window: Window) => any, ctx?: any): EventRef;
+    on(name: 'window-open', callback: (win: WorkspaceWindow, window: Window) => any, ctx?: any): EventRef
     /**
      * @public
      */
-    on(name: 'window-close', callback: (win: WorkspaceWindow, window: Window) => any, ctx?: any): EventRef;
+    on(name: 'window-close', callback: (win: WorkspaceWindow, window: Window) => any, ctx?: any): EventRef
     /**
      * Triggered when the CSS of the app has changed.
      * @public
      */
-    on(name: 'css-change', callback: () => any, ctx?: any): EventRef;
+    on(name: 'css-change', callback: () => any, ctx?: any): EventRef
     /**
      * Triggered when the user opens the context menu on a file.
      * @public
      */
-    on(name: 'file-menu', callback: (menu: Menu, file: TAbstractFile, source: string, leaf?: WorkspaceLeaf) => any, ctx?: any): EventRef;
+    on(name: 'file-menu', callback: (menu: Menu, file: TAbstractFile, source: string, leaf?: WorkspaceLeaf) => any, ctx?: any): EventRef
 
     /**
      * Triggered when the user opens the context menu on an editor.
      * @public
      */
-    on(name: 'editor-menu', callback: (menu: Menu, editor: Editor, info: MarkdownView | MarkdownFileInfo) => any, ctx?: any): EventRef;
+    on(name: 'editor-menu', callback: (menu: Menu, editor: Editor, info: MarkdownView | MarkdownFileInfo) => any, ctx?: any): EventRef
     /**
      * Triggered when changes to an editor has been applied, either programmatically or from a user event.
      * @public
      */
-    on(name: 'editor-change', callback: (editor: Editor, info: MarkdownView | MarkdownFileInfo) => any, ctx?: any): EventRef;
+    on(name: 'editor-change', callback: (editor: Editor, info: MarkdownView | MarkdownFileInfo) => any, ctx?: any): EventRef
     /**
      * Triggered when the editor receives a paste event.
      * Check for `evt.defaultPrevented` before attempting to handle this event, and return if it has been already handled.
      * Use `evt.preventDefault()` to indicate that you've handled the event.
      * @public
      */
-    on(name: 'editor-paste', callback: (evt: ClipboardEvent, editor: Editor, info: MarkdownView | MarkdownFileInfo) => any, ctx?: any): EventRef;
+    on(name: 'editor-paste', callback: (evt: ClipboardEvent, editor: Editor, info: MarkdownView | MarkdownFileInfo) => any, ctx?: any): EventRef
     /**
      * Triggered when the editor receives a drop event.
      * Check for `evt.defaultPrevented` before attempting to handle this event, and return if it has been already handled.
      * Use `evt.preventDefault()` to indicate that you've handled the event.
      * @public
      */
-    on(name: 'editor-drop', callback: (evt: DragEvent, editor: Editor, info: MarkdownView | MarkdownFileInfo) => any, ctx?: any): EventRef;
+    on(name: 'editor-drop', callback: (evt: DragEvent, editor: Editor, info: MarkdownView | MarkdownFileInfo) => any, ctx?: any): EventRef
 
     /**
      * @public
      */
-    on(name: 'codemirror', callback: (cm: CodeMirror.Editor) => any, ctx?: any): EventRef;
+    on(name: 'codemirror', callback: (cm: CodeMirror.Editor) => any, ctx?: any): EventRef
 
     /**
      * Triggered when the app is about to quit. Not guaranteed to actually run.
      * Perform some best effort cleanup here.
      * @public
      */
-    on(name: 'quit', callback: (tasks: Tasks) => any, ctx?: any): EventRef;
+    on(name: 'quit', callback: (tasks: Tasks) => any, ctx?: any): EventRef
 
 }
 
@@ -4493,9 +4493,9 @@ export class Workspace extends Events {
 export abstract class WorkspaceContainer extends WorkspaceSplit {
 
     /** @public */
-    abstract win: Window;
+    abstract win: Window
     /** @public */
-    abstract doc: Document;
+    abstract doc: Document
 
 }
 
@@ -4510,26 +4510,26 @@ export class WorkspaceFloating extends WorkspaceParent {
  * @public
  */
 export abstract class WorkspaceItem extends Events {
-    containerEl: HTMLElement;
-    dimension?: any;
-    id: string;
-    parent?: WorkspaceParent;
+    containerEl: HTMLElement
+    dimension?: any
+    id: string
+    parent?: WorkspaceParent
     type: WorkspaceParent['type'] | 'leaf'
 
-    constructor(t,n);
-    detach();
+    constructor(t,n)
+    detach()
     /**
      * Get the root container parent item, which can be one of:
      * - {@link WorkspaceRoot}
      * - {@link WorkspaceWindow}
      */
-    getContainer(): WorkspaceContainer;
-    getIcon();
-    getRoot(): WorkspaceItem;
-    onResizeStart(e);
-    serialize();
-    setDimension(e);
-    setParent(e);
+    getContainer(): WorkspaceContainer
+    getIcon()
+    getRoot(): WorkspaceItem
+    onResizeStart(e)
+    serialize()
+    setDimension(e)
+    setParent(e)
 
 }
 
@@ -4537,74 +4537,74 @@ export abstract class WorkspaceItem extends Events {
  * @public
  */
 export class WorkspaceLeaf extends WorkspaceItem {
-    activeTime: number;
-    app: App;
-    component: BaseComponent;
-    group?: any;
+    activeTime: number
+    app: App
+    component: BaseComponent
+    group?: any
     height: number
-    history: any;
-    parent: WorkspaceTabs;
-    pinned: boolean;
-    resizeHandleEl: HTMLElement;
-    resizeObserver: ResizeObserver;
-    tabHeaderCloseEl: HTMLElement;
-    tabHeaderEl: HTMLElement;
-    tabHeaderInnerIconEl?: HTMLElement;
-    tabHeaderInnerTitleEl: HTMLElement;
-    tabHeaderStatusContainerEl: HTMLElement;
-    tabHeaderStatusLinkEl?: HTMLElement;
-    tabHeaderStatusPinEl?: HTMLElement;
-    type: 'leaf';
-    view: View;
-    width: number;
-    working: boolean;
-    workspace: Workspace;
+    history: any
+    parent: WorkspaceTabs
+    pinned: boolean
+    resizeHandleEl: HTMLElement
+    resizeObserver: ResizeObserver
+    tabHeaderCloseEl: HTMLElement
+    tabHeaderEl: HTMLElement
+    tabHeaderInnerIconEl?: HTMLElement
+    tabHeaderInnerTitleEl: HTMLElement
+    tabHeaderStatusContainerEl: HTMLElement
+    tabHeaderStatusLinkEl?: HTMLElement
+    tabHeaderStatusPinEl?: HTMLElement
+    type: 'leaf'
+    view: View
+    width: number
+    working: boolean
+    workspace: Workspace
     _: {
         'group-change': any[];
         'history-change': any[];
         'pinned-change': any[];
     }
-    _empty: any;
+    _empty: any
 
-    constructor(app: App);
+    constructor(app: App)
 
-    canNavigate(): boolean;
-    constructor(t,n);
-    detach(): void;
-    getDisplayText(): string;
-    getEphemeralState();
-    getHistoryState();
-    getIcon(): IconName;
-    getViewState(): ViewState;
-    handleDrop(e,t,n);
-    highlight();
-    onOpenTabHeaderMenu(e);
-    onResize(): void;
-    open(view: View): Promise<View>;
+    canNavigate(): boolean
+    constructor(t,n)
+    detach(): void
+    getDisplayText(): string
+    getEphemeralState()
+    getHistoryState()
+    getIcon(): IconName
+    getViewState(): ViewState
+    handleDrop(e,t,n)
+    highlight()
+    onOpenTabHeaderMenu(e)
+    onResize(): void
+    open(view: View): Promise<View>
     /**
      * By default, `openFile` will also make the leaf active.
      * Pass in `{ active: false }` to override.
      */
-    openFile(file: TFile, openState?: OpenViewState): Promise<void>;
-    openLinkText(e,t,n);
-    rebuildView();
-    recordHistory(e);
-    serialize();
-    setEphemeralState(state: any): void;
-    setGroup(group: string): void;
-    setGroupMember(other: WorkspaceLeaf): void;
-    setPinned(pinned: boolean): void;
-    setViewState(viewState: ViewState, eState?: any): Promise<void>;
-    togglePinned(): void;
-    trigger(t);
-    unhighlight();
+    openFile(file: TFile, openState?: OpenViewState): Promise<void>
+    openLinkText(e,t,n)
+    rebuildView()
+    recordHistory(e)
+    serialize()
+    setEphemeralState(state: any): void
+    setGroup(group: string): void
+    setGroupMember(other: WorkspaceLeaf): void
+    setPinned(pinned: boolean): void
+    setViewState(viewState: ViewState, eState?: any): Promise<void>
+    togglePinned(): void
+    trigger(t)
+    unhighlight()
     /**
      * Calls setDisplayText() and updates the tab title.
      */
-    updateHeader(): void;
+    updateHeader(): void
 
-    on(name: 'pinned-change', callback: (pinned: boolean) => any, ctx?: any): EventRef;
-    on(name: 'group-change', callback: (group: string) => any, ctx?: any): EventRef;
+    on(name: 'pinned-change', callback: (pinned: boolean) => any, ctx?: any): EventRef
+    on(name: 'group-change', callback: (group: string) => any, ctx?: any): EventRef
 }
 
 /**
@@ -4613,34 +4613,34 @@ export class WorkspaceLeaf extends WorkspaceItem {
 export class WorkspaceMobileDrawer extends WorkspaceParent {
 
     /** @public */
-    collapsed: boolean;
+    collapsed: boolean
 
     /** @public */
-    expand(): void;
+    expand(): void
 
     /** @public */
-    collapse(): void;
+    collapse(): void
 
     /** @public */
-    toggle(): void;
+    toggle(): void
 }
 
 /**
  * @public
  */
 export abstract class WorkspaceParent extends WorkspaceItem {
-    app: App;
-    allowSingleChild: boolean;
-    autoManageDOM: boolean;
-    type: 'split' | 'tabs' | 'floating' | 'mobile-drawer';
-    children: WorkspaceItem[];
+    app: App
+    allowSingleChild: boolean
+    autoManageDOM: boolean
+    type: 'split' | 'tabs' | 'floating' | 'mobile-drawer'
+    children: WorkspaceItem[]
 
-    constructor(a: any, b: any);
-    insertChild(index: number, child: WorkspaceItem): any;
-    recomputeChildrenDimensions(): any;
-    removeChild(a: any): any;
-    replaceChild(a: any, b: any): any;
-    serialize(): any;
+    constructor(a: any, b: any)
+    insertChild(index: number, child: WorkspaceItem): any
+    recomputeChildrenDimensions(): any
+    removeChild(a: any): any
+    replaceChild(a: any, b: any): any
+    serialize(): any
 }
 
 /**
@@ -4655,11 +4655,11 @@ export class WorkspaceRibbon {
  */
 export class WorkspaceRoot extends WorkspaceContainer {
     /** @public */
-    win: Window;
+    win: Window
     /** @public */
-    doc: Document;
+    doc: Document
 
-    parent: undefined;
+    parent: undefined
 }
 
 /**
@@ -4668,14 +4668,14 @@ export class WorkspaceRoot extends WorkspaceContainer {
 export class WorkspaceSidedock extends WorkspaceSplit {
 
     /** @public */
-    collapsed: boolean;
+    collapsed: boolean
 
     /** @public */
-    toggle(): void;
+    toggle(): void
     /** @public */
-    collapse(): void;
+    collapse(): void
     /** @public */
-    expand(): void;
+    expand(): void
 
 }
 
@@ -4683,16 +4683,16 @@ export class WorkspaceSidedock extends WorkspaceSplit {
  * @public
  */
 export class WorkspaceSplit extends WorkspaceParent {
-    children: WorkspaceParent[];
-    component: Component;
-    direction: SplitDirection;
-    isResizing: boolean;
-    originalSizes?: any[];
-    resizeHandleEl: HTMLElement;
-    resizeStartPos?: any;
-    type: 'split';
-    win: Window;
-    workspace: Workspace;
+    children: WorkspaceParent[]
+    component: Component
+    direction: SplitDirection
+    isResizing: boolean
+    originalSizes?: any[]
+    resizeHandleEl: HTMLElement
+    resizeStartPos?: any
+    type: 'split'
+    win: Window
+    workspace: Workspace
 
 }
 
@@ -4700,32 +4700,32 @@ export class WorkspaceSplit extends WorkspaceParent {
  * @public
  */
 export class WorkspaceTabs extends WorkspaceParent {
-    currentTab: number;
-    children: WorkspaceLeaf[];
-    hasLockedTabWidths: boolean;
-    isStacked: boolean;
-    type: 'tabs';
-    resizeHandleEl: HTMLElement;
-    tabHeaderContainerEl: HTMLElement;
-    tabHeaderEls: HTMLElement;
-    tabsContainerEl: HTMLElement;
-    tabsInnerEl: HTMLElement;
+    currentTab: number
+    children: WorkspaceLeaf[]
+    hasLockedTabWidths: boolean
+    isStacked: boolean
+    type: 'tabs'
+    resizeHandleEl: HTMLElement
+    tabHeaderContainerEl: HTMLElement
+    tabHeaderEls: HTMLElement
+    tabsContainerEl: HTMLElement
+    tabsInnerEl: HTMLElement
 
-    constructor(a: any, b: any);
-    getTabInsertLocation(a: any): any;
-    insertChild(index: number, child: WorkspaceLeaf): any;
-    lockTabWidths(): any;
-    onContainerScroll(): any;
-    recomputeChildrenDimensions(): any;
-    removeChild(a: any): any;
-    scrollIntoView(a: any): any;
-    selectTab(a: any): any;
-    selectTabIndex(a: any): any;
-    serialize(): any;
-    setStacked(a: any): any;
-    unlockTabWidths(): any;
-    updateSlidingTabs(): any;
-    updateTabDisplay(): any;
+    constructor(a: any, b: any)
+    getTabInsertLocation(a: any): any
+    insertChild(index: number, child: WorkspaceLeaf): any
+    lockTabWidths(): any
+    onContainerScroll(): any
+    recomputeChildrenDimensions(): any
+    removeChild(a: any): any
+    scrollIntoView(a: any): any
+    selectTab(a: any): any
+    selectTabIndex(a: any): any
+    serialize(): any
+    setStacked(a: any): any
+    unlockTabWidths(): any
+    updateSlidingTabs(): any
+    updateTabDisplay(): any
 
 }
 
@@ -4735,9 +4735,9 @@ export class WorkspaceTabs extends WorkspaceParent {
 export class WorkspaceWindow extends WorkspaceContainer {
 
     /** @public */
-    win: Window;
+    win: Window
     /** @public */
-    doc: Document;
+    doc: Document
 
 }
 
@@ -4766,10 +4766,10 @@ declare global {
 	 * Global reference to the app.
 	 * @public
 	 */
-	var app: App;
+	var app: App
 }
 
 /** @public */
-type IconName = string;
+type IconName = string
 
 

@@ -1,38 +1,38 @@
-import { cssClasses } from "src/constants"
-import { settingChanges, settingsReady } from "src/settings/filesystem"
-import Plugin from "src/main"
-import Callbag from "src/utilities/callbag"
-import { layoutReady } from "src/utilities/layout-ready"
-import { globalStyle, toggleBodyClass, settingTriggers as t, themeChange } from "./style-tools"
+import { cssClasses } from 'src/constants'
+import { settingChanges, settingsReady } from 'src/settings/filesystem'
+import Plugin from 'src/main'
+import Callbag from 'src/utilities/callbag'
+import { layoutReady } from 'src/utilities/layout-ready'
+import { globalStyle, toggleBodyClass, settingTriggers as t, themeChange } from './style-tools'
 
 
-const { source: renderCodeblocks$, push: renderCodeblocks } = Callbag.subject<void>();
-const { source: renderTabs$, push: renderTabs } = Callbag.subject<void>();
+const { source: renderCodeblocks$, push: renderCodeblocks } = Callbag.subject<void>()
+const { source: renderTabs$, push: renderTabs } = Callbag.subject<void>()
 export { renderCodeblocks$, renderTabs$ }
-const renderAll = () => { renderTabs(); renderCodeblocks() };
+const renderAll = () => { renderTabs(); renderCodeblocks() }
 
 export function loadStyleFeatures(plugin: Plugin) {
-  globalStyle.registerStyleElement(plugin);
-  useThemeFont();
-  lineThickness();
-  lineHeight();
+  globalStyle.registerStyleElement(plugin)
+  useThemeFont()
+  lineThickness()
+  lineHeight()
 }
 
 async function useThemeFont() {
-  await layoutReady;
+  await layoutReady
 
   globalStyle.add([t.useThemeFont, themeChange], () => {
-    const { font } = getComputedStyle(document.body);
-    return `body.mmng-use-theme-font .markmap {font: ${font}}`;
+    const { font } = getComputedStyle(document.body)
+    return `body.mmng-use-theme-font .markmap {font: ${font}}`
   }, () => {
     renderAll()
   })
 
-  toggleBodyClass("useThemeFont", cssClasses.useThemeFont)
+  toggleBodyClass('useThemeFont', cssClasses.useThemeFont)
 }
 
 async function lineThickness() {
-  const s = await settingsReady;
+  const s = await settingsReady
   
   globalStyle.add(t.defaultThickness, () => `
     .markmap path.markmap-link,
@@ -55,25 +55,25 @@ async function lineThickness() {
 }
 
 async function lineHeight() {
-  const s = await settingsReady;
+  const s = await settingsReady
   globalStyle.add(t.lineHeight, () => `:root { --mm-line-height: ${s.lineHeight} }`)
 }
 
 
 // Color setting updates
-settingChanges.listen("coloring", renderAll);
-settingChanges.listen("defaultColor", renderAll);
-settingChanges.listen("depth1Color", renderAll);
-settingChanges.listen("depth2Color", renderAll);
-settingChanges.listen("depth3Color", renderAll);
-settingChanges.listen("colorFreezeLevel", renderAll);
+settingChanges.listen('coloring', renderAll)
+settingChanges.listen('defaultColor', renderAll)
+settingChanges.listen('depth1Color', renderAll)
+settingChanges.listen('depth2Color', renderAll)
+settingChanges.listen('depth3Color', renderAll)
+settingChanges.listen('colorFreezeLevel', renderAll)
 //
 
-settingChanges.listen("animationDuration", renderAll);
-settingChanges.listen("initialExpandLevel", renderAll);
-settingChanges.listen("maxWidth", renderAll);
-settingChanges.listen("nodeMinHeight", renderAll);
-settingChanges.listen("paddingX", renderAll);
-settingChanges.listen("spacingHorizontal", renderAll);
-settingChanges.listen("spacingVertical", renderAll);
-settingChanges.listen("titleAsRootNode", renderTabs);
+settingChanges.listen('animationDuration', renderAll)
+settingChanges.listen('initialExpandLevel', renderAll)
+settingChanges.listen('maxWidth', renderAll)
+settingChanges.listen('nodeMinHeight', renderAll)
+settingChanges.listen('paddingX', renderAll)
+settingChanges.listen('spacingHorizontal', renderAll)
+settingChanges.listen('spacingVertical', renderAll)
+settingChanges.listen('titleAsRootNode', renderTabs)

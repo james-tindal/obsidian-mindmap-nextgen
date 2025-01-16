@@ -1,18 +1,18 @@
-import { Markmap } from "markmap-view"
-import { TFile } from "obsidian";
-import { Toolbar } from "markmap-toolbar";
-import { IMarkmapOptions, INode } from "markmap-common";
+import { Markmap } from 'markmap-view'
+import { TFile } from 'obsidian'
+import { Toolbar } from 'markmap-toolbar'
+import { IMarkmapOptions, INode } from 'markmap-common'
 
-import { FileSettings, GlobalSettings } from "src/settings/filesystem";
-import { updateInternalLinks } from "src/rendering/internal-links";
-import { ScreenshotColors, takeScreenshot } from "src/rendering/screenshot";
-import { getOptions, parseMarkdown } from "./renderer-common"
-import { MindmapTab } from "src/workspace/types"
+import { FileSettings, GlobalSettings } from 'src/settings/filesystem'
+import { updateInternalLinks } from 'src/rendering/internal-links'
+import { ScreenshotColors, takeScreenshot } from 'src/rendering/screenshot'
+import { getOptions, parseMarkdown } from './renderer-common'
+import { MindmapTab } from 'src/workspace/types'
 
 
 
 export type TabRenderer = ReturnType<typeof TabRenderer>
-export function TabRenderer(containerEl: MindmapTab.View["containerEl"], globalSettings: GlobalSettings) {
+export function TabRenderer(containerEl: MindmapTab.View['containerEl'], globalSettings: GlobalSettings) {
   const { markmap, toolbar } = createMarkmap(containerEl)
   const state: {
     hasRendered: boolean
@@ -20,7 +20,7 @@ export function TabRenderer(containerEl: MindmapTab.View["containerEl"], globalS
     markmapOptions?: Partial<IMarkmapOptions>
   } = {
     hasRendered: false
-  };
+  }
 
   return { collapseAll, firstRender, render,
     takeScreenshot: () => takeScreenshot(globalSettings, markmap, state.screenshotColors!),
@@ -38,47 +38,47 @@ export function TabRenderer(containerEl: MindmapTab.View["containerEl"], globalS
     markmap.setData(markmap.state.data, {
       ...state.markmapOptions,
       initialExpandLevel: 0,
-    });
+    })
   }
 
   async function firstRender(file: TFile) {
-    if (state.hasRendered) return;
-    state.hasRendered = true;
-    await render(file);
-    markmap.fit();
+    if (state.hasRendered) return
+    state.hasRendered = true
+    await render(file)
+    markmap.fit()
   }
 
   async function render(file: TFile, content?: string) {
-    if (!state.hasRendered) return;
+    if (!state.hasRendered) return
 
-    const markdown = content ?? await app.vault.cachedRead(file);
+    const markdown = content ?? await app.vault.cachedRead(file)
     
-    const { rootNode, settings: fileSettings } = parseMarkdown<"file">(markdown)
+    const { rootNode, settings: fileSettings } = parseMarkdown<'file'>(markdown)
     const settings: FileSettings = { ...globalSettings, ...fileSettings }
-    const markmapOptions = getOptions(settings);
+    const markmapOptions = getOptions(settings)
 
     if (settings.titleAsRootNode)
-      addTitleToRootNode(rootNode, file.basename);
-    updateInternalLinks(rootNode);
+      addTitleToRootNode(rootNode, file.basename)
+    updateInternalLinks(rootNode)
 
-    markmap.setData(rootNode, markmapOptions);
+    markmap.setData(rootNode, markmapOptions)
 
-    state.markmapOptions = markmapOptions;
+    state.markmapOptions = markmapOptions
   }
 
   function addTitleToRootNode(root: INode, title: string) {
-    if (root.content == "") root.content = title;
+    if (root.content == '') root.content = title
     else root = { content: title, children: [root], type: 'heading', depth: 0 }
   }
 }
 
-function createMarkmap(containerEl: MindmapTab.View["containerEl"]) {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  const markmap = Markmap.create(svg, {});
-  const toolbar = Toolbar.create(markmap) as HTMLDivElement;
+function createMarkmap(containerEl: MindmapTab.View['containerEl']) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  const markmap = Markmap.create(svg, {})
+  const toolbar = Toolbar.create(markmap) as HTMLDivElement
 
-  const contentEl = containerEl.children[1];
-  contentEl.append(svg, toolbar);
+  const contentEl = containerEl.children[1]
+  contentEl.append(svg, toolbar)
 
-  return { svg, markmap, toolbar };
+  return { svg, markmap, toolbar }
 }

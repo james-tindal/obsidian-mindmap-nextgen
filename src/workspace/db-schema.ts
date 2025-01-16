@@ -1,9 +1,9 @@
-import { TFile } from "obsidian"
+import { TFile } from 'obsidian'
 
-import { FileSettings, GlobalSettings } from "src/settings/filesystem"
-import { CodeBlock } from "./types"
-import { FileTab } from "./types"
-import { INode } from "markmap-common"
+import { FileSettings, GlobalSettings } from 'src/settings/filesystem'
+import { CodeBlock } from './types'
+import { FileTab } from './types'
+import { INode } from 'markmap-common'
 
 
 export class DbSet<T> extends Set<T> {
@@ -66,8 +66,8 @@ export type Database = {
   codeBlocksWaiting: DbSet<CodeBlock>
 }
 
-export const TabRow = (args: Omit<TabRow, "codeBlocks" | "isCurrent">): TabRow => ({ ...args, isCurrent: false, codeBlocks: new DbSet() })
-export const FileRow = (args: Omit<FileRow, "tabs">): FileRow => ({ ...args, tabs: new DbSet() })
+export const TabRow = (args: Omit<TabRow, 'codeBlocks' | 'isCurrent'>): TabRow => ({ ...args, isCurrent: false, codeBlocks: new DbSet() })
+export const FileRow = (args: Omit<FileRow, 'tabs'>): FileRow => ({ ...args, tabs: new DbSet() })
 export const CodeBlockRow = (row: CodeBlockRow) => row
 
 export const createDb = (globalSettings: GlobalSettings): Database => ({
