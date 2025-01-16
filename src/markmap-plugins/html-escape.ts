@@ -7,6 +7,9 @@ type TokenWithChildren = Remarkable.Remarkable.Token & {
   children?: TokenWithChildren[]
 }
 
+/*
+ *  Replace all angle brackets with HTML character entities
+ */
 export const htmlEscapePlugin: ITransformPlugin = {
   name: 'htmlescape',
   config: {
