@@ -11,8 +11,6 @@ describe('markmap plugins: html escape', () => {
     const actual = response.root.content
     const expected = '&lt;&gt;&lt;&lt;&gt;&lt;&gt;&gt;&gt;&gt;&gt;&lt;'
 
-    console.log(response)
-    
     expect(actual).toEqual(expected)
   })
 
@@ -23,8 +21,6 @@ describe('markmap plugins: html escape', () => {
     const actual = response.root.content
     const expected = '&lt;&gt;&lt;&lt;&gt;&lt;&gt;&gt;&gt;&gt;&gt;&lt;'
 
-    console.log(response)
-    
     expect(actual).toEqual(expected)
   })
 })
