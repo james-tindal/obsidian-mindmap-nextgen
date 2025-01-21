@@ -74,7 +74,7 @@ export function getOptions(settings: CodeBlockSettings): Partial<IMarkmapOptions
   }
 }
 
-function depthColoring(settings: CodeBlockSettings) {
+export function depthColoring(settings: CodeBlockSettings) {
   return ({ depth }: INode) => {
     depth = depth!
 
