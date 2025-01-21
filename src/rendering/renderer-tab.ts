@@ -10,7 +10,6 @@ import { MindmapTab } from 'src/workspace/types'
 import { globalState } from 'src/misc/global-state'
 
 
-
 export type TabRenderer = ReturnType<typeof TabRenderer>
 export function TabRenderer(containerEl: MindmapTab.View['containerEl'], globalSettings: GlobalSettings) {
   const { markmap, svg, toolbar } = createMarkmap(containerEl)
