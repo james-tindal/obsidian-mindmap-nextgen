@@ -1,7 +1,6 @@
 import { INode } from 'markmap-common'
 import { getLinkpath } from 'obsidian'
 
-import { INTERNAL_LINK_REGEX } from 'src/constants'
 
 export function updateInternalLinks(node: INode) {
   replaceInternalLinks(node)
@@ -11,9 +10,8 @@ export function updateInternalLinks(node: INode) {
 }
 
 function replaceInternalLinks(node: INode) {
-  const matches = parseValue(node.content)
-  for (let i = 0; i < matches.length; i++) {
-    const match = matches[i]
+  const matches = matchRegex(node.content)
+  for (const match of matches) {
     const isWikiLink = match.groups!['wikitext']
     let linkText = isWikiLink
       ? match.groups!['wikitext']
@@ -30,7 +28,7 @@ function replaceInternalLinks(node: INode) {
       // "|": [[A & B|AB]]
       const regex = /^(.*?)\|(.*)$/
       const match_link_text = regex.exec(linkPath)
-      if(match_link_text && match_link_text.length === 3){
+      if (match_link_text && match_link_text.length === 3) {
         linkText = match_link_text[2]
         linkPath = match_link_text[1].trim()
       }
@@ -45,12 +43,13 @@ function replaceInternalLinks(node: INode) {
   }
 }
 
-function parseValue(v: string) {
-  const matches: any[] = []
-  let match
-  while ((match = INTERNAL_LINK_REGEX.exec(v))) {
-    matches.push(match)
-  }
-  return matches
-}
+// https://regex101.com/r/gw85cc/2
+const regex = /\[\[(?<wikitext>.*)\]\]|<a href="(?<mdpath>.*)">(?<mdtext>.*)<\/a>/gim
 
+function* matchRegex(str: string) {
+  while (true) {
+    const match = regex.exec(str)
+    if (!match) break
+    yield match
+  }
+}
