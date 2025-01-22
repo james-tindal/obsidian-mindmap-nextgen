@@ -31,9 +31,9 @@ export default class MindmapTabView extends ItemView {
     MindmapTabView.pinToggleListener(this)
   }
 
-  public getViewType() { return MM_VIEW_TYPE };
-  public getDisplayText() { return this.displayText };
-  public getIcon() { return 'dot-network' };
+  public getViewType() { return MM_VIEW_TYPE }
+  public getDisplayText() { return this.displayText }
+  public getIcon() { return 'dot-network' }
 
   public setDisplayText(displayText: string) {
     this.displayText = displayText

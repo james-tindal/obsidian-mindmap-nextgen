@@ -12,6 +12,7 @@ import Callbag, { flatMap, fromEvent, map, pairwise, takeUntil } from 'src/utili
 import { CodeBlockSettingsDialog } from 'src/settings/dialogs'
 import { isObjectEmpty } from 'src/utilities/utilities'
 import { TabRow } from 'src/workspace/db-schema'
+import { globalState } from 'src/misc/global-state'
 
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
@@ -19,6 +20,8 @@ export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, g
   const { markdown, containerEl } = codeBlock
 
   const { markmap, svg } = createMarkmap(containerEl)
+
+  globalState.svgs.set(svg, tabView.file)
 
   const { rootNode, settings: codeBlockSettings } = parseMarkdown<'codeBlock'>(markdown)
 
