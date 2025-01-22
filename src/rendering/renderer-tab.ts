@@ -4,16 +4,17 @@ import { Toolbar } from 'markmap-toolbar'
 import { IMarkmapOptions, INode } from 'markmap-common'
 
 import { FileSettings, GlobalSettings } from 'src/settings/filesystem'
-import { updateInternalLinks } from 'src/rendering/internal-links'
 import { ScreenshotColors, takeScreenshot } from 'src/rendering/screenshot'
 import { getOptions, parseMarkdown } from './renderer-common'
 import { MindmapTab } from 'src/workspace/types'
+import { globalState } from 'src/misc/global-state'
 
 
 
 export type TabRenderer = ReturnType<typeof TabRenderer>
 export function TabRenderer(containerEl: MindmapTab.View['containerEl'], globalSettings: GlobalSettings) {
-  const { markmap, toolbar } = createMarkmap(containerEl)
+  const { markmap, svg, toolbar } = createMarkmap(containerEl)
+
   const state: {
     hasRendered: boolean
     screenshotColors?: ScreenshotColors
@@ -49,6 +50,8 @@ export function TabRenderer(containerEl: MindmapTab.View['containerEl'], globalS
   }
 
   async function render(file: TFile, content?: string) {
+    globalState.svgs.set(svg, file)
+
     if (!state.hasRendered) return
 
     const markdown = content ?? await app.vault.cachedRead(file)
@@ -59,7 +62,6 @@ export function TabRenderer(containerEl: MindmapTab.View['containerEl'], globalS
 
     if (settings.titleAsRootNode)
       addTitleToRootNode(rootNode, file.basename)
-    updateInternalLinks(rootNode)
 
     markmap.setData(rootNode, markmapOptions)
 

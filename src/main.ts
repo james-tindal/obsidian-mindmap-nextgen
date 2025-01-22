@@ -7,6 +7,7 @@ import { LayoutManager } from 'src/views/layout-manager'
 import { loadStyleFeatures } from 'src/rendering/style-features'
 import { codeBlockHandler } from 'src/workspace'
 import autoBind from 'auto-bind'
+import { catchInternalLinks } from './misc/catch-internal-links'
 
 
 export default class Plugin extends ObsidianPlugin {
@@ -32,6 +33,8 @@ export default class Plugin extends ObsidianPlugin {
     this.registerMarkdownCodeBlockProcessor('markmap', codeBlockHandler)
 
     loadStyleFeatures(this)
+
+    catchInternalLinks()
   }
 
   public async onunload() {
