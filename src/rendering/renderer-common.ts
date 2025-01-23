@@ -6,7 +6,7 @@ import GrayMatter from 'gray-matter'
 
 import { CodeBlockSettings, FileSettings } from 'src/settings/filesystem'
 import { htmlEscapePlugin, checkBoxPlugin } from 'src/markmap-plugins'
-import { updateInternalLinks } from './internal-links'
+import { parseInternalLinks } from './internal-links'
 export const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin ])
 
 
@@ -18,7 +18,7 @@ export function parseMarkdown<Type extends 'file' | 'codeBlock'>(text: string) {
   
   const { root, features } = transformer.transform(content)
   loadAssets(features)
-  updateInternalLinks(root)
+  parseInternalLinks(root)
 
   const settings = (frontmatter?.markmap || {}) as Type extends 'file' ? FileSettings : CodeBlockSettings
 

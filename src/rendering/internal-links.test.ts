@@ -1,5 +1,5 @@
 import { Transformer } from 'markmap-lib'
-import { updateInternalLinks } from './internal-links'
+import { parseInternalLinks } from './internal-links'
 
 describe('markmap plugins: internal links', () => {
   const transformer = new Transformer()
@@ -8,7 +8,7 @@ describe('markmap plugins: internal links', () => {
   test('[[wikilink]]', () => {
     const markdown = '[[wikilink]]'
     const { root: rootNode } = transform(markdown)
-    updateInternalLinks(rootNode)
+    parseInternalLinks(rootNode)
 
     const actual = rootNode.content
     const expected = '<a href="wikilink">wikilink</a>'
@@ -19,7 +19,7 @@ describe('markmap plugins: internal links', () => {
   test('[[wikilink|with display text]]', () => {
     const markdown = '[[wikilink|with display text]]'
     const { root: rootNode } = transform(markdown)
-    updateInternalLinks(rootNode)
+    parseInternalLinks(rootNode)
 
     const actual = rootNode.content
     const expected = '<a href="wikilink">with display text</a>'

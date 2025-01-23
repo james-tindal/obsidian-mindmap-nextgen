@@ -1,27 +1,36 @@
 import { INode } from 'markmap-common'
 
 
-export function updateInternalLinks(node: INode) {
-  replaceInternalLinks(node)
-  if (node.children) {
-    node.children.forEach(updateInternalLinks)
-  }
+const recurseChildren = (fn: (node: INode) => void) => (node: INode) => {
+  fn(node)
+  node.children?.forEach(recurseChildren(fn))
 }
 
-function replaceInternalLinks(node: INode) {
-  const matches = matchRegex(node.content)
-  for (const match of matches) {
-    const { link, displayText } = match.groups!
-    const html = `<a href=\"${link}\">${displayText || link}</a>`
-    node.content = node.content.replace(match[0], html)
-  }
-}
-
-const wikilinkRegex = /\[\[(?<link>[^|\]]+)\|?((?<displayText>.+))?\]\]/g
-function* matchRegex(str: string) {
+function* matchRegex(str: string, regex: RegExp) {
   while (true) {
-    const match = wikilinkRegex.exec(str)
+    const match = regex.exec(str)
     if (!match) break
     yield match
   }
 }
+
+function replaceMatches(str: string, regex: RegExp, replacer: (match: RegExpExecArray) => string) {
+  let accumulator = str
+  const matches = matchRegex(str, regex)
+  for (const match of matches)
+    accumulator = accumulator.replace(match[0], replacer(match))
+  return accumulator
+}
+
+
+const wikilinkRegex = /\[\[(?<link>[^|\]]+)\|?((?<displayText>.+))?\]\]/g
+
+function replacement(match) {
+  const { link, displayText } = match.groups!
+  return `<a href=\"${link}\">${displayText || link}</a>`
+}
+
+export const parseInternalLinks = recurseChildren(node => {
+  node.content =
+    replaceMatches(node.content, wikilinkRegex, replacement)
+})
