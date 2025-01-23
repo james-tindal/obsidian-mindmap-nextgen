@@ -34,7 +34,7 @@ export default class Plugin extends ObsidianPlugin {
 
     loadStyleFeatures(this)
 
-    catchInternalLinks()
+    catchInternalLinks(this)
   }
 
   public async onunload() {

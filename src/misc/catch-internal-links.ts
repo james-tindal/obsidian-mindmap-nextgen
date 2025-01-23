@@ -1,14 +1,13 @@
 import { globalState } from './global-state'
+import Plugin from 'src/main'
 
-export const catchInternalLinks = () => {
+export const catchInternalLinks = (plugin: Plugin) => {
   const workspace = document.querySelector('.workspace' as 'div')
 
   if (!workspace)
     throw 'catch-internal-links called too early. Workspace not ready.'
 
-  // Need to register this event to be scrapped when plugin dies
-
-  workspace.addEventListener('click', event => {
+  plugin.registerDomEvent(workspace, 'click', event => {
     const { target } = event
     const isAnchor = target instanceof HTMLAnchorElement
       if (!isAnchor) return
