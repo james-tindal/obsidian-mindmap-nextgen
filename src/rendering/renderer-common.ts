@@ -6,7 +6,7 @@ import GrayMatter from 'gray-matter'
 
 import { CodeBlockSettings, FileSettings } from 'src/settings/filesystem'
 import { htmlEscapePlugin, checkBoxPlugin } from 'src/markmap-plugins'
-import { parseInternalLinks } from './internal-links'
+import { parseInternalLinks } from '../internal-links/parse-internal-links'
 export const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin ])
 
 
