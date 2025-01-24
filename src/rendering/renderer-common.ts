@@ -5,9 +5,9 @@ import { pick } from 'ramda'
 import GrayMatter from 'gray-matter'
 
 import { CodeBlockSettings, FileSettings } from 'src/settings/filesystem'
-import { htmlEscapePlugin, checkBoxPlugin } from 'src/markmap-plugins'
-import { parseInternalLinks } from '../internal-links/parse-internal-links'
-export const transformer = new Transformer([ ...builtInPlugins, htmlEscapePlugin, checkBoxPlugin ])
+import { parseInternalLinks } from 'src/internal-links/parse-internal-links'
+import { checkBoxPlugin } from 'src/markmap-plugins/checkbox'
+export const transformer = new Transformer([ ...builtInPlugins, checkBoxPlugin ])
 
 
 export function parseMarkdown<Type extends 'file' | 'codeBlock'>(text: string) {
