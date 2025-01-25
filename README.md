@@ -14,6 +14,10 @@ A similar plugin is available for [Visual Studio Code](https://marketplace.visua
   + [Copy screenshot](#copy-screenshot)
   + [Collapse all](#collapse-all)
   + [Toggle toolbar](#toggle-toolbar)
++ [Other features](#other-features)
+  + [Checkboxes](#checkboxes)
+  + [LaTeX](#latex)
+  + [Syntax Highlighting](#syntax-highlighting)
 + [Frontmatter](#frontmatter)
 + [Settings](#settings)
   + [Coloring approaches](#coloring-approaches)
@@ -21,9 +25,6 @@ A similar plugin is available for [Visual Studio Code](https://marketplace.visua
   + [Highlight inline markmaps](#highlight-inline-markmaps)
   + [Use title as root node](#use-title-as-root-node)
   + [Markmap settings](#markmap-settings)
-+ [Other features](#other-features)
-  + [Checkboxes](#checkboxes)
-  + [LaTeX](#latex)
 + [Installing](#installing)
 + [Contributing](#contributing)
 
@@ -99,6 +100,17 @@ $$
 \frac{\partial f}{\partial t}
 $$
 ```
+
+### Syntax Highlighting
+
+This uses highlightjs for syntax highlighting, so you need to use highlightjs compatible colour schemes.
+Here's a demonstration of all the colour schemes provided by highlightjs: https://highlightjs.org/examples
+Once you've picked a colour scheme, you can download it from here: https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.11.1/styles/
+
+Put the css file in your [Snippets](https://help.obsidian.md/Extending+Obsidian/CSS+snippets) folder and turn it on in Settings > Appearance.
+
+tokyo-dark is a nice pair of themes for light and dark mode.
+Mindmap Nextgen is not yet able to switch between light and dark mode syntax highlighting automatically
 
 
 ## Frontmatter
