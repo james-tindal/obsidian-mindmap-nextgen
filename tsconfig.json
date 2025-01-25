@@ -24,6 +24,7 @@
       "obsidian": ["src/types/obsidian.d.ts"],
       "d3-svg-to-png": ["src/types/d3SvgToPng.d.ts"]
     },
+    "types": ["vitest/globals"]
   },
   "include": [
     "**/*.ts",
