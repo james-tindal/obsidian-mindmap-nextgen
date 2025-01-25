@@ -4,6 +4,7 @@ import { Markmap } from 'markmap-view'
 import { depthColoring } from 'src/rendering/renderer-common'
 import { CodeBlockSettings } from 'src/settings/filesystem'
 
+// @vitest-environment jsdom
 
 /**
  * Skipped test
