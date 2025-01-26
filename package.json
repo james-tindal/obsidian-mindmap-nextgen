@@ -63,19 +63,5 @@
     "markmap-view": "^0.15.8",
     "ramda": "^0.30.1",
     "vitest": "^3.0.4"
-  },
-  "jest": {
-    "transformIgnorePatterns": [
-      "/node_modules/(?!auto-bind)/"
-    ],
-    "testMatch": [
-      "**/src/**/*.test.ts",
-      "**/tests/**/*.ts"
-    ],
-    "moduleDirectories": [
-      "node_modules",
-      "<rootDir>"
-    ],
-    "testEnvironment": "jsdom"
   }
 }
