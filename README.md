@@ -5,7 +5,7 @@
 
 Obsidian plugin to view your notes as mindmaps using [Markmap](https://markmap.js.org/).
 
-A similar plugin is available for [Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=gera2ld.markmap-vscode).
+[<img src="https://github.com/user-attachments/assets/dcbda58a-454d-4d45-93ee-0901449ce8c6" width="200">](https://checkout.revolut.com/pay/b8fb99ec-f2b0-4166-a58a-04d4d43d010f)
 
 ## Table of contents
 + [Usage](#usage)
