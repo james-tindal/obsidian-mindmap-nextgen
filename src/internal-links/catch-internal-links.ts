@@ -15,7 +15,7 @@ export const catchInternalLinks = (plugin: Plugin) => {
       if (!parentMindmap) return
     const href = target.getAttribute('href')
       if (!href) return
-    const hasProtocol = /:/.test(href)
+    const hasProtocol = /^[^#:]*:.*#/.test(href)  // https://regex101.com/r/RLG0a5/1
       if (hasProtocol) return
 
     event.preventDefault()
