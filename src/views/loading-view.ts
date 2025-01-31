@@ -3,9 +3,9 @@ import { MM_VIEW_TYPE } from 'src/constants'
 
 export class LoadingView extends ItemView {
   private static instances: LoadingView[] = []
-  public getViewType() { return MM_VIEW_TYPE };
-  public getDisplayText() { return 'Mindmap' };
-  public getIcon() { return 'dot-network' };
+  public getViewType() { return MM_VIEW_TYPE }
+  public getDisplayText() { return 'Mindmap' }
+  public getIcon() { return 'dot-network' }
   private isLoadingView = true
 
   constructor(leaf: WorkspaceLeaf) {
