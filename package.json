@@ -7,7 +7,7 @@
     "dev": "rollup --config rollup.config.js -w",
     "build": "rollup --config rollup.config.js",
     "coverage": "nyc -r lcov -e .ts -x \"*.test.ts\" npm run test",
-    "test": "jest --watchAll"
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
