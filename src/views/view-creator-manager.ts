@@ -24,7 +24,7 @@ export class ViewCreatorManager {
     plugin.registerView(MM_VIEW_TYPE, (leaf: WorkspaceLeaf) => ViewCreatorManager.viewCreator(leaf))
   }
 
-  public setViewCreator(vc: ViewCreator) { ViewCreatorManager.viewCreator = vc };
+  public setViewCreator(vc: ViewCreator) { ViewCreatorManager.viewCreator = vc }
 
   public constructView(leaf: WorkspaceLeaf, subject: MindmapSubject) {
     return ViewCreatorManager.enqueue(async () => {

@@ -3,7 +3,10 @@ import parserTs from '@typescript-eslint/parser'
 
 export default [
   {
-    files: ['**/*.ts'],
+    ignores: ['main.js', 'test-vault/**']
+  },
+  {
+    files: ['**/*.ts', '*.js'],
     languageOptions: {
       parser: parserTs,
     },
@@ -13,7 +16,9 @@ export default [
     rules: {
       '@stylistic/semi': ['error', 'never'],
       '@stylistic/quotes': ['error', 'single'],
-      '@stylistic/arrow-parens': ['error', 'as-needed']
+      '@stylistic/arrow-parens': ['error', 'as-needed'],
+      '@stylistic/linebreak-style': 'error',
+      '@stylistic/eol-last': 'error'
     }
   }
 ]
