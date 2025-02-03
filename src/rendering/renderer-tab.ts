@@ -69,7 +69,7 @@ export function TabRenderer(containerEl: MindmapTab.View['containerEl'], globalS
 
   function addTitleToRootNode(root: IPureNode, title: string) {
     if (root.content == '') root.content = title
-    else root = { content: title, children: [root], type: 'heading', depth: 0 }
+    else root = { content: title, children: [root] }
   }
 }
 
