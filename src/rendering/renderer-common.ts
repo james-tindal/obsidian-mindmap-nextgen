@@ -81,8 +81,8 @@ export function depthColoring(settings: CodeBlockSettings) {
 
     const colors = [settings.depth1Color, settings.depth2Color, settings.depth3Color]
 
-    return depth < 3
-      ? colors[depth]
+    return depth <= 3
+      ? colors[depth - 1]
       : settings.defaultColor
   }
 }
