@@ -1,4 +1,5 @@
 import create from 'callbag-create'
+import distinct from 'callbag-drop-repeats'
 import filter from 'callbag-filter'
 import flatMap from 'callbag-flat-map'
 import fromEvent from 'callbag-from-event'
@@ -8,6 +9,7 @@ import of from 'callbag-of'
 import pairwise from 'callbag-pairwise'
 import pipe from 'callbag-pipe'
 import reject from 'callbag-reject'
+import remember from 'callbag-remember'
 import share from 'callbag-share'
 import startWith from 'callbag-start-with'
 import subscribe from 'callbag-subscribe'
@@ -37,6 +39,7 @@ const subscribe2 = <T>(source: Source<T>, listener: Listener<T> | Subscriber<T>)
 
 const Callbag = {
   create,
+  distinct,
   filter,
   flatMap,
   fromEvent,
@@ -46,6 +49,7 @@ const Callbag = {
   pairwise,
   pipe,
   reject,
+  remember,
   share,
   startWith,
   subject,
@@ -56,6 +60,7 @@ const Callbag = {
 
 export {
   create,
+  distinct,
   filter,
   flatMap,
   fromEvent,
@@ -65,6 +70,7 @@ export {
   pairwise,
   pipe,
   reject,
+  remember,
   share,
   startWith,
   subject,
