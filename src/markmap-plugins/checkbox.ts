@@ -1,12 +1,12 @@
 import { ITransformPlugin } from 'markmap-lib'
-import { InlineParsingRule } from 'remarkable/lib'
+import type { ParserInline } from 'markdown-it'
 
 /*
  *  Display Obsidian checkboxes in the mindmap
  *  https://github.com/james-tindal/obsidian-mindmap-nextgen#checkboxes
  */
 
-const parser: InlineParsingRule = state => {
+const parser: ParserInline.RuleInline = state => {
   if (state.pos !== 0) return false
 
   const match = /^ *-? *\[(?<state>[ xX])\] +/.exec(state.src)
@@ -16,11 +16,7 @@ const parser: InlineParsingRule = state => {
 
   if (!match) return false
 
-  state.push({
-    type: token,
-    level: state.level,
-    block: false
-  })
+  state.push(token, token, 0)
 
   state.pos += length
   return true
@@ -35,7 +31,7 @@ export const checkBoxPlugin: ITransformPlugin = {
   },
   transform: transformHooks => {
     transformHooks.parser.tap(md => {
-      md.inline.ruler.push('checkbox', parser, {})
+      md.inline.ruler.push('checkbox', parser)
 
       md.renderer.rules.checkbox_chkd   = () => '<span class="mm-ng-checkbox-checked">✓&nbsp;</span>'
       md.renderer.rules.checkbox_unchkd = () => '<span class="mm-ng-checkbox-unchecked">✗&nbsp;</span>'

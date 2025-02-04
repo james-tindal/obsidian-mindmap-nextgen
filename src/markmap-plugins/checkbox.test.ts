@@ -6,7 +6,7 @@ describe('markmap plugins: checkbox', () => {
   const transform = transformer.transform.bind(transformer)
 
   test('1', () => {
-    const markdown = '[ ] test'
+    const markdown = '* [ ] test'
     const response = transform(markdown)
     const actual = response.root.content
     const expected = '<span class="mm-ng-checkbox-unchecked">✗&nbsp;</span>test'
@@ -29,7 +29,7 @@ describe('markmap plugins: checkbox', () => {
       '+ [x] test\n' +
       '- [X] test'
     const response = transform(markdown)
-    const actual = response.root.children?.map(x => x.children![0].content)
+    const actual = response.root.children?.map(x => x.content)
     const expected = [
       '<span class="mm-ng-checkbox-unchecked">✗&nbsp;</span>test',
       '<span class="mm-ng-checkbox-checked">✓&nbsp;</span>test',
