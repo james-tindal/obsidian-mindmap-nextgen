@@ -12,7 +12,7 @@ import { isObjectEmpty, nextTick } from 'src/utilities/utilities'
 import { ExtractRecord, ExtractUnion, Matcher, Stackable, Tagged, match, tr, unionConstructors } from './utilities'
 import { parseMarkdown } from 'src/rendering/renderer-common'
 import { FileSettingsDialog } from 'src/settings/dialogs'
-
+import * as Events from 'src/core/events'
 
 
 const InputEvent = unionConstructors(

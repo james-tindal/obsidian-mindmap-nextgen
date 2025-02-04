@@ -1,16 +1,24 @@
-import Callbag, { distinct, flatMap, map, merge, remember } from 'src/utilities/callbag'
+import Callbag, { completeWhen, distinct, flatMap, map, merge, remember } from 'src/utilities/callbag'
 import Plugin from './entry'
 
 
 export const plugin = Plugin.stream
+
+export const pluginUnload = Callbag.pipe(
+  plugin,
+  flatMap(plugin =>
+    Callbag.create<void>((next, error, complete) =>
+      plugin.register(() => { next(); complete() }))
+  )
+)
+
+const completeOnUnload = completeWhen(pluginUnload)
 
 export const cssChange = Callbag.pipe(
   plugin,
   flatMap(plugin =>
     Callbag.create<void>(next =>
       plugin.registerEvent(app.workspace.on('css-change', next))
-      // when plugin unloads, it should also end all the streams, not just deregister the initial listener
-      // how do you do this?
     )
   )
 )

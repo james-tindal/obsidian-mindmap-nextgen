@@ -17,6 +17,7 @@ import take from 'callbag-take'
 import takeUntil from 'callbag-take-until'
 
 import { Source, UnwrapSource } from 'callbag'
+import { consumeSource, createSource } from 'callbag-toolkit'
 
 
 const subject = <T>(): { source: Source<T>, push: (v: T) => void } => {
@@ -26,6 +27,31 @@ const subject = <T>(): { source: Source<T>, push: (v: T) => void } => {
     push: (v: T) => next && next(v)
   }
 }
+
+const completeWhen = <T>(trigger: Source<unknown>) => (subject: Source<T>) =>
+  createSource(({ complete, ...rest }) => {
+    const subjectConsumption = consumeSource(subject, {
+      complete() {
+        triggerConsumption.stop()
+        subjectConsumption.stop()
+      },
+      ...rest
+    })
+    const triggerConsumption = consumeSource(trigger, {
+      next() {
+        triggerConsumption.stop()
+        subjectConsumption.stop()
+        complete()
+      },
+      complete() {
+        triggerConsumption.stop()
+      }
+    })
+    return () => {
+      triggerConsumption.stop()
+      subjectConsumption.stop()
+    }
+  })
 
 type Listener<T> = (data: T) => any
 type Subscriber<T> = {
@@ -39,6 +65,7 @@ const subscribe2 = <T>(source: Source<T>, listener: Listener<T> | Subscriber<T>)
 
 const Callbag = {
   create,
+  completeWhen,
   distinct,
   filter,
   flatMap,
@@ -60,6 +87,7 @@ const Callbag = {
 
 export {
   create,
+  completeWhen,
   distinct,
   filter,
   flatMap,
