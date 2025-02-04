@@ -6,7 +6,7 @@ describe('markmap plugins: internal links', () => {
   const transform = transformer.transform.bind(transformer)
 
   test('[[wikilink]]', () => {
-    const markdown = '[[wikilink]]'
+    const markdown = '* [[wikilink]]'
     const { root: rootNode } = transform(markdown)
     parseInternalLinks(rootNode)
 
@@ -17,7 +17,7 @@ describe('markmap plugins: internal links', () => {
   })
 
   test('[[wikilink|with display text]]', () => {
-    const markdown = '[[wikilink|with display text]]'
+    const markdown = '* [[wikilink|with display text]]'
     const { root: rootNode } = transform(markdown)
     parseInternalLinks(rootNode)
 
@@ -28,7 +28,7 @@ describe('markmap plugins: internal links', () => {
   })
 
   test('[markdown link](url)', () => {
-    const markdown = '[link text](url)'
+    const markdown = '* [link text](url)'
     const { root: rootNode } = transform(markdown)
 
     const actual = rootNode.content
@@ -38,7 +38,7 @@ describe('markmap plugins: internal links', () => {
   })
 
   test('[markdown link](url with space)', () => {
-    const markdown = '[link text](url with space)'
+    const markdown = '* [link text](url with space)'
     const { root: rootNode } = transform(markdown)
 
     const actual = rootNode.content
