@@ -1,7 +1,7 @@
 import { ViewCreator, WorkspaceLeaf } from 'obsidian'
 import { MM_VIEW_TYPE } from 'src/constants'
 import { GlobalSettings } from 'src/settings/filesystem'
-import Plugin from 'src/main'
+import Plugin from 'src/core/entry'
 import { MindmapSubject } from './layout-manager'
 import MindmapTabView from './view'
 import { Views, getActiveFile } from './view-manager'

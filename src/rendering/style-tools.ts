@@ -1,5 +1,5 @@
 import { GlobalSettings, settingChanges, settingsReady } from 'src/settings/filesystem'
-import Plugin from 'src/main'
+import Plugin from 'src/core/entry'
 
 
 export function toggleBodyClass(setting: keyof GlobalSettings, className: string) {
