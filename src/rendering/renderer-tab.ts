@@ -1,7 +1,7 @@
-import { Markmap } from 'markmap-view'
+import { IMarkmapOptions, Markmap } from 'markmap-view'
 import { TFile } from 'obsidian'
 import { Toolbar } from 'markmap-toolbar'
-import { IMarkmapOptions, IPureNode } from 'markmap-common'
+import { IPureNode } from 'markmap-common'
 
 import { FileSettings, GlobalSettings } from 'src/settings/filesystem'
 import { ScreenshotColors, takeScreenshot } from 'src/rendering/screenshot'
