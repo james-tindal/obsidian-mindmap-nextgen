@@ -1,6 +1,6 @@
 import { debounce } from 'obsidian'
 import { GlobalSettings } from 'src/settings/filesystem'
-import Plugin from 'src/main'
+import Plugin from 'src/core/entry'
 import { EventListeners } from './event-listeners'
 import MindmapTabView from './view'
 import { ViewCreatorManager } from './view-creator-manager'

@@ -1,7 +1,7 @@
 import { PluginSettingTab, Modal } from 'obsidian'
 import autoBind from 'auto-bind'
 
-import Plugin from 'src/main'
+import Plugin from 'src/core/entry'
 import { GlobalSettings } from './filesystem'
 import { PageSelector } from './components/PageSelector'
 import { CodeBlockPage, FilePage, GlobalPage } from './components/pages'

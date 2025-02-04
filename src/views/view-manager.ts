@@ -1,7 +1,7 @@
 import { TFile } from 'obsidian'
 
 import { GlobalSettings } from 'src/settings/filesystem'
-import Plugin from 'src/main'
+import Plugin from 'src/core/entry'
 import MindmapTabView from './view'
 import { LayoutManager, MindmapSubject } from './layout-manager'
 import { EventListeners } from './event-listeners'

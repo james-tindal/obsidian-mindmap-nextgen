@@ -6,9 +6,9 @@ import copy from 'rollup-plugin-copy'
 const TEST_VAULT = 'test-vault/.obsidian/plugins/obsidian-mindmap'
 
 export default {
-  input: 'src/main.ts',
+  input: 'src/core/entry.ts',
   output: {
-    dir: './',
+    file: 'main.js',
     sourcemap: 'inline',
     format: 'cjs',
     exports: 'default',

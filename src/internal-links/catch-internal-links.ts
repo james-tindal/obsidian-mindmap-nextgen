@@ -1,5 +1,5 @@
 import { globalState } from '../misc/global-state'
-import Plugin from 'src/main'
+import Plugin from 'src/core/entry'
 
 export const catchInternalLinks = (plugin: Plugin) => {
   const workspace = document.querySelector('.workspace' as 'div')
