@@ -1,6 +1,6 @@
-import { loadJS, loadCSS, IMarkmapOptions, INode } from 'markmap-common'
+import { loadJS, loadCSS, INode } from 'markmap-common'
 import { builtInPlugins, IFeatures, Transformer } from 'markmap-lib'
-import { deriveOptions } from 'markmap-view'
+import { deriveOptions, IMarkmapOptions } from 'markmap-view'
 import { pick } from 'ramda'
 import GrayMatter from 'gray-matter'
 
