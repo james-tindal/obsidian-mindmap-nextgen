@@ -146,4 +146,8 @@ declare module 'obsidian' {
     updateTheme()
     updateViewHeaderDisplay()
   }
+
+  export interface Workspace {
+    on(name: 'css-change', callback: () => any, ctx?: any): EventRef
+  }
 }

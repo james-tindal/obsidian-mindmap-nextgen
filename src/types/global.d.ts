@@ -10,7 +10,7 @@ export type FromEntriesWithReadOnly<T> = FromEntries<DeepWriteable<T>>
 
 
 declare global {
-   interface ObjectConstructor {
+  interface ObjectConstructor {
      fromEntries<T>(obj: T): FromEntriesWithReadOnly<T>
   }
 }
