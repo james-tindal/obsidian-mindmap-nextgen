@@ -4,6 +4,5 @@
   "version": "1.11.3",
   "description": "View your Markdown as a mindmap",
   "isDesktopOnly": false,
-  "js": "main.js",
   "minAppVersion": "1.0.0"
 }
