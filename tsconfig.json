@@ -1,23 +1,23 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "outDir": "~/.Trash",
     "inlineSourceMap": true,
     "inlineSources": true,
     "module": "ESNext",
     "target": "es2018",
     "allowJs": true,
     "noImplicitAny": false,
-    "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "importHelpers": true,
     "esModuleInterop": true,
     "strictNullChecks": true,
     "downlevelIteration": true,
     "strictBindCallApply": true,
+    "skipLibCheck": true,
     "lib": [
       "dom",
       "es5",
-      "scripthost",
       "es2020"
     ],
     "paths": {
@@ -28,6 +28,9 @@
   },
   "include": [
     "**/*.ts",
-    "src/types",
+    "src/types"
+  ],
+  "exclude": [
+    "node_modules/"
   ]
 }

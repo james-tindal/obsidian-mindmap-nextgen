@@ -8,7 +8,6 @@ pnpm-lock.yaml
 /main.js
 *.js.map
 *.zip
-dist/
 data.json
 coverage/
 .nyc_output/

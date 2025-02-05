@@ -24,6 +24,7 @@ export default class Plugin extends ObsidianPlugin {
       Callbag.create(next => next(this)),
       Callbag.remember
     )
+    Callbag.subscribe(Plugin.stream, () => import('./events'))
     console.info('Loading Mindmap plugin')
 
     this.setup()
