@@ -149,5 +149,13 @@ declare module 'obsidian' {
 
   export interface Workspace {
     on(name: 'css-change', callback: () => any, ctx?: any): EventRef
+
+    trigger(name: 'hover-link', data: {
+      event: MouseEvent
+      source: string
+      hoverParent: Element
+      targetEl: Element
+      linktext: string
+    })
   }
 }
