@@ -3,6 +3,7 @@ import { resolve } from 'path'
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
 import { type Configuration } from 'webpack'
 import webpack from 'webpack'
+import ForkTsCheckerPlugin from 'fork-ts-checker-webpack-plugin'
 
 export default (env, argv): Configuration => ({
   mode: getMode(argv.mode),
@@ -33,6 +34,7 @@ export default (env, argv): Configuration => ({
         { from: 'manifest.json', to: '.' },
       ]
     }),
+    new ForkTsCheckerPlugin
   ],
   externals: {
     electron: 'commonjs electron',
