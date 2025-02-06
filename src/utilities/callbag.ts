@@ -28,7 +28,7 @@ const subject = <T>(): { source: Source<T>, push: (v: T) => void } => {
   }
 }
 
-const completeWhen = <T>(trigger: Source<unknown>) => (subject: Source<T>) =>
+const completeWhen = (trigger: Source<unknown>) => <T>(subject: Source<T>): Source<T> =>
   createSource(({ complete, ...rest }) => {
     const subjectConsumption = consumeSource(subject, {
       complete() {
