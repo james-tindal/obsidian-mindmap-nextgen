@@ -8,20 +8,19 @@ import { ViewManager } from 'src/views/view-manager'
 import { LayoutManager } from 'src/views/layout-manager'
 import { loadStyleFeatures } from 'src/rendering/style-features'
 import { codeBlockHandler } from 'src/workspace'
-import { catchInternalLinks } from 'src/internal-links/catch-internal-links'
 
 export let plugin: Plugin
 
 export default class Plugin extends ObsidianPlugin {
   constructor(_: App, manifest: PluginManifest) {
+    console.info('Loading Mindmap plugin')
+
     super(app, manifest)
     autoBind(this)
     plugin = this
 
     import('./events')
-    
-    console.info('Loading Mindmap plugin')
-
+    import('src/internal-links/catch-internal-links')
     this.setup()
   }
 
@@ -36,8 +35,6 @@ export default class Plugin extends ObsidianPlugin {
     this.registerMarkdownCodeBlockProcessor('markmap', codeBlockHandler)
 
     loadStyleFeatures(this)
-
-    catchInternalLinks(this)
   }
 
   public async onunload() {
