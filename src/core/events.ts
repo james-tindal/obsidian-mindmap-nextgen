@@ -1,30 +1,25 @@
-import Callbag, { completeWhen, distinct, flatMap, map, merge, remember } from 'src/utilities/callbag'
-import Plugin from './entry'
+import Callbag, { completeWhen, distinct, map, merge, remember } from 'src/utilities/callbag'
+import { plugin } from './entry'
 
 
-export const plugin = Plugin.stream
+export const start = Callbag.create<void>(
+  (next, error, complete) => { next(); complete() })
 
-export const pluginUnload = Callbag.pipe(
-  plugin,
-  flatMap(plugin =>
-    Callbag.create<void>((next, error, complete) =>
-      plugin.register(() => { next(); complete() }))
-  )
-)
+export const pluginUnload = Callbag.create<void>(
+  (next, error, complete) =>
+    plugin.register(() => { next(); complete() }))
 
 const completeOnUnload = completeWhen(pluginUnload)
 
 export const cssChange = Callbag.pipe(
-  plugin,
-  flatMap(plugin =>
-    Callbag.create<void>(next =>
-      plugin.registerEvent(app.workspace.on('css-change', next))
-    )
-  )
+  Callbag.create<void>(next =>
+    plugin.registerEvent(app.workspace.on('css-change', next))
+  ),
+  completeOnUnload
 )
 
 export const isDarkMode = Callbag.pipe(
-  merge(cssChange, plugin),
+  merge(start, cssChange),
   map(() => document.body.classList.contains('theme-dark')),
   distinct(),
   remember

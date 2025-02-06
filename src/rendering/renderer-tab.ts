@@ -7,7 +7,7 @@ import { FileSettings, GlobalSettings } from 'src/settings/filesystem'
 import { ScreenshotColors, takeScreenshot } from 'src/rendering/screenshot'
 import { getOptions, parseMarkdown } from './renderer-common'
 import { MindmapTab } from 'src/workspace/types'
-import { globalState } from 'src/core/state'
+import { pluginState } from 'src/core/state'
 
 
 export type TabRenderer = ReturnType<typeof TabRenderer>
@@ -49,7 +49,7 @@ export function TabRenderer(containerEl: MindmapTab.View['containerEl'], globalS
   }
 
   async function render(file: TFile, content?: string) {
-    globalState.svgs.set(svg, file)
+    pluginState.svgs.set(svg, file)
 
     if (!state.hasRendered) return
 

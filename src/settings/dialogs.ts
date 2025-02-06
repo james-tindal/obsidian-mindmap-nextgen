@@ -1,15 +1,15 @@
 import { PluginSettingTab, Modal } from 'obsidian'
 import autoBind from 'auto-bind'
 
-import Plugin from 'src/core/entry'
 import { GlobalSettings } from './filesystem'
 import { PageSelector } from './components/PageSelector'
 import { CodeBlockPage, FilePage, GlobalPage } from './components/pages'
+import { plugin } from 'src/core/entry'
 
 
 export class GlobalSettingsDialog extends PluginSettingTab {
   constructor(settings: GlobalSettings) {
-    super(app, Plugin.instance)
+    super(app, plugin)
 
     this.containerEl.addClass('mmng-settings-tab')
 

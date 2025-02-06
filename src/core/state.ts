@@ -1,7 +1,7 @@
-import { TFile } from 'obsidian'
+import type { TFile } from 'obsidian'
 
 const svgs = new Map<SVGSVGElement, TFile>()
 
-export const globalState = {
+export const pluginState = {
   svgs
 }
