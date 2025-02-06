@@ -1,4 +1,4 @@
-import { globalState } from '../misc/global-state'
+import { pluginState } from '../core/state'
 import Plugin from 'src/core/entry'
 
 export const catchInternalLinks = (plugin: Plugin) => {
@@ -20,7 +20,7 @@ export const catchInternalLinks = (plugin: Plugin) => {
 
     event.preventDefault()
 
-    const { path } = globalState.svgs.get(parentMindmap)!
+    const { path } = pluginState.svgs.get(parentMindmap)!
     app.workspace.openLinkText(href, path)
   })
 }

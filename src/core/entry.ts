@@ -9,22 +9,17 @@ import { LayoutManager } from 'src/views/layout-manager'
 import { loadStyleFeatures } from 'src/rendering/style-features'
 import { codeBlockHandler } from 'src/workspace'
 import { catchInternalLinks } from 'src/internal-links/catch-internal-links'
-import Callbag from 'src/utilities/callbag'
 
+export let plugin: Plugin
 
 export default class Plugin extends ObsidianPlugin {
-  public static instance: Plugin
-  public static stream: Source<Plugin>
-
   constructor(_: App, manifest: PluginManifest) {
     super(app, manifest)
     autoBind(this)
-    Plugin.instance = this
-    Plugin.stream = Callbag.pipe(
-      Callbag.create(next => next(this)),
-      Callbag.remember
-    )
-    Callbag.subscribe(Plugin.stream, () => import('./events'))
+    plugin = this
+
+    import('./events')
+    
     console.info('Loading Mindmap plugin')
 
     this.setup()
