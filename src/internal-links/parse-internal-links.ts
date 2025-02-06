@@ -23,7 +23,7 @@ function replaceMatches(str: string, regex: RegExp, replacer: (match: RegExpExec
 }
 
 
-const wikilinkRegex = /\[\[(?<link>[^|\]]+)\|?((?<displayText>.+))?\]\]/g
+const wikilinkRegex = /\[\[(?<link>[^|\]]+)\|?((?<displayText>[^\]]+))?\]\]/g
 
 function replacement(match) {
   const { link, displayText } = match.groups!
