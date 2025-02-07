@@ -19,7 +19,7 @@ export default class Plugin extends ObsidianPlugin {
     plugin = this
 
     import('./events')
-    import('src/internal-links/catch-internal-links')
+    import('src/internal-links/handle-internal-links')
     this.setup()
   }
 
