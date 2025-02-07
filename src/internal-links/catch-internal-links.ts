@@ -1,4 +1,4 @@
-import { globalState } from '../misc/global-state'
+import { globalState } from 'src/core/state'
 import Plugin from 'src/core/entry'
 
 export const catchInternalLinks = (plugin: Plugin) => {
