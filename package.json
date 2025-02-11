@@ -66,5 +66,10 @@
     "vitest": "^3.0.4",
     "webpack": "^5.97.1",
     "webpack-cli": "^6.0.1"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "d3-svg-to-png": "patches/d3-svg-to-png.patch"
+    }
   }
 }

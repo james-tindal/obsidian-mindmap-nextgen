@@ -21,8 +21,7 @@
       "es2020"
     ],
     "paths": {
-      "obsidian": ["src/types/obsidian.d.ts"],
-      "d3-svg-to-png": ["src/types/d3SvgToPng.d.ts"]
+      "obsidian": ["src/types/obsidian.d.ts"]
     },
     "types": ["vitest/globals"]
   },
