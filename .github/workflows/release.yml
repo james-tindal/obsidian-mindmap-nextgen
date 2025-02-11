@@ -6,24 +6,30 @@ on:
       - "*"
 
 env:
-  PLUGIN_NAME: obsidian-mindmap-nextgen # Change this to match the id of your plugin.
+  PLUGIN_NAME: obsidian-mindmap-nextgen
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "23.x"
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
       - name: Build
         id: build
         run: |
-          npm install
-          npm run build
+          pnpm install
+          pnpm run build
           mkdir ${{ env.PLUGIN_NAME }}
           cp main.js manifest.json styles.css ${{ env.PLUGIN_NAME }}
           zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
