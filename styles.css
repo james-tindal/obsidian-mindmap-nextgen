@@ -27,6 +27,8 @@
 
 .markmap div { line-height: var(--mm-line-height, 1em) }
 
+.katex-html { display: none }
+
 
 /* Code blocks inside mindmaps */
 
