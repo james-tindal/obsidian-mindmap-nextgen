@@ -4,6 +4,10 @@ import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
 import { type Configuration } from 'webpack'
 import webpack from 'webpack'
 import ForkTsCheckerPlugin from 'fork-ts-checker-webpack-plugin'
+import { Buffer } from 'buffer'
+import { createRequire } from 'module'
+
+const require = createRequire(import.meta.url)
 
 export default (env, argv): Configuration => ({
   mode: getMode(argv.mode),
@@ -15,9 +19,11 @@ export default (env, argv): Configuration => ({
   },
   resolve: {
     extensions: ['.ts', '.js'],
-    plugins: [new TsconfigPathsPlugin]
+    plugins: [new TsconfigPathsPlugin],
+    fallback: { 
+      buffer: require.resolve('buffer/')
+    }
   },
-  target: 'node',
   module: {
     rules: [
       {
@@ -28,6 +34,9 @@ export default (env, argv): Configuration => ({
   },
   plugins: [
     new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }),
     new CopyPlugin({
       patterns: [
         { from: 'styles.css', to: '.' },
