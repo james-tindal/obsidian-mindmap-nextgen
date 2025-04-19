@@ -25,6 +25,11 @@
     },
     "types": ["vitest/globals"]
   },
+  "ts-node": {
+    "compilerOptions": {
+    },
+    "esm": true
+  },
   "include": [
     "**/*.ts",
     "src/types"
