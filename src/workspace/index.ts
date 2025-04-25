@@ -2,17 +2,19 @@ import { MarkdownPostProcessorContext, MarkdownRenderChild, TFile } from 'obsidi
 import GrayMatter from 'gray-matter'
 
 import { FileSettings, GlobalSettings, globalSettings$ } from 'src/settings/filesystem'
-import Callbag, { filter, flatMap, map, merge, pairwise, Source, startWith, take } from 'src/utilities/callbag'
+import Callbag, { flatMap, map, merge, pairwise, Source, startWith } from 'src/utilities/callbag'
 import { ImmutableSet } from 'src/utilities/immutable-set'
 import { FileMap, getLayout } from './get-layout'
-import { CodeBlockRow, createDb, Database, FileRow, TabRow } from './db-schema'
+import { CodeBlockRow, Database, FileRow, TabRow } from './db-schema'
 import { CodeBlock, FileTab } from './types'
 import { CodeBlockRenderer } from 'src/rendering/renderer-codeblock'
 import { isObjectEmpty, nextTick } from 'src/utilities/utilities'
 import { ExtractRecord, ExtractUnion, Matcher, Stackable, Tagged, match, tr, unionConstructors } from './utilities'
 import { parseMarkdown } from 'src/rendering/renderer-common'
 import { FileSettingsDialog } from 'src/settings/dialogs'
-import * as Events from 'src/core/events'
+import { pluginState } from 'src/core/entry'
+
+const globalSettings = pluginState.settings
 
 
 const InputEvent = unionConstructors(
@@ -141,7 +143,7 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
         return true
       }
     })
-    const dialog = new FileSettingsDialog(database.globalSettings, fileSettingsProxy)
+    const dialog = new FileSettingsDialog(globalSettings, fileSettingsProxy)
     tabRow.view.addAction('dot-network', 'Edit mindmap settings', dialog.open)
 
     function updateFrontmatter() {
@@ -219,7 +221,6 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
     database.codeBlocks.add(codeBlockRow)
     tabRow.codeBlocks.add(codeBlockRow)
 
-    const globalSettings = database.globalSettings
     const fileSettings = tabRow.file.settings
     const isCurrent = tabRow.isCurrent
     const tabView = tabRow.view
@@ -251,16 +252,10 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
 }; return matcher }
 
 
-
+const database = pluginState.workspace
 const codeBlockEvent$ = Callbag.pipe(
   inputEvent$,
-  filter((event): event is InputEvents['globalSettings'] => event.tag === 'globalSettings'),
-  take(1),
-  flatMap(({ data: globalSettings }) => {
-    const database = createDb(globalSettings)
-    const eventMatcher = (event: InputEvent) => match(event, matcher(database))
-    return map(eventMatcher)(inputEvent$)
-  }),
+  map((event: InputEvent) => match(event, matcher(database))),
   Stackable.flatten
 )
 
