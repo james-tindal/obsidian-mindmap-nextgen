@@ -59,7 +59,6 @@ export type CodeBlockRow = {
 }
 
 export type Database = {
-  globalSettings: GlobalSettings
   tabs: DbSet<TabRow>
   files: DbSet<FileRow>
   codeBlocks: DbSet<CodeBlockRow>
@@ -70,8 +69,7 @@ export const TabRow = (args: Omit<TabRow, 'codeBlocks' | 'isCurrent'>): TabRow =
 export const FileRow = (args: Omit<FileRow, 'tabs'>): FileRow => ({ ...args, tabs: new DbSet() })
 export const CodeBlockRow = (row: CodeBlockRow) => row
 
-export const createDb = (globalSettings: GlobalSettings): Database => ({
-  globalSettings,
+export const createDb = (): Database => ({
   tabs: new DbSet(),
   files: new DbSet(),
   codeBlocks: new DbSet(),

@@ -6,15 +6,17 @@ import { GlobalSettingsDialog } from 'src/settings/dialogs'
 import { ViewManager } from 'src/views/view-manager'
 import { LayoutManager } from 'src/views/layout-manager'
 import { loadStyleFeatures } from 'src/rendering/style-features'
-import { codeBlockHandler } from 'src/workspace'
+import { createDb, Database } from 'src/workspace/db-schema'
 
 export let plugin: Plugin
 export const pluginState = {} as PluginState
 interface PluginState {
   svgs: Map<SVGSVGElement, TFile>
   settings: GlobalSettings
+  workspace: Database
 }
 pluginState.svgs = new Map()
+pluginState.workspace = createDb()
 
 
 export default class Plugin extends ObsidianPlugin {
@@ -35,11 +37,12 @@ export default class Plugin extends ObsidianPlugin {
     pluginState.settings = settings
     this.addSettingTab(new GlobalSettingsDialog())
 
+    const { codeBlockHandler } = await import('src/workspace')
+    this.registerMarkdownCodeBlockProcessor('markmap', codeBlockHandler)
+
     const layoutManager = LayoutManager(saveLayout, loadLayout)
 
     ViewManager(this, settings, layoutManager)
-
-    this.registerMarkdownCodeBlockProcessor('markmap', codeBlockHandler)
 
     loadStyleFeatures()
   }
