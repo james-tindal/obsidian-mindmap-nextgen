@@ -7,7 +7,7 @@ import { FileSettings, GlobalSettings } from 'src/settings/filesystem'
 import { ScreenshotColors, takeScreenshot } from 'src/rendering/screenshot'
 import { getOptions, parseMarkdown } from './renderer-common'
 import { MindmapTab } from 'src/workspace/types'
-import { pluginState } from 'src/core/state'
+import { pluginState } from 'src/core/entry'
 
 
 export type TabRenderer = ReturnType<typeof TabRenderer>

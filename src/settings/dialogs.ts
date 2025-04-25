@@ -4,12 +4,13 @@ import autoBind from 'auto-bind'
 import { GlobalSettings } from './filesystem'
 import { PageSelector } from './components/PageSelector'
 import { CodeBlockPage, FilePage, GlobalPage } from './components/pages'
-import { plugin } from 'src/core/entry'
+import { plugin, pluginState } from 'src/core/entry'
 
 
 export class GlobalSettingsDialog extends PluginSettingTab {
-  constructor(settings: GlobalSettings) {
+  constructor() {
     super(app, plugin)
+    const { settings } = pluginState
 
     this.containerEl.addClass('mmng-settings-tab')
 
