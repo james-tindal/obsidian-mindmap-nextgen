@@ -12,7 +12,7 @@ import Callbag, { flatMap, fromEvent, map, pairwise, takeUntil } from 'src/utili
 import { CodeBlockSettingsDialog } from 'src/settings/dialogs'
 import { isObjectEmpty } from 'src/utilities/utilities'
 import { TabRow } from 'src/workspace/db-schema'
-import { pluginState } from 'src/core/state'
+import { pluginState } from 'src/core/entry'
 
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>

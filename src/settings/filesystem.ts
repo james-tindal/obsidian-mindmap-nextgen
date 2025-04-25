@@ -1,7 +1,6 @@
 import type { Plugin_2, SplitDirection } from 'obsidian'
 import { LocalEvents, PromiseSubject } from '../utilities/utilities'
 import { Layout } from '../views/layout-manager'
-import type { GlobalSettingsDialog } from './dialogs'
 import Callbag from '../utilities/callbag'
 
 export enum ScreenshotBgStyle {
@@ -274,14 +273,6 @@ function upgrade(data: any): FileSystemData {
   }
 }
 
-type Set = {
-  set: <K extends keyof GlobalSettings>(_: any, key: K, value: GlobalSettings[K]) => boolean;
-}
-
-type Get = {
-  get: <K extends keyof GlobalSettings>(_: any, key: K) => GlobalSettings[K];
-}
-
 const [ resolveSettingsReady, settingsReady ] = PromiseSubject<GlobalSettings>()
 export { settingsReady }
 
@@ -299,31 +290,25 @@ export async function FilesystemManager (
   const fsd: FileSystemData = upgrade(await loadData())
   saveData(fsd)
 
-  const get: Get = { get: (_, key) => fsd.settings[key] }
-  const cantSet: Set = { set: () => false }
-  const set: Set = {
-    set(_, key, value) {
+  const settings = new Proxy<GlobalSettings>(fsd.settings, {
+    get: (_, key) => fsd.settings[key],
+    set<K extends keyof GlobalSettings>(_, key: K, value: GlobalSettings[K]) {
       fsd.settings[key] = value
       events.emit(key, value)
       pushSettings(fsd.settings)
       saveData(fsd)
       return true
     }
-  }
-
-  const getterSetter = new Proxy<GlobalSettings>(fsd.settings, { ...get, ...set })
-  const getter       = new Proxy<GlobalSettings>(fsd.settings, { ...get, ...cantSet })
+  })
 
   const saveLayout = (layout: Layout) => { fsd.layout = layout; saveData(fsd) }
   const loadLayout = () => fsd.layout
 
-  pushSettings(getterSetter)
-  resolveSettingsReady(getterSetter)
-
+  pushSettings(settings)
+  resolveSettingsReady(settings)
 
   return {
-    settings: getter,
-    createSettingsTab: (Constructor: typeof GlobalSettingsDialog) => new Constructor(getterSetter),
+    settings,
     saveLayout,
     loadLayout
   }

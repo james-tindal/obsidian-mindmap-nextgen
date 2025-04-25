@@ -1,5 +1,4 @@
-import { plugin } from 'src/core/entry'
-import { pluginState } from 'src/core/state'
+import { plugin, pluginState } from 'src/core/entry'
 
 
 const workspace = document.querySelector('.workspace' as 'div')!
