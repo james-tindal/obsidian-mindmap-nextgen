@@ -57,9 +57,10 @@ import { CodeBlockSettings } from './filesystem'
 import { CodeBlockDoc, FileDoc } from './components/explanations'
 
 export class CodeBlockSettingsDialog extends Modal {
-  constructor(globalSettings: GlobalSettings, fileSettings: Partial<FileSettings>, codeBlockSettings: Partial<CodeBlockSettings>) {
+  constructor(fileSettings: Partial<FileSettings>, codeBlockSettings: Partial<CodeBlockSettings>) {
     super(app)
     autoBind(this)
+    const globalSettings = pluginState.settings
 
     const inheritSettings = new Proxy({} as GlobalSettings, {
       get: (_, key) => fileSettings[key] || globalSettings[key],
