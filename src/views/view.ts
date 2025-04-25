@@ -1,6 +1,5 @@
 import { ItemView, Menu, WorkspaceLeaf } from 'obsidian'
 
-import { GlobalSettings } from 'src/settings/filesystem'
 import { MM_VIEW_TYPE } from 'src/constants'
 import { TabRenderer } from 'src/rendering/renderer-tab'
 
@@ -13,12 +12,12 @@ export default class MindmapTabView extends ItemView {
   public render: TabRenderer['render']
   public firstRender: TabRenderer['firstRender']
 
-  constructor(settings: GlobalSettings, leaf: WorkspaceLeaf, displayText: string, pinned: boolean) {
+  constructor(leaf: WorkspaceLeaf, displayText: string, pinned: boolean) {
     super(leaf)
     this.displayText = displayText
     this.pinned = pinned
 
-    this.renderer = TabRenderer(this.containerEl, settings)
+    this.renderer = TabRenderer(this.containerEl)
     this.render = this.renderer.render
     this.firstRender = this.renderer.firstRender
   }

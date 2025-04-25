@@ -1,7 +1,6 @@
 import { TFile } from 'obsidian'
 
-import { GlobalSettings } from 'src/settings/filesystem'
-import Plugin from 'src/core/entry'
+import { plugin, pluginState } from 'src/core/entry'
 import MindmapTabView from './view'
 import { LayoutManager, MindmapSubject } from './layout-manager'
 import { EventListeners } from './event-listeners'
@@ -14,14 +13,14 @@ import Callbag from 'src/utilities/callbag'
 
 export const views = Views()
 
-export function ViewManager(plugin: Plugin, settings: GlobalSettings, layoutManager: LayoutManager) {
-
-  const viewCreatorManager = new ViewCreatorManager(plugin, settings, views)
+export function ViewManager(layoutManager: LayoutManager) {
+  const settings = pluginState.settings
+  const viewCreatorManager = new ViewCreatorManager(views)
   const createLeafIn = CreateLeafIn(settings.splitDirection)
   const leafManager = LeafManager(views, createLeafIn, viewCreatorManager.constructView)
-  const eventListeners = EventListeners(views, settings, layoutManager, leafManager)
+  const eventListeners = EventListeners(views, layoutManager, leafManager)
 
-  registerEvents(plugin, eventListeners, views, viewCreatorManager.setViewCreator)
+  registerEvents(eventListeners, views, viewCreatorManager.setViewCreator)
 
   Callbag.subscribe(renderTabs$, views.renderAll)
 }

@@ -3,7 +3,7 @@ import { TFile } from 'obsidian'
 import { Toolbar } from 'markmap-toolbar'
 import { IPureNode } from 'markmap-common'
 
-import { FileSettings, GlobalSettings } from 'src/settings/filesystem'
+import { FileSettings } from 'src/settings/filesystem'
 import { ScreenshotColors, takeScreenshot } from 'src/rendering/screenshot'
 import { getOptions, parseMarkdown } from './renderer-common'
 import { MindmapTab } from 'src/workspace/types'
@@ -11,7 +11,7 @@ import { pluginState } from 'src/core/entry'
 
 
 export type TabRenderer = ReturnType<typeof TabRenderer>
-export function TabRenderer(containerEl: MindmapTab.View['containerEl'], globalSettings: GlobalSettings) {
+export function TabRenderer(containerEl: MindmapTab.View['containerEl']) {
   const { markmap, svg, toolbar } = createMarkmap(containerEl)
 
   const state: {
@@ -23,7 +23,7 @@ export function TabRenderer(containerEl: MindmapTab.View['containerEl'], globalS
   }
 
   return { collapseAll, firstRender, render,
-    takeScreenshot: () => takeScreenshot(globalSettings, markmap, state.screenshotColors!),
+    takeScreenshot: () => takeScreenshot(markmap, state.screenshotColors!),
     toolbar: {
       get hidden() { return toolbar.hidden },
       toggle: () => 
@@ -56,7 +56,7 @@ export function TabRenderer(containerEl: MindmapTab.View['containerEl'], globalS
     const markdown = content ?? await app.vault.cachedRead(file)
     
     const { rootNode, settings: fileSettings } = parseMarkdown<'file'>(markdown)
-    const settings: FileSettings = { ...globalSettings, ...fileSettings }
+    const settings: FileSettings = { ...pluginState.settings, ...fileSettings }
     const markmapOptions = getOptions(settings)
 
     if (settings.titleAsRootNode)
