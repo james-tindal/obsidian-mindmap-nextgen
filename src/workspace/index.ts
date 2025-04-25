@@ -15,6 +15,7 @@ import { FileSettingsDialog } from 'src/settings/dialogs'
 import { pluginState } from 'src/core/entry'
 
 const globalSettings = pluginState.settings
+const database = pluginState.workspace
 
 
 const InputEvent = unionConstructors(
@@ -107,7 +108,7 @@ const inputEvent$: Source<InputEvent> = Callbag.share(merge(layout$, codeBlock$,
 
 type EventMatcher = Matcher<InputEvent, Stackable<CodeBlockEvent>>
 
-const matcher = (database: Database): EventMatcher => { const matcher = {
+const matcher: EventMatcher = {
   'tab opened': leaf => {
     const fileHandle = leaf.view.file
     const fileRowInDb = database.files.find(row => row.handle === fileHandle)
@@ -244,26 +245,21 @@ const matcher = (database: Database): EventMatcher => { const matcher = {
       tabRow.codeBlocks.map(({ codeBlock }) =>
         CodeBlockEvent.fileSettings({ codeBlock, fileSettings: settings })
       ))
-  },
-  'globalSettings': globalSettings => {
-    return database.codeBlocks.map(({ codeBlock }) =>
-      CodeBlockEvent.globalSettings({ codeBlock, globalSettings }))
   }
-}; return matcher }
+}
 
 
-const database = pluginState.workspace
 const codeBlockEvent$ = Callbag.pipe(
   inputEvent$,
-  map((event: InputEvent) => match(event, matcher(database))),
+  map((event: InputEvent) => match(event, matcher)),
   Stackable.flatten
 )
 
 
 const renderers = new Map<CodeBlock, CodeBlockRenderer>()
 Callbag.subscribe(codeBlockEvent$, event => match(event, {
-  'start' ({ codeBlock, globalSettings, fileSettings, isCurrent, tabView, tabRow }) {
-    const renderer = CodeBlockRenderer(codeBlock, tabView, globalSettings, fileSettings, tabRow)
+  'start' ({ codeBlock, fileSettings, isCurrent, tabView, tabRow }) {
+    const renderer = CodeBlockRenderer(codeBlock, tabView, fileSettings, tabRow)
     if (isCurrent) renderer.fit()
     renderers.set(codeBlock, renderer)
   },

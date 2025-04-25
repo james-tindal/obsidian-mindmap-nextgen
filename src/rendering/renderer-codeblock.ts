@@ -16,7 +16,7 @@ import { pluginState } from 'src/core/entry'
 
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
-export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, globalSettings: GlobalSettings, fileSettings: FileSettings, tabRow: TabRow) {
+export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, fileSettings: FileSettings, tabRow: TabRow) {
   const { markdown, containerEl } = codeBlock
 
   const { markmap, svg } = createMarkmap(containerEl)
@@ -25,16 +25,12 @@ export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, g
 
   const { rootNode, settings: codeBlockSettings } = parseMarkdown<'codeBlock'>(markdown)
 
-  const settings = new SettingsManager(tabView, codeBlock, {
-    global: globalSettings,
-    file: fileSettings,
-    codeBlock: codeBlockSettings,
-  })
+  const settings = new SettingsManager(tabView, codeBlock, fileSettings, codeBlockSettings)
 
   SizeManager(containerEl, svg, settings)
 
   if (tabView.getMode() === 'source')
-    SettingsDialog(codeBlock, tabRow, codeBlockSettings, globalSettings)
+    SettingsDialog(codeBlock, tabRow, codeBlockSettings)
 
   let hasFit = false
   function fit() {
@@ -81,13 +77,24 @@ function createMarkmap(containerEl: CodeBlock['containerEl']) {
 class SettingsManager {
   private newHeight: number | undefined
   private readonly DEFAULT_HEIGHT = 150
+  private settings: {
+    global: GlobalSettings
+    file: FileSettings
+    codeBlock: CodeBlockSettings
+  }
 
   constructor(
     private tabView: FileTab.View,
     private __codeBlock: CodeBlock,
-    private settings: { global: GlobalSettings, file: FileSettings, codeBlock: CodeBlockSettings }
+    fileSettings: FileSettings,
+    codeBlockSettings: CodeBlockSettings
   ) {
     autoBind(this)
+    this.settings = {
+      global: pluginState.settings,
+      file: fileSettings,
+      codeBlock: codeBlockSettings
+    }
   }
 
   get merged(): CodeBlockSettings {
@@ -169,7 +176,7 @@ function SizeManager(containerEl: CodeBlock['containerEl'], svg: SVGSVGElement, 
   Callbag.subscribe(fromEvent(document, 'mouseup'), settings.saveHeight)
 }
 
-function SettingsDialog(codeBlock: CodeBlock, tabRow: TabRow, codeBlockSettings: CodeBlockSettings, globalSettings: GlobalSettings) {
+function SettingsDialog(codeBlock: CodeBlock, tabRow: TabRow, codeBlockSettings: CodeBlockSettings) {
   const fileSettings = new Proxy({} as FileSettings, {
     get: (_, key) => tabRow.file.settings[key],
     has: (_, key) => key in tabRow.file.settings,
@@ -220,7 +227,7 @@ function SettingsDialog(codeBlock: CodeBlock, tabRow: TabRow, codeBlockSettings:
     )
   }
 
-  const dialog = new CodeBlockSettingsDialog(globalSettings, fileSettings, codeBlockProxy)
+  const dialog = new CodeBlockSettingsDialog(fileSettings, codeBlockProxy)
 
   const button = new ButtonComponent(codeBlock.containerEl.parentElement!)
     .setClass('edit-block-button')
