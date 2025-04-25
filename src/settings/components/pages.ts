@@ -2,6 +2,7 @@ import { Setting } from 'obsidian'
 import { CodeBlockSettings, Coloring, FileSettings, GlobalSettings, ScreenshotBgStyle } from '../filesystem'
 import { Heading, HtmlComponent, fragment } from './various'
 import { SettingComponent, dropdown, numberText, text } from './SettingComponent'
+import { pluginState } from 'src/core/entry'
 
 
 
@@ -104,22 +105,22 @@ const ColorFreezeLevel = SettingComponent({
 })
 
 
-const SectionColoringGlobal = (settings: GlobalSettings) => {
-  const approach = ColoringApproach.global(settings)
+const SectionColoringGlobal = () => {
+  const approach = ColoringApproach.global()
   const branch = [
     Description('branch'),
-    ColorFreezeLevel.global(settings),
+    ColorFreezeLevel.global(),
   ]
   const depth = [
     Description('depth'),
-    Color1.global(settings),
-    Color2.global(settings),
-    Color3.global(settings),
-    ColorDefault.global(settings),
+    Color1.global(),
+    Color2.global(),
+    Color3.global(),
+    ColorDefault.global(),
   ]
   const single = [
     Description('single'),
-    ColorSingle.global(settings),
+    ColorSingle.global(),
   ]
   const all = [ ...branch, ...depth, ...single ]
 
@@ -132,7 +133,7 @@ const SectionColoringGlobal = (settings: GlobalSettings) => {
     })
   }
 
-  setApproach(settings.coloring)
+  setApproach(pluginState.settings.coloring)
   approach.onChange(setApproach)
 
   return fragment([
@@ -317,65 +318,64 @@ const MaxWidth = SettingComponent({
 
 // -- Complete Pages -- //
 
-const GlobalPage = (settings: GlobalSettings) => () => {
-  return fragment([
-    fragment([
-      SplitDirection.global(settings),
-      HighlightInlineMindmap.global(settings),
-      TitleAsRootNode.global(settings),
-      UseThemeFont.global(settings),
-    ]),
-    SectionColoringGlobal(settings),
-    fragment([
-      SectionThicknessHeading(),
-      Thickness1.global(settings),
-      Thickness2.global(settings),
-      Thickness3.global(settings),
-      ThicknessDefault.global(settings),
-    ]),
-    fragment([
-      SectionScreenshotsHeading(),
-      ScreenshotTextColor(settings),
-      ScreenshotBackgroundStyle(settings),
-    ]),
-    fragment([
-      SectionMarkmapHeading(),
-      NodeMinHeight.global(settings),
-      NodeTextLineHeight.global(settings),
-      VerticalSpacing.global(settings),
-      HorizontalSpacing.global(settings),
-      HorizontalPadding.global(settings),
-      InitialExpandLevel.global(settings),
-      AnimationDuration.global(settings),
-      MaxWidth.global(settings),
-    ])
+const globalSettings = pluginState.settings
+const GlobalPage = () => fragment([
+  fragment([
+    SplitDirection.global(),
+    HighlightInlineMindmap.global(),
+    TitleAsRootNode.global(),
+    UseThemeFont.global(),
+  ]),
+  SectionColoringGlobal(),
+  fragment([
+    SectionThicknessHeading(),
+    Thickness1.global(),
+    Thickness2.global(),
+    Thickness3.global(),
+    ThicknessDefault.global(),
+  ]),
+  fragment([
+    SectionScreenshotsHeading(),
+    ScreenshotTextColor(globalSettings),
+    ScreenshotBackgroundStyle(globalSettings),
+  ]),
+  fragment([
+    SectionMarkmapHeading(),
+    NodeMinHeight.global(),
+    NodeTextLineHeight.global(),
+    VerticalSpacing.global(),
+    HorizontalSpacing.global(),
+    HorizontalPadding.global(),
+    InitialExpandLevel.global(),
+    AnimationDuration.global(),
+    MaxWidth.global(),
   ])
-}
+])
 
-const FilePage = (global: GlobalSettings, file: Partial<FileSettings>) => () =>
+const FilePage = (file: Partial<FileSettings>) => () =>
   fragment([
     fragment([
-      HighlightInlineMindmap.heritable(global, file),
-      TitleAsRootNode.heritable(global, file),
+      HighlightInlineMindmap.heritable(globalSettings, file),
+      TitleAsRootNode.heritable(globalSettings, file),
     ]),
-    SectionColoringHeritable(global, file),
+    SectionColoringHeritable(globalSettings, file),
     fragment([
       SectionThicknessHeading(),
-      Thickness1.heritable(global, file),
-      Thickness2.heritable(global, file),
-      Thickness3.heritable(global, file),
-      ThicknessDefault.heritable(global, file),
+      Thickness1.heritable(globalSettings, file),
+      Thickness2.heritable(globalSettings, file),
+      Thickness3.heritable(globalSettings, file),
+      ThicknessDefault.heritable(globalSettings, file),
     ]),
     fragment([
       SectionMarkmapHeading(),
-      NodeMinHeight.heritable(global, file),
-      NodeTextLineHeight.heritable(global, file),
-      VerticalSpacing.heritable(global, file),
-      HorizontalSpacing.heritable(global, file),
-      HorizontalPadding.heritable(global, file),
-      InitialExpandLevel.heritable(global, file),
-      AnimationDuration.heritable(global, file),
-      MaxWidth.heritable(global, file),
+      NodeMinHeight.heritable(globalSettings, file),
+      NodeTextLineHeight.heritable(globalSettings, file),
+      VerticalSpacing.heritable(globalSettings, file),
+      HorizontalSpacing.heritable(globalSettings, file),
+      HorizontalPadding.heritable(globalSettings, file),
+      InitialExpandLevel.heritable(globalSettings, file),
+      AnimationDuration.heritable(globalSettings, file),
+      MaxWidth.heritable(globalSettings, file),
     ])
   ])
 

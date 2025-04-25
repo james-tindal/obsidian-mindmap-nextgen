@@ -16,7 +16,7 @@ export class GlobalSettingsDialog extends PluginSettingTab {
 
     const appendContent =
       PageSelector('global', {
-        global: GlobalPage(settings),
+        global: GlobalPage,
         file: FileDoc,
         codeBlock: CodeBlockDoc
       })
@@ -34,7 +34,7 @@ export class GlobalSettingsDialog extends PluginSettingTab {
 import { FileSettings } from './filesystem'
 
 export class FileSettingsDialog extends Modal {
-  constructor(globalSettings: GlobalSettings, fileSettings: Partial<FileSettings>) {
+  constructor(fileSettings: Partial<FileSettings>) {
     super(app)
     autoBind(this)
 
@@ -42,8 +42,8 @@ export class FileSettingsDialog extends Modal {
 
     const appendContent =
       PageSelector('file', {
-        global: GlobalPage(globalSettings),
-        file: FilePage(globalSettings, fileSettings),
+        global: GlobalPage,
+        file: FilePage(fileSettings),
         codeBlock: CodeBlockDoc
       })
 
@@ -71,8 +71,8 @@ export class CodeBlockSettingsDialog extends Modal {
 
     const appendContent =
       PageSelector('codeBlock', {
-        global: GlobalPage(globalSettings),
-        file: FilePage(globalSettings, fileSettings),
+        global: GlobalPage,
+        file: FilePage(fileSettings),
         codeBlock: CodeBlockPage(inheritSettings, codeBlockSettings)
       })
 
