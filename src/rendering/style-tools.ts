@@ -1,5 +1,5 @@
 import { GlobalSettings, settingChanges, settingsReady } from 'src/settings/filesystem'
-import Plugin from 'src/core/entry'
+import { plugin } from 'src/core/entry'
 
 
 export function toggleBodyClass(setting: keyof GlobalSettings, className: string) {
@@ -32,7 +32,7 @@ export const globalStyle = (() => {
       : trigger_s(updateSection)
   }
 
-  function registerStyleElement(plugin: Plugin) {
+  function registerStyleElement() {
     plugin.register(() => styleEl.remove())
   }
 })()
