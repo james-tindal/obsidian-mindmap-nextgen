@@ -1,6 +1,5 @@
 import { cssClasses } from 'src/constants'
 import { settingChanges, settingsReady } from 'src/settings/filesystem'
-import Plugin from 'src/core/entry'
 import Callbag from 'src/utilities/callbag'
 import { layoutReady } from 'src/utilities/layout-ready'
 import { globalStyle, toggleBodyClass, settingTriggers as t, themeChange } from './style-tools'
@@ -11,8 +10,8 @@ const { source: renderTabs$, push: renderTabs } = Callbag.subject<void>()
 export { renderCodeblocks$, renderTabs$ }
 const renderAll = () => { renderTabs(); renderCodeblocks() }
 
-export function loadStyleFeatures(plugin: Plugin) {
-  globalStyle.registerStyleElement(plugin)
+export function loadStyleFeatures() {
+  globalStyle.registerStyleElement()
   useThemeFont()
   lineThickness()
   lineHeight()

@@ -41,7 +41,7 @@ export default class Plugin extends ObsidianPlugin {
 
     this.registerMarkdownCodeBlockProcessor('markmap', codeBlockHandler)
 
-    loadStyleFeatures(this)
+    loadStyleFeatures()
   }
 
   public async onunload() {
