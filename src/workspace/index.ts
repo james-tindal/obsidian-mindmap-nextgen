@@ -1,11 +1,11 @@
 import { MarkdownPostProcessorContext, MarkdownRenderChild, TFile } from 'obsidian'
 import GrayMatter from 'gray-matter'
 
-import { FileSettings, GlobalSettings, globalSettings$ } from 'src/settings/filesystem'
+import { FileSettings } from 'src/settings/filesystem'
 import Callbag, { flatMap, map, merge, pairwise, Source, startWith } from 'src/utilities/callbag'
 import { ImmutableSet } from 'src/utilities/immutable-set'
 import { FileMap, getLayout } from './get-layout'
-import { CodeBlockRow, Database, FileRow, TabRow } from './db-schema'
+import { CodeBlockRow, FileRow, TabRow } from './db-schema'
 import { CodeBlock, FileTab } from './types'
 import { CodeBlockRenderer } from 'src/rendering/renderer-codeblock'
 import { isObjectEmpty, nextTick } from 'src/utilities/utilities'
@@ -14,7 +14,6 @@ import { parseMarkdown } from 'src/rendering/renderer-common'
 import { FileSettingsDialog } from 'src/settings/dialogs'
 import { pluginState } from 'src/core/entry'
 
-const globalSettings = pluginState.settings
 const database = pluginState.workspace
 
 
@@ -27,15 +26,13 @@ const InputEvent = unionConstructors(
   Tagged('tab not current', tr as FileTab.Leaf),
   Tagged('tab changed file', tr as [ FileTab.Leaf, TFile ]),
   Tagged('fileSettings',     tr as { file: TFile, settings: FileSettings }),
-  Tagged('globalSettings',   tr as GlobalSettings),
 )
 type InputEvent = ExtractUnion<typeof InputEvent>
 type InputEvents = ExtractRecord<typeof InputEvent>
 
 const CodeBlockEvent = unionConstructors(
-  Tagged('start',          tr as { codeBlock: CodeBlock, globalSettings: GlobalSettings, fileSettings: FileSettings, isCurrent: boolean, tabView: FileTab.View, tabRow: TabRow }),
+  Tagged('start',          tr as { codeBlock: CodeBlock, fileSettings: FileSettings, isCurrent: boolean, tabView: FileTab.View, tabRow: TabRow }),
   Tagged('current',        tr as { codeBlock: CodeBlock }),
-  Tagged('globalSettings', tr as { codeBlock: CodeBlock, globalSettings: GlobalSettings }),
   Tagged('fileSettings',   tr as { codeBlock: CodeBlock, fileSettings: FileSettings }),
   Tagged('end',            tr as { codeBlock: CodeBlock }),
 )
@@ -102,9 +99,7 @@ const file$ = Callbag.pipe(
 
 const fileSettings$ = Callbag.pipe(file$, map(InputEvent.fileSettings))
 
-const globalSettingsEvent$ = Callbag.pipe(globalSettings$, map(InputEvent.globalSettings))
-
-const inputEvent$: Source<InputEvent> = Callbag.share(merge(layout$, codeBlock$, fileSettings$, globalSettingsEvent$))
+const inputEvent$: Source<InputEvent> = Callbag.share(merge(layout$, codeBlock$, fileSettings$))
 
 type EventMatcher = Matcher<InputEvent, Stackable<CodeBlockEvent>>
 
@@ -144,7 +139,7 @@ const matcher: EventMatcher = {
         return true
       }
     })
-    const dialog = new FileSettingsDialog(globalSettings, fileSettingsProxy)
+    const dialog = new FileSettingsDialog(fileSettingsProxy)
     tabRow.view.addAction('dot-network', 'Edit mindmap settings', dialog.open)
 
     function updateFrontmatter() {
@@ -226,7 +221,7 @@ const matcher: EventMatcher = {
     const isCurrent = tabRow.isCurrent
     const tabView = tabRow.view
 
-    return CodeBlockEvent.start({ codeBlock, globalSettings, fileSettings, isCurrent, tabView, tabRow })
+    return CodeBlockEvent.start({ codeBlock, fileSettings, isCurrent, tabView, tabRow })
 
   },
   'codeBlock deleted': codeBlock => {
@@ -265,9 +260,6 @@ Callbag.subscribe(codeBlockEvent$, event => match(event, {
   },
   'current' ({ codeBlock }) {
     renderers.get(codeBlock)!.fit()
-  },
-  'globalSettings' ({ codeBlock, globalSettings }) {
-    renderers.get(codeBlock)!.updateGlobalSettings(globalSettings)
   },
   'fileSettings' ({ codeBlock, fileSettings }) {
     renderers.get(codeBlock)!.updateFileSettings(fileSettings)

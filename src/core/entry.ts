@@ -2,7 +2,6 @@ import { App, Plugin as ObsidianPlugin, PluginManifest, TFile } from 'obsidian'
 import autoBind from 'auto-bind'
 
 import { FilesystemManager, GlobalSettings } from 'src/settings/filesystem'
-import { GlobalSettingsDialog } from 'src/settings/dialogs'
 import { ViewManager } from 'src/views/view-manager'
 import { LayoutManager } from 'src/views/layout-manager'
 import { loadStyleFeatures } from 'src/rendering/style-features'
@@ -35,6 +34,7 @@ export default class Plugin extends ObsidianPlugin {
   private async setup() {
     const { settings, saveLayout, loadLayout } = await FilesystemManager(this.loadData, this.saveData)
     pluginState.settings = settings
+    const { GlobalSettingsDialog } = await import('src/settings/dialogs')
     this.addSettingTab(new GlobalSettingsDialog())
 
     const { codeBlockHandler } = await import('src/workspace')

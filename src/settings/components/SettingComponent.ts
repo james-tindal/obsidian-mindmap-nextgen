@@ -2,6 +2,7 @@ import { ValueComponent, ExtraButtonComponent, DropdownComponent, TextComponent 
 import { GlobalSettings } from '../filesystem'
 import { Resolve } from 'src/workspace/utilities'
 import { Setting } from './setting-constructor'
+import { pluginState } from 'src/core/entry'
 
 
 interface ControlComponent<T> extends ValueComponent<T> {
@@ -77,8 +78,9 @@ export const SettingComponent = (options: SettingOptions) => {
     return result
   }
 
-  const global = (settings: GlobalSettings) => {
+  const global = () => {
     const { node, control, key, onChange } = common()
+    const settings = pluginState.settings
 
     function update() { control.setValue(settings[key])}
     update()
