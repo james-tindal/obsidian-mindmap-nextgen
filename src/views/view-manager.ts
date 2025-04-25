@@ -21,7 +21,7 @@ export function ViewManager(plugin: Plugin, settings: GlobalSettings, layoutMana
   const leafManager = LeafManager(views, createLeafIn, viewCreatorManager.constructView)
   const eventListeners = EventListeners(views, settings, layoutManager, leafManager)
 
-  registerEvents(plugin, eventListeners, views, viewCreatorManager.setViewCreator, settings)
+  registerEvents(plugin, eventListeners, views, viewCreatorManager.setViewCreator)
 
   Callbag.subscribe(renderTabs$, views.renderAll)
 }
