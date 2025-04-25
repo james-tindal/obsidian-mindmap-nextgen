@@ -3,7 +3,10 @@ import { Markmap } from 'markmap-view'
 import d3SvgToPng from 'd3-svg-to-png'
 import { ZoomTransform } from 'd3-zoom'
 
-import { GlobalSettings, ScreenshotBgStyle } from 'src/settings/filesystem'
+import { ScreenshotBgStyle } from 'src/settings/filesystem'
+import { pluginState } from 'src/core/entry'
+
+const globalSettings = pluginState.settings
 
 export interface ScreenshotColors {
   background: string;
@@ -11,12 +14,11 @@ export interface ScreenshotColors {
 }
 
 export async function takeScreenshot(
-  globalSettings: GlobalSettings,
   markmap: Markmap,
   frontmatterColors: ScreenshotColors
 ) {
   const themeColors = getThemeColors(markmap)
-  const screenshotSettings = getScreenshotSettings(globalSettings, frontmatterColors, themeColors)
+  const screenshotSettings = getScreenshotSettings(frontmatterColors, themeColors)
   prepareSvgDom(screenshotSettings, markmap)
   const pngDataUrl: string = await createPng(screenshotSettings, markmap)
   restoreSvgDom(themeColors, markmap)
@@ -29,7 +31,6 @@ const getThemeColors = (markmap: Markmap): ScreenshotColors => ({
 })
 
 function getScreenshotSettings(
-  globalSettings: GlobalSettings,
   frontmatterColors: ScreenshotColors,
   themeColors: ScreenshotColors
 ): ScreenshotColors {

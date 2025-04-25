@@ -10,7 +10,6 @@ import { plugin, pluginState } from 'src/core/entry'
 export class GlobalSettingsDialog extends PluginSettingTab {
   constructor() {
     super(app, plugin)
-    const { settings } = pluginState
 
     this.containerEl.addClass('mmng-settings-tab')
 

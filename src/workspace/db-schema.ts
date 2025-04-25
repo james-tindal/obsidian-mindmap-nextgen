@@ -1,6 +1,6 @@
 import { TFile } from 'obsidian'
 
-import { FileSettings, GlobalSettings } from 'src/settings/filesystem'
+import { FileSettings } from 'src/settings/filesystem'
 import { CodeBlock } from './types'
 import { FileTab } from './types'
 import { IPureNode } from 'markmap-common'
