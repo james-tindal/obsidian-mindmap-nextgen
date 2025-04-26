@@ -1,22 +1,18 @@
 import type { Plugin_2, SplitDirection } from 'obsidian'
-import { LocalEvents, PromiseSubject } from '../utilities/utilities'
-import { Layout } from '../views/layout-manager'
-import Callbag from '../utilities/callbag'
+import { LocalEvents, PromiseSubject } from 'src/utilities/utilities'
+import { Layout } from 'src/views/layout-manager'
+import Callbag from 'src/utilities/callbag'
 
+
+export type Coloring = 'depth' | 'branch' | 'single'
 export enum ScreenshotBgStyle {
   Transparent = 'transparent',
   Color = 'color',
   Theme = 'theme',
 }
 
-/**
- * Given a version number MAJOR.MINOR, increment the:
- * 1. MAJOR version when previously valid keys are removed or have a different function
- * 2. MINOR version - Deprecated. If you are adding a key, just add it to the type and the defaults.
- */
-
 // Default settings
-export const defaults: v2['settings'] = {
+export const defaultSettings: v2['settings'] = {
   splitDirection: 'horizontal',
   nodeMinHeight: 16,
   lineHeight: '1em',
@@ -46,85 +42,6 @@ export const defaults: v2['settings'] = {
   titleAsRootNode: true,
   useThemeFont: false,
 }
-
-const defaultsV1: v1_1 = {
-  splitDirection:     defaults.splitDirection,
-  nodeMinHeight:      defaults.nodeMinHeight,
-  lineHeight:         defaults.lineHeight,
-  spacingVertical:    defaults.spacingVertical,
-  spacingHorizontal:  defaults.spacingHorizontal,
-  paddingX:           defaults.paddingX,
-  initialExpandLevel: defaults.initialExpandLevel,
-  defaultColor:       defaults.defaultColor,
-  colorFreezeLevel:   defaults.colorFreezeLevel,
-  animationDuration:  defaults.animationDuration,
-  maxWidth:           defaults.maxWidth,
-  highlight:          defaults.highlight,
-  screenshotBgColor:  defaults.screenshotBgColor,
-  screenshotBgStyle:  defaults.screenshotBgStyle,
-
-  color1:                   defaults.depth1Color,
-  color1Thickness:          defaults.depth1Thickness,
-  color2:                   defaults.depth2Color,
-  color2Thickness:          defaults.depth2Thickness,
-  color3:                   defaults.depth3Color,
-  color3Thickness:          defaults.depth3Thickness,
-  defaultColorThickness:    defaults.defaultThickness,
-  screenshotFgColor:        defaults.screenshotTextColor,
-  screenshotFgColorEnabled: defaults.screenshotTextColorEnabled,
-
-  coloring: 'depth',
-  onlyUseDefaultColor: false,
-  screenshotTransparentBg: false
-}
-
-
-//  Version 1.0
-
-export type v1_0 = {
-  splitDirection: SplitDirection;
-  nodeMinHeight: number;
-  lineHeight: string;
-  spacingVertical: number;
-  spacingHorizontal: number;
-  paddingX: number;
-  initialExpandLevel: number;
-  color1: string;
-  color1Thickness: string;
-  color2: string;
-  color2Thickness: string;
-  color3: string;
-  color3Thickness: string;
-  defaultColor: string;
-  defaultColorThickness: string;
-  onlyUseDefaultColor: boolean;
-}
-
-//  Version 1.1
-
-export type v1_1 = v1_0 & {
-  coloring: 'depth' | 'branch';
-  colorFreezeLevel: number;
-  animationDuration: number;
-  maxWidth: number;
-  highlight: boolean;
-  screenshotBgColor: string;
-  screenshotFgColor: string;
-  screenshotFgColorEnabled: boolean;
-  screenshotBgStyle: ScreenshotBgStyle;
-  screenshotTransparentBg: boolean;
-}
-
-// Upgrade from v1.0 to v1.1
-const upgrade1_1 = (data: v1_0): v1_1 => ({
-  ...defaultsV1,
-  ...data
-})
-
-
-//  Version 2.0
-
-export type Coloring = 'depth' | 'branch' | 'single'
 
 type SettingsV2 = {
   splitDirection: SplitDirection
@@ -163,67 +80,12 @@ export type v2 = {
   layout: Layout
 }
 
-const upgrade2_0 = (data: v1_1): v2 => {
-  const removed = ['onlyUseDefaultColor', 'screenshotTransparentBg']
-
-  const unchanged = {
-    splitDirection:     data.splitDirection,
-    nodeMinHeight:      data.nodeMinHeight,
-    lineHeight:         data.lineHeight,
-    spacingVertical:    data.spacingVertical,
-    spacingHorizontal:  data.spacingHorizontal,
-    paddingX:           data.paddingX,
-    initialExpandLevel: data.initialExpandLevel,
-    defaultColor:       data.defaultColor,
-    colorFreezeLevel:   data.colorFreezeLevel,
-    animationDuration:  data.animationDuration,
-    maxWidth:           data.maxWidth,
-    highlight:          data.highlight,
-    screenshotBgColor:  data.screenshotBgColor,
-    screenshotBgStyle:  data.screenshotBgStyle
-  }
-
-  const renamed = {
-    depth1Color:                data.color1,
-    depth1Thickness:            data.color1Thickness,
-    depth2Color:                data.color2,
-    depth2Thickness:            data.color2Thickness,
-    depth3Color:                data.color3,
-    depth3Thickness:            data.color3Thickness,
-    defaultThickness:           data.defaultColorThickness,
-    screenshotTextColor:        data.screenshotFgColor,
-    screenshotTextColorEnabled: data.screenshotFgColorEnabled,
-  }
-
-  const transformed = {
-    coloring:
-      data.onlyUseDefaultColor ? 'single' : data.coloring as Coloring
-  }
-
-  return {
-    version: '2.0',
-    layout: [],
-    settings: {
-      ...defaults,
-      ...unchanged,
-      ...renamed,
-      ...transformed
-    }
-  }
-}
-
-const defaultsV2 = (): v2 => ({
-  version: '2.0',
-  layout: [],
-  settings: defaults
-})
-
 const useDefaultsForMissingKeys =
 (data: any): v2 => ({
   version: '2.0',
   layout: data.layout || [],
   settings: {
-    ...defaults,
+    ...defaultSettings,
     ...data.settings
   }
 })
@@ -241,37 +103,6 @@ export type FileSettings = Omit<GlobalSettings, OmitFromFileSettings> & { color?
 export type CodeBlockSettings = Omit<FileSettings, 'titleAsRootNode'> & { height?: number }
 
 type FileSystemData = v2
-const latestVersion = '2.0'
-
-const isObject = (x: any) => typeof x === 'object' && x !== null
-
-type Version = '' | '1.0' | '1.1' | '2.0'
-
-const detectVersion = (data: any) =>
-  !isObject(data)    ? '' :
-  'version'  in data ? data.version as Version :
-  'coloring' in data ? '1.1' :
-  'color1'   in data ? '1.0'
-                     : ''
-
-const upgrades = {
-  '1.0': upgrade1_1,
-  '1.1': upgrade2_0,
-  '2.0': useDefaultsForMissingKeys,
-  ''   : defaultsV2,
-}
-
-function upgrade(data: any): FileSystemData {
-  let accumulator = data
-  let version
-  for (;;) {
-    version = detectVersion(accumulator)
-    if (version !== latestVersion)
-      accumulator = upgrades[version](accumulator)
-    else
-      return upgrades[latestVersion](accumulator)
-  }
-}
 
 const [ resolveSettingsReady, settingsReady ] = PromiseSubject<GlobalSettings>()
 export { settingsReady }
@@ -287,7 +118,7 @@ export async function FilesystemManager (
   loadData: Plugin_2['loadData'],
   saveData: Plugin_2['saveData']
 ) {
-  const fsd: FileSystemData = upgrade(await loadData())
+  const fsd: FileSystemData = useDefaultsForMissingKeys(await loadData())
   saveData(fsd)
 
   const settings = new Proxy<GlobalSettings>(fsd.settings, {
@@ -313,4 +144,3 @@ export async function FilesystemManager (
     loadLayout
   }
 }
-
