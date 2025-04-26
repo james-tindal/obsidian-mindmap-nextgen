@@ -12,9 +12,7 @@ import { isObjectEmpty, nextTick } from 'src/utilities/utilities'
 import { ExtractRecord, ExtractUnion, Matcher, Stackable, Tagged, match, tr, unionConstructors } from './utilities'
 import { parseMarkdown } from 'src/rendering/renderer-common'
 import { FileSettingsDialog } from 'src/settings/dialogs'
-import { pluginState } from 'src/core/entry'
-
-const database = pluginState.workspace
+import { workspace } from 'src/core/entry'
 
 
 const InputEvent = unionConstructors(
@@ -106,7 +104,7 @@ type EventMatcher = Matcher<InputEvent, Stackable<CodeBlockEvent>>
 const matcher: EventMatcher = {
   'tab opened': leaf => {
     const fileHandle = leaf.view.file
-    const fileRowInDb = database.files.find(row => row.handle === fileHandle)
+    const fileRowInDb = workspace.files.find(row => row.handle === fileHandle)
     let fileRow: FileRow
 
     if (fileRowInDb)
@@ -114,11 +112,11 @@ const matcher: EventMatcher = {
     else {
       const fileText = leaf.view.editor.getValue()
       fileRow = FileRow({ handle: fileHandle, ...parseMarkdown<'file'>(fileText) })
-      database.files.add(fileRow)
+      workspace.files.add(fileRow)
     }
 
     const tabRow = TabRow({ leaf, view: leaf.view, containerEl: leaf.containerEl, file: fileRow })
-    database.tabs.add(tabRow)
+    workspace.tabs.add(tabRow)
     fileRow.tabs.add(tabRow)
 
     // --
@@ -149,19 +147,19 @@ const matcher: EventMatcher = {
     }
     // --
 
-    return database.codeBlocksWaiting
+    return workspace.codeBlocksWaiting
       .filter(codeBlock => leaf.containerEl.contains(codeBlock.containerEl))
       .map(codeBlock => {
-        database.codeBlocksWaiting.delete(codeBlock)
+        workspace.codeBlocksWaiting.delete(codeBlock)
         return matcher['codeBlock created'](codeBlock)
       })
   },
 
   'tab changed file': ([tabLeaf, newFileHandle]) => {
-    const tabRow         = database.tabs.find(row => row.leaf === tabLeaf)!
+    const tabRow         = workspace.tabs.find(row => row.leaf === tabLeaf)!
     const oldFileHandle  = tabRow.file.handle
-    const oldFileRow     = database.files.find(row => row.handle === oldFileHandle)!
-    const newFileRowInDb = database.files.find(row => row.handle === newFileHandle)
+    const oldFileRow     = workspace.files.find(row => row.handle === oldFileHandle)!
+    const newFileRowInDb = workspace.files.find(row => row.handle === newFileHandle)
     let newFileRow: FileRow
 
     if (newFileRowInDb)
@@ -171,50 +169,50 @@ const matcher: EventMatcher = {
       const fileText = tabLeaf.view.editor.getValue()
       newFileRow = FileRow({ handle: newFileHandle, ...parseMarkdown<'file'>(fileText) })
       // Add it to the db
-      database.files.add(newFileRow)
+      workspace.files.add(newFileRow)
     }
     
     // Update 1-to-many relation
     tabRow.file = newFileRow
     // Remove file from files if no tab refers to it.
-    const old_file_is_not_in_use = ! database.tabs.find(row => row.file.handle === oldFileHandle)
-    if (old_file_is_not_in_use) database.files.delete(oldFileRow)
+    const old_file_is_not_in_use = ! workspace.tabs.find(row => row.file.handle === oldFileHandle)
+    if (old_file_is_not_in_use) workspace.files.delete(oldFileRow)
   },
   'tab current': tabLeaf => {
-    const tabRow = database.tabs.find(row => row.leaf === tabLeaf)!
+    const tabRow = workspace.tabs.find(row => row.leaf === tabLeaf)!
     tabRow.isCurrent = true
     return tabRow.codeBlocks.map(CodeBlockEvent.current)
   },
   'tab not current': tabLeaf => {
-    const tabRow = database.tabs.find(row => row.leaf === tabLeaf)
+    const tabRow = workspace.tabs.find(row => row.leaf === tabLeaf)
     tabRow && (tabRow.isCurrent = false)
   },
   'tab closed': tabLeaf => {
-    const tabRow = database.tabs.find(row => row.leaf === tabLeaf)!
+    const tabRow = workspace.tabs.find(row => row.leaf === tabLeaf)!
     const fileRow = tabRow.file
 
     // remove tab from db.tabs
-    database.tabs.delete(tabRow)
+    workspace.tabs.delete(tabRow)
 
     // remove tab from db.files
-    database.files.forEach(fileRow => fileRow.tabs.delete(tabRow))
+    workspace.files.forEach(fileRow => fileRow.tabs.delete(tabRow))
 
     // remove file if it has no tabs
-    database.tabs.find(row => row.file === fileRow)
+    workspace.tabs.find(row => row.file === fileRow)
 
     // codeBlocks will each have their own delete events
   },
   'codeBlock created': codeBlock => {
-    const tabRow = database.tabs.find(tab => tab.containerEl.contains(codeBlock.containerEl))
+    const tabRow = workspace.tabs.find(tab => tab.containerEl.contains(codeBlock.containerEl))
     
     if (!tabRow) {
-      database.codeBlocksWaiting.add(codeBlock)
+      workspace.codeBlocksWaiting.add(codeBlock)
       return
     }
 
     const codeBlockRow = CodeBlockRow({ codeBlock, tab: tabRow })
 
-    database.codeBlocks.add(codeBlockRow)
+    workspace.codeBlocks.add(codeBlockRow)
     tabRow.codeBlocks.add(codeBlockRow)
 
     const fileSettings = tabRow.file.settings
@@ -225,15 +223,15 @@ const matcher: EventMatcher = {
 
   },
   'codeBlock deleted': codeBlock => {
-    const codeBlockRow = database.codeBlocks.find(row => row.codeBlock === codeBlock)!
+    const codeBlockRow = workspace.codeBlocks.find(row => row.codeBlock === codeBlock)!
 
-    database.codeBlocks.delete(codeBlockRow)
+    workspace.codeBlocks.delete(codeBlockRow)
     codeBlockRow.tab.codeBlocks.delete(codeBlockRow)
 
     return CodeBlockEvent.end({ codeBlock })
   },
   'fileSettings' ({ file, settings }) {
-    const fileRow = database.files.find(row => row.handle === file)!
+    const fileRow = workspace.files.find(row => row.handle === file)!
     fileRow.settings = settings
 
     return fileRow.tabs.flatMap(tabRow =>

@@ -1,17 +1,12 @@
-import { App, Plugin as ObsidianPlugin, PluginManifest, TFile } from 'obsidian'
+import { App, Plugin as ObsidianPlugin, PluginManifest } from 'obsidian'
 import autoBind from 'auto-bind'
 
-import { createDb, Database } from 'src/workspace/db-schema'
+import { createDb } from 'src/workspace/db-schema'
 
 
 export let plugin: Plugin
-export const pluginState = {} as PluginState
-interface PluginState {
-  svgs: Map<SVGSVGElement, TFile>
-  workspace: Database
-}
-pluginState.svgs = new Map()
-pluginState.workspace = createDb()
+export const svgs = new Map()
+export const workspace = createDb()
 
 
 export default class Plugin extends ObsidianPlugin {
