@@ -3,7 +3,7 @@ import { ButtonComponent, EditorPosition } from 'obsidian'
 import autoBind from 'auto-bind'
 import GrayMatter from 'gray-matter'
 
-import { CodeBlockSettings, FileSettings, GlobalSettings } from 'src/settings/filesystem'
+import { CodeBlockSettings, FileSettings, globalSettings, GlobalSettings } from 'src/settings/filesystem'
 import { cssClasses } from 'src/constants'
 import { CodeBlock, FileTab } from 'src/workspace/types'
 import { getOptions, parseMarkdown } from 'src/rendering/renderer-common'
@@ -91,7 +91,7 @@ class SettingsManager {
   ) {
     autoBind(this)
     this.settings = {
-      global: pluginState.settings,
+      global: globalSettings,
       file: fileSettings,
       codeBlock: codeBlockSettings
     }

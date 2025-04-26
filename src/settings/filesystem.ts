@@ -1,7 +1,7 @@
-import type { Plugin_2, SplitDirection } from 'obsidian'
+import type { SplitDirection } from 'obsidian'
 import { LocalEvents, PromiseSubject } from 'src/utilities/utilities'
 import { Layout } from 'src/views/layout-manager'
-import Callbag from 'src/utilities/callbag'
+import { plugin } from 'src/core/entry'
 
 
 export type Coloring = 'depth' | 'branch' | 'single'
@@ -102,40 +102,40 @@ export type GlobalSettings = v2['settings']
 export type FileSettings = Omit<GlobalSettings, OmitFromFileSettings> & { color?: string[] }
 export type CodeBlockSettings = Omit<FileSettings, 'titleAsRootNode'> & { height?: number }
 
-type FileSystemData = v2
-
-const [ resolveSettingsReady, settingsReady ] = PromiseSubject<GlobalSettings>()
-export { settingsReady }
+const [ resolve, settingsLoaded ] = PromiseSubject<GlobalSettings>()
+export { settingsLoaded }
 
 const events = new LocalEvents<keyof GlobalSettings>()
 export const settingChanges = { listen: events.listen }
 
-export type FilesystemManager = Awaited<ReturnType<typeof FilesystemManager>>
-export async function FilesystemManager (
-  loadData: Plugin_2['loadData'],
-  saveData: Plugin_2['saveData']
-) {
-  const fsd: FileSystemData = useDefaultsForMissingKeys(await loadData())
-  saveData(fsd)
+export let globalSettings: GlobalSettings
+export let layout: {
+  save(layout: Layout): void
+  load(): Layout
+}
 
-  const settings = new Proxy<GlobalSettings>(fsd.settings, {
+plugin.loadData()
+.then(useDefaultsForMissingKeys)
+.then(fsd => {
+  plugin.saveData(fsd)
+
+  globalSettings = new Proxy<GlobalSettings>(fsd.settings, {
     get: (_, key) => fsd.settings[key],
     set<K extends keyof GlobalSettings>(_, key: K, value: GlobalSettings[K]) {
       fsd.settings[key] = value
       events.emit(key, value)
-      saveData(fsd)
+      plugin.saveData(fsd)
       return true
     }
   })
 
-  const saveLayout = (layout: Layout) => { fsd.layout = layout; saveData(fsd) }
-  const loadLayout = () => fsd.layout
-
-  resolveSettingsReady(settings)
-
-  return {
-    settings,
-    saveLayout,
-    loadLayout
+  layout = {
+    save(layout: Layout) {
+      fsd.layout = layout
+      plugin.saveData(fsd)
+    },
+    load: () => fsd.layout
   }
-}
+
+  resolve(globalSettings)
+})

@@ -3,10 +3,8 @@ import { Markmap } from 'markmap-view'
 import d3SvgToPng from 'd3-svg-to-png'
 import { ZoomTransform } from 'd3-zoom'
 
-import { ScreenshotBgStyle } from 'src/settings/filesystem'
-import { pluginState } from 'src/core/entry'
+import { globalSettings, ScreenshotBgStyle } from 'src/settings/filesystem'
 
-const globalSettings = pluginState.settings
 
 export interface ScreenshotColors {
   background: string;

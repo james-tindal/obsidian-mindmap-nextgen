@@ -1,8 +1,6 @@
 import { App, Plugin as ObsidianPlugin, PluginManifest, TFile } from 'obsidian'
 import autoBind from 'auto-bind'
 
-import { FilesystemManager, GlobalSettings } from 'src/settings/filesystem'
-import { loadStyleFeatures } from 'src/rendering/style-features'
 import { createDb, Database } from 'src/workspace/db-schema'
 
 
@@ -10,7 +8,6 @@ export let plugin: Plugin
 export const pluginState = {} as PluginState
 interface PluginState {
   svgs: Map<SVGSVGElement, TFile>
-  settings: GlobalSettings
   workspace: Database
 }
 pluginState.svgs = new Map()
@@ -31,8 +28,9 @@ export default class Plugin extends ObsidianPlugin {
   }
 
   private async setup() {
-    const { settings, saveLayout, loadLayout } = await FilesystemManager(this.loadData, this.saveData)
-    pluginState.settings = settings
+    const { settingsLoaded } = await import('src/settings/filesystem')
+    await settingsLoaded
+    const { loadStyleFeatures } = await import('src/rendering/style-features')
     const { GlobalSettingsDialog } = await import('src/settings/dialogs')
     const { codeBlockHandler } = await import('src/workspace')
     const { ViewManager } = await import('src/views/view-manager')
@@ -40,7 +38,7 @@ export default class Plugin extends ObsidianPlugin {
 
     this.addSettingTab(new GlobalSettingsDialog())
     this.registerMarkdownCodeBlockProcessor('markmap', codeBlockHandler)
-    const layoutManager = LayoutManager(saveLayout, loadLayout)
+    const layoutManager = LayoutManager()
     ViewManager(layoutManager)
     loadStyleFeatures()
   }

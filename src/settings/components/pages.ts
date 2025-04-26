@@ -1,8 +1,7 @@
 import { Setting } from 'obsidian'
-import { CodeBlockSettings, Coloring, FileSettings, GlobalSettings, ScreenshotBgStyle } from '../filesystem'
+import { CodeBlockSettings, Coloring, FileSettings, globalSettings, GlobalSettings, ScreenshotBgStyle } from '../filesystem'
 import { Heading, HtmlComponent, fragment } from './various'
 import { SettingComponent, dropdown, numberText, text } from './SettingComponent'
-import { pluginState } from 'src/core/entry'
 
 
 
@@ -133,7 +132,7 @@ const SectionColoringGlobal = () => {
     })
   }
 
-  setApproach(pluginState.settings.coloring)
+  setApproach(globalSettings.coloring)
   approach.onChange(setApproach)
 
   return fragment([
@@ -318,7 +317,6 @@ const MaxWidth = SettingComponent({
 
 // -- Complete Pages -- //
 
-const globalSettings = pluginState.settings
 const GlobalPage = () => fragment([
   fragment([
     SplitDirection.global(),

@@ -22,7 +22,7 @@ export default (env, argv): Configuration => ({
     rules: [
       {
         test: /\.ts$/,
-        loader: 'esbuild-loader',
+        loader: 'esbuild-loader'
       },
     ],
   },

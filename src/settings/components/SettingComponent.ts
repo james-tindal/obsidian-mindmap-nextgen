@@ -1,8 +1,7 @@
 import { ValueComponent, ExtraButtonComponent, DropdownComponent, TextComponent } from 'obsidian'
-import { GlobalSettings } from '../filesystem'
+import { globalSettings, GlobalSettings } from '../filesystem'
 import { Resolve } from 'src/workspace/utilities'
 import { Setting } from './setting-constructor'
-import { pluginState } from 'src/core/entry'
 
 
 interface ControlComponent<T> extends ValueComponent<T> {
@@ -80,13 +79,12 @@ export const SettingComponent = (options: SettingOptions) => {
 
   const global = () => {
     const { node, control, key, onChange } = common()
-    const settings = pluginState.settings
 
-    function update() { control.setValue(settings[key])}
+    function update() { control.setValue(globalSettings[key])}
     update()
 
     control.onChange(value =>
-      (settings[key] as any) = value)
+      (globalSettings[key] as any) = value)
 
     return {
       node,

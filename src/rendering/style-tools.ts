@@ -1,4 +1,4 @@
-import { GlobalSettings, settingChanges, settingsReady } from 'src/settings/filesystem'
+import { globalSettings, GlobalSettings, settingChanges } from 'src/settings/filesystem'
 import { plugin } from 'src/core/entry'
 
 
@@ -7,7 +7,7 @@ export function toggleBodyClass(setting: keyof GlobalSettings, className: string
     ? document.body.classList.add(className)
     : document.body.classList.remove(className)
   settingChanges.listen(setting, fn)
-  settingsReady.then(settings => fn(settings[setting]))
+  fn(globalSettings[setting])
 }
 
 export type Trigger = (next: () => void) => void

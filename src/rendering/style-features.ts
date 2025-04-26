@@ -1,5 +1,5 @@
 import { cssClasses } from 'src/constants'
-import { settingChanges, settingsReady } from 'src/settings/filesystem'
+import { globalSettings, settingChanges } from 'src/settings/filesystem'
 import Callbag from 'src/utilities/callbag'
 import { layoutReady } from 'src/utilities/layout-ready'
 import { globalStyle, toggleBodyClass, settingTriggers as t, themeChange } from './style-tools'
@@ -31,31 +31,28 @@ async function useThemeFont() {
 }
 
 async function lineThickness() {
-  const s = await settingsReady
-  
   globalStyle.add(t.defaultThickness, () => `
     .markmap path.markmap-link,
     .markmap g.markmap-node line {
-      stroke-width: ${s.defaultThickness} }`)
+      stroke-width: ${globalSettings.defaultThickness} }`)
 
   globalStyle.add(t.depth1Thickness, () => `
     .markmap g[data-depth="0"].markmap-node line {
-      stroke-width: ${s.depth1Thickness} }`)
+      stroke-width: ${globalSettings.depth1Thickness} }`)
 
   globalStyle.add(t.depth2Thickness, () => `
     .markmap path.markmap-link[data-depth="1"],
     .markmap    g.markmap-node[data-depth="1"] line {
-      stroke-width: ${s.depth2Thickness} }`)
+      stroke-width: ${globalSettings.depth2Thickness} }`)
 
   globalStyle.add(t.depth3Thickness, () => `
     .markmap path.markmap-link[data-depth="2"],
     .markmap    g.markmap-node[data-depth="2"] line {
-      stroke-width: ${s.depth3Thickness} }`)
+      stroke-width: ${globalSettings.depth3Thickness} }`)
 }
 
 async function lineHeight() {
-  const s = await settingsReady
-  globalStyle.add(t.lineHeight, () => `:root { --mm-line-height: ${s.lineHeight} }`)
+  globalStyle.add(t.lineHeight, () => `:root { --mm-line-height: ${globalSettings.lineHeight} }`)
 }
 
 
