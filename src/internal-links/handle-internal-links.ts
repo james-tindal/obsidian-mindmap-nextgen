@@ -1,4 +1,4 @@
-import { plugin, pluginState } from 'src/core/entry'
+import { plugin, svgs } from 'src/core/entry'
 
 
 const workspace = document.querySelector('.workspace' as 'div')!
@@ -26,7 +26,7 @@ const registerEvent = (type: 'click' | 'mouseover', fn: (args: {
 registerEvent('click', ({ event, parentMindmap, href }) => {
   event.preventDefault()
 
-  const { path } = pluginState.svgs.get(parentMindmap)!
+  const { path } = svgs.get(parentMindmap)!
   app.workspace.openLinkText(href, path)
 })
 
