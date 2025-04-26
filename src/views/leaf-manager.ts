@@ -1,11 +1,12 @@
-import { WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs, WorkspaceParent, SplitDirection } from 'obsidian'
+import { WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs, WorkspaceParent } from 'obsidian'
 import { MindmapSubject } from './layout-manager'
 import { ViewCreatorManager } from './view-creator-manager'
 import views from './views'
+import { globalSettings } from 'src/settings/filesystem'
 
 
 export type LeafManager = ReturnType<typeof LeafManager>
-export function LeafManager(createLeafIn: CreateLeafIn, constructView: ViewCreatorManager['constructView']) {
+export function LeafManager(constructView: ViewCreatorManager['constructView']) {
   return {
     close,
     reveal,
@@ -67,15 +68,11 @@ export function LeafManager(createLeafIn: CreateLeafIn, constructView: ViewCreat
 }
 
 
-export type CreateLeafIn = ReturnType<typeof CreateLeafIn>
-export function CreateLeafIn(splitDirection: SplitDirection) {
-  return {
-    tabGroup: (tabGroup: WorkspaceTabs, index: number) =>
-        app.workspace
-          .createLeafInParent(tabGroup, index),
-
-    newSplit: () =>
-        app.workspace
-          .getLeaf('split', splitDirection)
-  }
+export const createLeafIn = {
+  tabGroup: (tabGroup: WorkspaceTabs, index: number) =>
+    app.workspace
+      .createLeafInParent(tabGroup, index),
+  newSplit: () =>
+    app.workspace
+      .getLeaf('split', globalSettings.splitDirection)
 }

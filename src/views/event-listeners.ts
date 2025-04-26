@@ -4,9 +4,9 @@ import { LeafManager } from './leaf-manager'
 import { LoadingView } from './loading-view'
 import MindmapTabView from './view'
 import { ViewCreatorManager } from './view-creator-manager'
-import { pluginState } from 'src/core/entry'
 import { getActiveFile } from './get-active-file'
 import views from './views'
+import { globalSettings } from 'src/settings/filesystem'
 
 
 export type EventListeners = {
@@ -128,7 +128,7 @@ export function EventListeners(layoutManager: LayoutManager, leafManager: LeafMa
   renameFile({ path }) {
     const activeFile = getActiveFile()
     const unpinned = views.get('unpinned')
-    if (unpinned && activeFile?.path === path && pluginState.settings.titleAsRootNode)
+    if (unpinned && activeFile?.path === path && globalSettings.titleAsRootNode)
       unpinned.render(activeFile)
 
     const result = views.getByPath(path)

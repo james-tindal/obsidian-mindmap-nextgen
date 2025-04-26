@@ -1,10 +1,10 @@
 import { PluginSettingTab, Modal } from 'obsidian'
 import autoBind from 'auto-bind'
 
-import { GlobalSettings } from './filesystem'
+import { globalSettings, GlobalSettings } from './filesystem'
 import { PageSelector } from './components/PageSelector'
 import { CodeBlockPage, FilePage, GlobalPage } from './components/pages'
-import { plugin, pluginState } from 'src/core/entry'
+import { plugin } from 'src/core/entry'
 
 
 export class GlobalSettingsDialog extends PluginSettingTab {
@@ -59,7 +59,6 @@ export class CodeBlockSettingsDialog extends Modal {
   constructor(fileSettings: Partial<FileSettings>, codeBlockSettings: Partial<CodeBlockSettings>) {
     super(app)
     autoBind(this)
-    const globalSettings = pluginState.settings
 
     const inheritSettings = new Proxy({} as GlobalSettings, {
       get: (_, key) => fileSettings[key] || globalSettings[key],

@@ -6,6 +6,7 @@ import { LoadingView } from './loading-view'
 import MindmapTabView from './view'
 import { getActiveFile } from './get-active-file'
 import views from './views'
+import { layout } from 'src/settings/filesystem'
 
 
 export type MindmapSubject = TFile | 'unpinned'
@@ -22,12 +23,9 @@ type FlatSubject =
 | { type: 'pinned', path: TFile['path'] }
 
 export type LayoutManager = ReturnType<typeof LayoutManager>
-export function LayoutManager(
-  saveLayout: (layout: Layout) => void,
-  loadLayout: () => Layout
-) {
+export function LayoutManager() {
   return {
-    serialise: () => saveLayout(getLayout()),
+    serialise: () => layout.save(getLayout()),
     deserialise
   }
 
@@ -52,7 +50,7 @@ export function LayoutManager(
 
   async function deserialise(replace: LeafManager['replace']) {
     const actualLayout = app.workspace.rootSplit.children[0] as WorkspaceSplit | WorkspaceTabs
-    const serialisedLayout = loadLayout()
+    const serialisedLayout = layout.load()
     const activeTabGroup = app.workspace.activeTabGroup!
 
     type Actual = WorkspaceSplit | WorkspaceTabs

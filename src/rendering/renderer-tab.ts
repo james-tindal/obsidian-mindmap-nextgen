@@ -3,7 +3,7 @@ import { TFile } from 'obsidian'
 import { Toolbar } from 'markmap-toolbar'
 import { IPureNode } from 'markmap-common'
 
-import { FileSettings } from 'src/settings/filesystem'
+import { FileSettings, globalSettings } from 'src/settings/filesystem'
 import { ScreenshotColors, takeScreenshot } from 'src/rendering/screenshot'
 import { getOptions, parseMarkdown } from './renderer-common'
 import { MindmapTab } from 'src/workspace/types'
@@ -56,7 +56,7 @@ export function TabRenderer(containerEl: MindmapTab.View['containerEl']) {
     const markdown = content ?? await app.vault.cachedRead(file)
     
     const { rootNode, settings: fileSettings } = parseMarkdown<'file'>(markdown)
-    const settings: FileSettings = { ...pluginState.settings, ...fileSettings }
+    const settings: FileSettings = { ...globalSettings, ...fileSettings }
     const markmapOptions = getOptions(settings)
 
     if (settings.titleAsRootNode)
