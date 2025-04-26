@@ -2,10 +2,10 @@ import { debounce } from 'obsidian'
 import { EventListeners } from './event-listeners'
 import MindmapTabView from './view'
 import { ViewCreatorManager } from './view-creator-manager'
-import { Views } from './view-manager'
 import { plugin } from 'src/core/entry'
+import views from './views'
 
-export async function registerEvents(listeners: EventListeners, views: Views, setViewCreator: ViewCreatorManager['setViewCreator']) {
+export async function registerEvents(listeners: EventListeners, setViewCreator: ViewCreatorManager['setViewCreator']) {
   listeners.appLoading(setViewCreator)
   const mindmapLayoutReady = new Promise(resolve =>
     app.workspace.onLayoutReady(() =>

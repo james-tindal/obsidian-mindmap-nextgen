@@ -2,19 +2,18 @@ import { ViewCreator, WorkspaceLeaf } from 'obsidian'
 import { MM_VIEW_TYPE } from 'src/constants'
 import { MindmapSubject } from './layout-manager'
 import MindmapTabView from './view'
-import { Views, getActiveFile } from './view-manager'
 import { plugin } from 'src/core/entry'
+import { getActiveFile } from './get-active-file'
+import views from './views'
 
 export class ViewCreatorManager {
-  private static views: Views
   private static viewCreator: ViewCreator
   private static instance: ViewCreatorManager
   private static waitForLastConstruct = Promise.resolve()
 
-  constructor(views: Views) {
+  constructor() {
     if (ViewCreatorManager.instance) return ViewCreatorManager.instance
     ViewCreatorManager.instance = this
-    ViewCreatorManager.views = views
 
     plugin.registerView(MM_VIEW_TYPE, (leaf: WorkspaceLeaf) => ViewCreatorManager.viewCreator(leaf))
   }
@@ -23,7 +22,6 @@ export class ViewCreatorManager {
 
   public constructView(leaf: WorkspaceLeaf, subject: MindmapSubject) {
     return ViewCreatorManager.enqueue(async () => {
-      const { views } = ViewCreatorManager
       const pinned = subject !== 'unpinned'
       const displayText = pinned ? subject.basename : 'Mindmap'
   

@@ -4,8 +4,10 @@ import { LeafManager } from './leaf-manager'
 import { LoadingView } from './loading-view'
 import MindmapTabView from './view'
 import { ViewCreatorManager } from './view-creator-manager'
-import { getActiveFile, Views } from './view-manager'
 import { pluginState } from 'src/core/entry'
+import { getActiveFile } from './get-active-file'
+import views from './views'
+
 
 export type EventListeners = {
   appLoading(setViewCreator: ViewCreatorManager['setViewCreator']): void;
@@ -21,17 +23,17 @@ export type EventListeners = {
   fileOpen(file: TFile | null): void;
   renameFile(file: TAbstractFile, oldPath: string): void;
 }
-export function EventListeners(views: Views, layoutManager: LayoutManager, leafManager: LeafManager): EventListeners { return {
+export function EventListeners(layoutManager: LayoutManager, leafManager: LeafManager): EventListeners { return {
   appLoading(setViewCreator: ViewCreatorManager['setViewCreator']) {
     setViewCreator((leaf: WorkspaceLeaf) => new LoadingView(leaf))
   },
 
   layoutReady() {
-    return layoutManager.deserialise(leafManager.replace, views)
+    return layoutManager.deserialise(leafManager.replace)
   },
 
   layoutChange() {
-    layoutManager.serialise(views)
+    layoutManager.serialise()
 
     const topLevel = app.workspace.rootSplit.children[0] as WorkspaceSplit | WorkspaceTabs;
 
