@@ -1,10 +1,11 @@
 import { WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs, WorkspaceParent, SplitDirection } from 'obsidian'
 import { MindmapSubject } from './layout-manager'
 import { ViewCreatorManager } from './view-creator-manager'
-import { Views } from './view-manager'
+import views from './views'
+
 
 export type LeafManager = ReturnType<typeof LeafManager>
-export function LeafManager(views: Views, createLeafIn: CreateLeafIn, constructView: ViewCreatorManager['constructView']) {
+export function LeafManager(createLeafIn: CreateLeafIn, constructView: ViewCreatorManager['constructView']) {
   return {
     close,
     reveal,

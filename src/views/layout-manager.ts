@@ -4,7 +4,8 @@ import { MM_VIEW_TYPE } from 'src/constants'
 import { LeafManager } from './leaf-manager'
 import { LoadingView } from './loading-view'
 import MindmapTabView from './view'
-import { Views, getActiveFile } from './view-manager'
+import { getActiveFile } from './get-active-file'
+import views from './views'
 
 
 export type MindmapSubject = TFile | 'unpinned'
@@ -26,11 +27,11 @@ export function LayoutManager(
   loadLayout: () => Layout
 ) {
   return {
-    serialise: (views: Views) => saveLayout(getLayout(views)),
+    serialise: () => saveLayout(getLayout()),
     deserialise
   }
 
-  function getLayout(views: Views): Layout {
+  function getLayout(): Layout {
     const topLevel = app.workspace.rootSplit.children[0] as WorkspaceSplit | WorkspaceTabs
     return loop(topLevel)
   
@@ -49,7 +50,7 @@ export function LayoutManager(
     }
   }
 
-  async function deserialise(replace: LeafManager['replace'], views: Views) {
+  async function deserialise(replace: LeafManager['replace']) {
     const actualLayout = app.workspace.rootSplit.children[0] as WorkspaceSplit | WorkspaceTabs
     const serialisedLayout = loadLayout()
     const activeTabGroup = app.workspace.activeTabGroup!

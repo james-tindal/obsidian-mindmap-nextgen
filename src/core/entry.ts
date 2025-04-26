@@ -5,6 +5,7 @@ import { FilesystemManager, GlobalSettings } from 'src/settings/filesystem'
 import { loadStyleFeatures } from 'src/rendering/style-features'
 import { createDb, Database } from 'src/workspace/db-schema'
 
+
 export let plugin: Plugin
 export const pluginState = {} as PluginState
 interface PluginState {
