@@ -107,9 +107,6 @@ type FileSystemData = v2
 const [ resolveSettingsReady, settingsReady ] = PromiseSubject<GlobalSettings>()
 export { settingsReady }
 
-const { source: globalSettings$, push: pushSettings } = Callbag.subject<GlobalSettings>()
-export { globalSettings$ }
-
 const events = new LocalEvents<keyof GlobalSettings>()
 export const settingChanges = { listen: events.listen }
 
@@ -126,7 +123,6 @@ export async function FilesystemManager (
     set<K extends keyof GlobalSettings>(_, key: K, value: GlobalSettings[K]) {
       fsd.settings[key] = value
       events.emit(key, value)
-      pushSettings(fsd.settings)
       saveData(fsd)
       return true
     }
@@ -135,7 +131,6 @@ export async function FilesystemManager (
   const saveLayout = (layout: Layout) => { fsd.layout = layout; saveData(fsd) }
   const loadLayout = () => fsd.layout
 
-  pushSettings(settings)
   resolveSettingsReady(settings)
 
   return {
