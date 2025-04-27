@@ -1,5 +1,4 @@
 import { TFile, MarkdownView, MarkdownFileInfo, WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs, Editor, TAbstractFile } from 'obsidian'
-import { LayoutManager } from './layout-manager'
 import { LeafManager } from './leaf-manager'
 import { LoadingView } from './loading-view'
 import MindmapTabView from './view'
@@ -23,17 +22,18 @@ export type EventListeners = {
   fileOpen(file: TFile | null): void;
   renameFile(file: TAbstractFile, oldPath: string): void;
 }
-export function EventListeners(layoutManager: LayoutManager, leafManager: LeafManager): EventListeners { return {
+export function EventListeners(leafManager: LeafManager): EventListeners { return {
   appLoading(setViewCreator: ViewCreatorManager['setViewCreator']) {
     setViewCreator((leaf: WorkspaceLeaf) => new LoadingView(leaf))
   },
 
   layoutReady() {
-    return layoutManager.deserialise(leafManager.replace)
+    // return layoutManager.deserialise(leafManager.replace)
+    return Promise.resolve()
   },
 
   layoutChange() {
-    layoutManager.serialise()
+    // layoutManager.serialise()
 
     const topLevel = app.workspace.rootSplit.children[0] as WorkspaceSplit | WorkspaceTabs;
 

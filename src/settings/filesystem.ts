@@ -1,6 +1,6 @@
 import type { SplitDirection } from 'obsidian'
 import { LocalEvents, PromiseSubject } from 'src/utilities/utilities'
-import { Layout } from 'src/views/layout-manager'
+import { Layout } from 'src/views/former-layout-manager'
 import { plugin } from 'src/core/entry'
 
 

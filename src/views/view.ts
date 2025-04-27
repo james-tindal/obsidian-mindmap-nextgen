@@ -1,25 +1,48 @@
-import { ItemView, Menu, WorkspaceLeaf } from 'obsidian'
+import { ItemView, Menu, TFile, ViewStateResult, WorkspaceLeaf } from 'obsidian'
 
 import { MM_VIEW_TYPE } from 'src/constants'
 import { TabRenderer } from 'src/rendering/renderer-tab'
 
 
+type LayoutState = { pinned: boolean, filePath: string }
+type LiveState   = { pinned: boolean, file: TFile }
+
 export default class MindmapTabView extends ItemView {
   private displayText: string
-  private pinned: boolean
+  public pinned: boolean
+  public file: TFile
   
   private renderer: TabRenderer
   public render: TabRenderer['render']
   public firstRender: TabRenderer['firstRender']
 
-  constructor(leaf: WorkspaceLeaf, displayText: string, pinned: boolean) {
+  constructor(leaf: WorkspaceLeaf) {
     super(leaf)
-    this.displayText = displayText
-    this.pinned = pinned
 
     this.renderer = TabRenderer(this.containerEl)
     this.render = this.renderer.render
     this.firstRender = this.renderer.firstRender
+  }
+
+  getState(): LayoutState {
+    return {
+      pinned: this.pinned,
+      filePath: this.file.path
+    }
+  }
+  setState(state: LayoutState | LiveState, result: ViewStateResult): Promise<void> {
+    console.log('view setState', state, this)
+
+    const file = 
+      'file' in state ? state.file :
+      app.vault.getAbstractFileByPath(state.filePath) 
+    if (file instanceof TFile) {
+      this.file = file
+      this.setDisplayText(file.basename)
+      this.firstRender(file)
+    }
+    this.pinned = state.pinned
+    return super.setState(state, result)
   }
 
   private static pinToggleListener: (view: MindmapTabView) => void

@@ -1,5 +1,5 @@
 import { getActiveFile } from './get-active-file'
-import { MindmapSubject } from './layout-manager'
+import { MindmapSubject } from './former-layout-manager'
 import MindmapTabView from './view'
 
 type Get<MSV extends MindmapSubject | MindmapTabView> = MSV extends MindmapTabView ? MindmapSubject : MindmapTabView

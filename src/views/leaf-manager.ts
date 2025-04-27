@@ -1,5 +1,5 @@
 import { WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs, WorkspaceParent } from 'obsidian'
-import { MindmapSubject } from './layout-manager'
+import { MindmapSubject } from './former-layout-manager'
 import { ViewCreatorManager } from './view-creator-manager'
 import views from './views'
 import { globalSettings } from 'src/settings/filesystem'
@@ -17,14 +17,14 @@ export function LeafManager(constructView: ViewCreatorManager['constructView']) 
     },
   }
 
-  async function replace(remove: MindmapSubject | WorkspaceLeaf, add: MindmapSubject) {
+  async function replace(remove: MindmapSubject | WorkspaceLeaf, toAdd: MindmapSubject) {
     const leafToRemove = isLeaf(remove) ? remove : views.get(remove)!.leaf
     const tabGroup = leafToRemove.parent
     const index = tabGroup.children.indexOf(leafToRemove)
 
     const newLeaf = createLeafIn.tabGroup(tabGroup, index)
 
-    await constructView(newLeaf, add)
+    await constructView(newLeaf, toAdd)
     leafToRemove.detach()
   }
 
@@ -68,7 +68,7 @@ export function LeafManager(constructView: ViewCreatorManager['constructView']) 
 }
 
 
-export const createLeafIn = {
+const createLeafIn = {
   tabGroup: (tabGroup: WorkspaceTabs, index: number) =>
     app.workspace
       .createLeafInParent(tabGroup, index),

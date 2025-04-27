@@ -1,7 +1,8 @@
-import { App, Plugin as ObsidianPlugin, PluginManifest } from 'obsidian'
+import { App, Plugin as ObsidianPlugin, PluginManifest, WorkspaceLeaf } from 'obsidian'
 import autoBind from 'auto-bind'
 
 import { createDb } from 'src/workspace/db-schema'
+import { MM_VIEW_TYPE } from 'src/constants'
 
 
 export let plugin: Plugin
@@ -29,12 +30,12 @@ export default class Plugin extends ObsidianPlugin {
     const { GlobalSettingsDialog } = await import('src/settings/dialogs')
     const { codeBlockHandler } = await import('src/workspace')
     const { ViewManager } = await import('src/views/view-manager')
-    const { LayoutManager } = await import('src/views/layout-manager')
+    const { default: MindmapTabView } = await import('src/views/view')
 
+    this.registerView(MM_VIEW_TYPE, (leaf: WorkspaceLeaf) => new MindmapTabView(leaf))
     this.addSettingTab(new GlobalSettingsDialog())
     this.registerMarkdownCodeBlockProcessor('markmap', codeBlockHandler)
-    const layoutManager = LayoutManager()
-    ViewManager(layoutManager)
+    ViewManager()
     loadStyleFeatures()
   }
 
