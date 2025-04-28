@@ -4,6 +4,7 @@ import { layoutManager } from 'src/views/layout-manager'
 import { fromObsidianEvent } from 'src/utilities/from-obsidian-event'
 import { renderTabs$ } from 'src/rendering/style-features'
 import views from 'src/views/views'
+import { fromCommand } from 'src/utilities/from-command'
 
 
 export const start = Callbag.create<void>(
@@ -34,6 +35,9 @@ export const isDarkMode = Callbag.pipe(
 
 export const fileOpen = fromObsidianEvent(app.workspace, 'file-open').unary()
 export const fileRenamed = fromObsidianEvent(app.vault, 'rename').unary()
+
+export const commandOpenUnpinned = fromCommand('mindmapnextgen:unpinned', 'Open unpinned mindmap')
+export const commandOpenPinned = fromCommand('mindmapnextgen:pinned', 'Open pinned mindmap')
 
 
 Callbag.subscribe(isDarkMode, isDarkMode => {
