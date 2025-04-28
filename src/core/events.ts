@@ -1,10 +1,11 @@
-import Callbag, { debounce, distinct, flatMap, fromPromise, map, merge, remember } from 'src/utilities/callbag'
+import Callbag, { debounce, distinct, filter, flatMap, fromPromise, map, merge, partition, remember } from 'src/utilities/callbag'
 import { plugin } from './entry'
 import { layoutManager } from 'src/views/layout-manager'
 import { fromObsidianEvent } from 'src/utilities/from-obsidian-event'
 import { renderTabs$ } from 'src/rendering/style-features'
 import views from 'src/views/views'
 import { fromCommand } from 'src/utilities/from-command'
+import MindmapTabView from 'src/views/view'
 
 
 export const start = Callbag.create<void>(
@@ -40,6 +41,17 @@ export const fileChanged = Callbag.pipe(
   debounce(300)
 )
 
+export const [pin, unpin] =
+  Callbag.pipe(MindmapTabView.togglePinned$,
+    map(views.get),
+    filter(x => !!x),
+    partition(subject => subject === 'unpinned'),
+    ([pin, unpin]) => [
+      Callbag.pipe(pin, map(() => {})),
+      unpin
+    ]
+  )
+
 export const commandOpenUnpinned = fromCommand('mindmapnextgen:unpinned', 'Open unpinned mindmap')
 export const commandOpenPinned = fromCommand('mindmapnextgen:pinned', 'Open pinned mindmap')
 
@@ -50,3 +62,5 @@ Callbag.subscribe(isDarkMode, isDarkMode => {
 })
 
 Callbag.subscribe(renderTabs$, views.renderAll)
+
+import('src/views/event-listeners')

@@ -2,6 +2,7 @@ import { ItemView, Menu, WorkspaceLeaf } from 'obsidian'
 
 import { MM_VIEW_TYPE } from 'src/constants'
 import { TabRenderer } from 'src/rendering/renderer-tab'
+import Callbag from 'src/utilities/callbag'
 
 
 export default class MindmapTabView extends ItemView {
@@ -22,12 +23,10 @@ export default class MindmapTabView extends ItemView {
     this.firstRender = this.renderer.firstRender
   }
 
-  private static pinToggleListener: (view: MindmapTabView) => void
-  public static onPinToggle(listener: (view: MindmapTabView) => void) {
-    MindmapTabView.pinToggleListener = listener
-  }
+  private static togglePinnedSubject = Callbag.subject<MindmapTabView>()
+  public static togglePinned$ = this.togglePinnedSubject.source
   private togglePinned() {
-    MindmapTabView.pinToggleListener(this)
+    MindmapTabView.togglePinnedSubject.push(this)
   }
 
   public getViewType() { return MM_VIEW_TYPE }

@@ -45,6 +45,7 @@
     "callbag-merge": "^3.2.2",
     "callbag-of": "^2.0.1",
     "callbag-pairwise": "^1.0.1",
+    "callbag-partition": "^1.0.0",
     "callbag-pipe": "^1.2.0",
     "callbag-reject": "^1.0.0",
     "callbag-remember": "^2.0.0",
