@@ -2,7 +2,7 @@ import { WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs, WorkspaceParent } from 'o
 import { MindmapSubject } from './layout-manager'
 import views from './views'
 import { globalSettings } from 'src/settings/filesystem'
-import { constructView } from './view-creator-manager'
+import { constructView } from './view-creator'
 
 
 export type LeafManager = ReturnType<typeof LeafManager>
