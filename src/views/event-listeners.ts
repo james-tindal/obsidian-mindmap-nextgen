@@ -7,34 +7,34 @@ import views from './views'
 import { globalSettings } from 'src/settings/filesystem'
 import { setViewCreator } from './view-creator'
 import { leafManager } from './leaf-manager'
-import { start } from 'src/core/events'
+import { layoutChange, start } from 'src/core/events'
 import Callbag from 'src/utilities/callbag'
 
 
 Callbag.subscribe(start, () =>
   setViewCreator((leaf: WorkspaceLeaf) => new LoadingView(leaf)))
 
+Callbag.subscribe(layoutChange, () => {
+  layoutManager.serialise()
+
+  const topLevel = app.workspace.rootSplit.children[0] as WorkspaceSplit | WorkspaceTabs;
+
+  (function loop(parent: WorkspaceSplit | WorkspaceTabs) {
+    if (parent.type === 'split')
+      parent.children.map(loop)
+    else {
+      const currentTab = parent.children[parent.currentTab]
+      const view = currentTab.view
+      const loaded = view instanceof MindmapTabView
+      if (!loaded) return
+      const subject = views.get(view)!
+      const file = subject === 'unpinned' ? getActiveFile() : subject
+      if (file) view.firstRender(file)
+    }
+  })(topLevel)
+})
+
 export const eventListeners = {
-  layoutChange() {
-    layoutManager.serialise()
-
-    const topLevel = app.workspace.rootSplit.children[0] as WorkspaceSplit | WorkspaceTabs;
-
-    (function loop(parent: WorkspaceSplit | WorkspaceTabs) {
-      if (parent.type === 'split')
-        parent.children.map(loop)
-      else {
-        const currentTab = parent.children[parent.currentTab]
-        const view = currentTab.view
-        const loaded = view instanceof MindmapTabView
-        if (!loaded) return
-        const subject = views.get(view)!
-        const file = subject === 'unpinned' ? getActiveFile() : subject
-        if (file) view.firstRender(file)
-      }
-    })(topLevel)
-  },
-
   viewRequest: {
     'hotkey-open-unpinned' () {
       const activeFile = getActiveFile()
