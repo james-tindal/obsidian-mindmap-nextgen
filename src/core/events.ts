@@ -1,6 +1,7 @@
-import Callbag, { completeWhen, distinct, flatMap, fromPromise, map, merge, remember } from 'src/utilities/callbag'
+import Callbag, { distinct, flatMap, fromPromise, map, merge, remember } from 'src/utilities/callbag'
 import { plugin } from './entry'
 import { layoutManager } from 'src/views/layout-manager'
+import { fromObsidianEvent } from 'src/utilities/from-obsidian-event'
 
 
 export const start = Callbag.create<void>(
@@ -20,18 +21,7 @@ export const layoutChange = Callbag.pipe(
   }))
 )
 
-export const pluginUnload = Callbag.create<void>(
-  (next, error, complete) =>
-    plugin.register(() => { next(); complete() }))
-
-const completeOnUnload = completeWhen(pluginUnload)
-
-export const cssChange = Callbag.pipe(
-  Callbag.create<void>(next =>
-    plugin.registerEvent(app.workspace.on('css-change', next))
-  ),
-  completeOnUnload
-)
+export const cssChange = fromObsidianEvent(app.workspace, 'css-change')
 
 export const isDarkMode = Callbag.pipe(
   merge(start, cssChange),
