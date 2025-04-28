@@ -8,7 +8,6 @@ import { renderTabs$ } from 'src/rendering/style-features'
 
 
 export async function registerEvents() {
-  listeners.appLoading()
   const mindmapLayoutReady = new Promise(resolve =>
     app.workspace.onLayoutReady(() =>
       listeners.layoutReady().then(resolve)

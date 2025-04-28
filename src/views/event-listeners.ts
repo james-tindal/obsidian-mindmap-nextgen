@@ -7,13 +7,14 @@ import views from './views'
 import { globalSettings } from 'src/settings/filesystem'
 import { setViewCreator } from './view-creator'
 import { leafManager } from './leaf-manager'
+import { start } from 'src/core/events'
+import Callbag from 'src/utilities/callbag'
 
+
+Callbag.subscribe(start, () =>
+  setViewCreator((leaf: WorkspaceLeaf) => new LoadingView(leaf)))
 
 export const eventListeners = {
-  appLoading() {
-    setViewCreator((leaf: WorkspaceLeaf) => new LoadingView(leaf))
-  },
-
   layoutReady() {
     return layoutManager.deserialise()
   },
