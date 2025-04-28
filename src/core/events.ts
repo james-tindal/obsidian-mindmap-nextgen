@@ -2,6 +2,8 @@ import Callbag, { distinct, flatMap, fromPromise, map, merge, remember } from 's
 import { plugin } from './entry'
 import { layoutManager } from 'src/views/layout-manager'
 import { fromObsidianEvent } from 'src/utilities/from-obsidian-event'
+import { renderTabs$ } from 'src/rendering/style-features'
+import views from 'src/views/views'
 
 
 export const start = Callbag.create<void>(
@@ -38,3 +40,5 @@ Callbag.subscribe(isDarkMode, isDarkMode => {
   const method = isDarkMode ? 'add' : 'remove'
   document.body.classList[method]('markmap-dark')
 })
+
+Callbag.subscribe(renderTabs$, views.renderAll)
