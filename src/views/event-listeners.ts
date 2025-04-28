@@ -15,10 +15,6 @@ Callbag.subscribe(start, () =>
   setViewCreator((leaf: WorkspaceLeaf) => new LoadingView(leaf)))
 
 export const eventListeners = {
-  layoutReady() {
-    return layoutManager.deserialise()
-  },
-
   layoutChange() {
     layoutManager.serialise()
 

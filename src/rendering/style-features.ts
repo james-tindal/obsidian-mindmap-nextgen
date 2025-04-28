@@ -1,8 +1,8 @@
 import { cssClasses } from 'src/constants'
 import { globalSettings, settingChanges } from 'src/settings/filesystem'
 import Callbag from 'src/utilities/callbag'
-import { layoutReady } from 'src/utilities/layout-ready'
 import { globalStyle, toggleBodyClass, settingTriggers as t, themeChange } from './style-tools'
+import { layoutReady } from 'src/core/events'
 
 
 const { source: renderCodeblocks$, push: renderCodeblocks } = Callbag.subject<void>()
