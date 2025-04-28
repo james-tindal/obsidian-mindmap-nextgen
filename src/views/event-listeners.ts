@@ -6,7 +6,7 @@ import MindmapTabView from './view'
 import { getActiveFile } from './get-active-file'
 import views from './views'
 import { globalSettings } from 'src/settings/filesystem'
-import { setViewCreator } from './view-creator-manager'
+import { setViewCreator } from './view-creator'
 
 
 export type EventListeners = {
