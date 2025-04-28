@@ -21,7 +21,7 @@ export const layoutChange = Callbag.pipe(
   }))
 )
 
-export const cssChange = fromObsidianEvent(app.workspace, 'css-change')
+export const cssChange = fromObsidianEvent(app.workspace, 'css-change').void()
 
 export const isDarkMode = Callbag.pipe(
   merge(start, cssChange),
