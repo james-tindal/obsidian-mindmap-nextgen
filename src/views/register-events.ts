@@ -10,7 +10,6 @@ import { renderTabs$ } from 'src/rendering/style-features'
 export async function registerEvents() {
   ;[
     app.workspace.on('editor-change', debounce(listeners.editorChange, 300, true)),
-    app.workspace.on('file-open', listeners.fileOpen),
     app.vault.on('rename', listeners.renameFile)
   ]
   .forEach(listener => plugin.registerEvent(listener))

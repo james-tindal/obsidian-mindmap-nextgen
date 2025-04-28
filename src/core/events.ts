@@ -30,6 +30,7 @@ export const isDarkMode = Callbag.pipe(
   remember
 )
 
+export const fileOpen = fromObsidianEvent(app.workspace, 'file-open').unary()
 
 Callbag.subscribe(isDarkMode, isDarkMode => {
   const method = isDarkMode ? 'add' : 'remove'
