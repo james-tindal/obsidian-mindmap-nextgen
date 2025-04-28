@@ -8,6 +8,7 @@ import map from 'callbag-map'
 import merge from 'callbag-merge'
 import of from 'callbag-of'
 import pairwise from 'callbag-pairwise'
+import partition from 'callbag-partition'
 import pipe from 'callbag-pipe'
 import reject from 'callbag-reject'
 import remember from 'callbag-remember'
@@ -78,6 +79,7 @@ const Callbag = {
   merge,
   of,
   pairwise,
+  partition,
   pipe,
   reject,
   remember,
@@ -102,6 +104,7 @@ export {
   merge,
   of,
   pairwise,
+  partition,
   pipe,
   reject,
   remember,

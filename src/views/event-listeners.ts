@@ -7,7 +7,7 @@ import views from './views'
 import { globalSettings } from 'src/settings/filesystem'
 import { setViewCreator } from './view-creator'
 import { leafManager } from './leaf-manager'
-import { commandOpenPinned, commandOpenUnpinned, fileChanged, fileOpen, fileRenamed, layoutChange, start } from 'src/core/events'
+import { commandOpenPinned, commandOpenUnpinned, fileChanged, fileOpen, fileRenamed, layoutChange, pin, start, unpin } from 'src/core/events'
 import Callbag from 'src/utilities/callbag'
 
 
@@ -34,28 +34,23 @@ Callbag.subscribe(layoutChange, () => {
   })(topLevel)
 })
 
-export const eventListeners = {
-  viewRequest: {
-    'menu-pin' () {
-      const activeFile = getActiveFile()!
-      if (views.has(activeFile)) {
-        leafManager.close(activeFile)
-        leafManager.replace('unpinned', activeFile)
-      }
-      else
-        leafManager.replace('unpinned', activeFile)
-    },
-
-    'menu-unpin' (file: TFile) {
-      if (views.has('unpinned')) {
-        leafManager.close('unpinned')
-        leafManager.replace(file, 'unpinned')
-      }
-      else
-        leafManager.replace(file, 'unpinned')
-    }
-  },
-}
+Callbag.subscribe(pin, () => {
+  const activeFile = getActiveFile()!
+  if (views.has(activeFile)) {
+    leafManager.close(activeFile)
+    leafManager.replace('unpinned', activeFile)
+  }
+  else
+    leafManager.replace('unpinned', activeFile)
+})
+Callbag.subscribe(unpin, (file: TFile) => {
+  if (views.has('unpinned')) {
+    leafManager.close('unpinned')
+    leafManager.replace(file, 'unpinned')
+  }
+  else
+    leafManager.replace(file, 'unpinned')
+})
 
 Callbag.subscribe(fileOpen, file => {
   if (file?.extension !== 'md') return
@@ -122,3 +117,4 @@ Callbag.subscribe(fileChanged, ({ editor, info: { file } }) => {
     view.render(file, content)
   }
 })
+

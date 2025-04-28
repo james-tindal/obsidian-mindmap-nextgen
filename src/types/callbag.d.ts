@@ -48,6 +48,21 @@ declare module 'callbag-pairwise' {
   export default pairwise
 }
 
+declare module 'callbag-partition' {
+  import { Source } from 'callbag'
+
+  const partition: {
+    <T, S extends T>(predicate: (value: T) => value is S):
+      (source: Source<T>) =>
+        [pass: Source<S>, fail: Source<Exclude<T, S>>]
+    <T>(predicate: (value: T) => boolean):
+      (source: Source<T>) =>
+        [pass: Source<T>, fail: Source<T>]
+  }
+
+  export default partition
+}
+
 declare module 'callbag-take-until' {
   import { Source } from 'callbag'
 
