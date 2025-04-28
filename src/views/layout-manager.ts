@@ -1,7 +1,7 @@
 import { WorkspaceSplit, WorkspaceTabs, WorkspaceLeaf, TFile } from 'obsidian'
 import { range } from 'ramda'
 import { MM_VIEW_TYPE } from 'src/constants'
-import { LeafManager } from './leaf-manager'
+import { leafManager } from './leaf-manager'
 import { LoadingView } from './loading-view'
 import MindmapTabView from './view'
 import { getActiveFile } from './get-active-file'
@@ -48,7 +48,7 @@ export function LayoutManager() {
     }
   }
 
-  async function deserialise(replace: LeafManager['replace']) {
+  async function deserialise() {
     const actualLayout = app.workspace.rootSplit.children[0] as WorkspaceSplit | WorkspaceTabs
     const serialisedLayout = layout.load()
     const activeTabGroup = app.workspace.activeTabGroup!
@@ -88,7 +88,7 @@ export function LayoutManager() {
         const subject = Subject.deserialise(serialised as FlatSubject)
         const leaf = actual as WorkspaceLeaf
         if (subject)
-          return replace(leaf, subject)
+          return leafManager.replace(leaf, subject)
       }
     }
 
