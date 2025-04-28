@@ -6,54 +6,44 @@ import { plugin } from 'src/core/entry'
 import { getActiveFile } from './get-active-file'
 import views from './views'
 
-export class ViewCreatorManager {
-  private static viewCreator: ViewCreator
-  private static instance: ViewCreatorManager
-  private static waitForLastConstruct = Promise.resolve()
+let viewCreator!: ViewCreator
+export function setViewCreator(vc: ViewCreator) { viewCreator = vc }
+plugin.registerView(MM_VIEW_TYPE, (leaf: WorkspaceLeaf) => viewCreator(leaf))
 
-  constructor() {
-    if (ViewCreatorManager.instance) return ViewCreatorManager.instance
-    ViewCreatorManager.instance = this
+export function constructView(leaf: WorkspaceLeaf, subject: MindmapSubject) {
+  return enqueue(async () => {
+    const pinned = subject !== 'unpinned'
+    const displayText = pinned ? subject.basename : 'Mindmap'
 
-    plugin.registerView(MM_VIEW_TYPE, (leaf: WorkspaceLeaf) => ViewCreatorManager.viewCreator(leaf))
-  }
+    viewCreator = () => {
+      const view = new MindmapTabView(leaf, displayText, pinned)
+      views.set(subject, view)
+      return view
+    }
+    await leaf.setViewState({ type: MM_VIEW_TYPE, active: true })
 
-  public setViewCreator(vc: ViewCreator) { ViewCreatorManager.viewCreator = vc }
+    const view = leaf.view as MindmapTabView
+    const file = pinned ? subject : getActiveFile()
 
-  public constructView(leaf: WorkspaceLeaf, subject: MindmapSubject) {
-    return ViewCreatorManager.enqueue(async () => {
-      const pinned = subject !== 'unpinned'
-      const displayText = pinned ? subject.basename : 'Mindmap'
-  
-      ViewCreatorManager.viewCreator = () => {
-        const view = new MindmapTabView(leaf, displayText, pinned)
-        views.set(subject, view)
-        return view
-      }
-      await leaf.setViewState({ type: MM_VIEW_TYPE, active: true })
-
-      const view = leaf.view as MindmapTabView
-      const file = pinned ? subject : getActiveFile()
-
-      ViewCreatorManager.waitUntilActive(leaf)
-      .then(() =>
-        file && view.firstRender(file))
-    })
-  }
-
-  private static enqueue(onfulfilled: () => Promise<void>) {
-    return ViewCreatorManager.waitForLastConstruct = ViewCreatorManager.waitForLastConstruct.then(onfulfilled)
-  }
-
-  private static waitUntilActive = (leaf: WorkspaceLeaf) =>
-    new Promise<void>(resolve => {
-      const listener =
-        app.workspace.on('active-leaf-change', activeLeaf => {
-          if (activeLeaf === leaf) {
-            resolve()
-            app.workspace.offref(listener)
-          }
-        })
-      plugin.registerEvent(listener)
-    })
+    waitUntilActive(leaf)
+    .then(() =>
+      file && view.firstRender(file))
+  })
 }
+
+let waitForLastConstruct = Promise.resolve()
+function enqueue(onfulfilled: () => Promise<void>) {
+  return waitForLastConstruct = waitForLastConstruct.then(onfulfilled)
+}
+
+const waitUntilActive = (leaf: WorkspaceLeaf) =>
+  new Promise<void>(resolve => {
+    const listener =
+      app.workspace.on('active-leaf-change', activeLeaf => {
+        if (activeLeaf === leaf) {
+          resolve()
+          app.workspace.offref(listener)
+        }
+      })
+    plugin.registerEvent(listener)
+  })

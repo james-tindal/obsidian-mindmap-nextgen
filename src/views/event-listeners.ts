@@ -3,14 +3,14 @@ import { LayoutManager } from './layout-manager'
 import { LeafManager } from './leaf-manager'
 import { LoadingView } from './loading-view'
 import MindmapTabView from './view'
-import { ViewCreatorManager } from './view-creator-manager'
 import { getActiveFile } from './get-active-file'
 import views from './views'
 import { globalSettings } from 'src/settings/filesystem'
+import { setViewCreator } from './view-creator-manager'
 
 
 export type EventListeners = {
-  appLoading(setViewCreator: ViewCreatorManager['setViewCreator']): void;
+  appLoading(): void;
   layoutReady(): Promise<void>;
   layoutChange(): void;
   viewRequest: {
@@ -24,7 +24,7 @@ export type EventListeners = {
   renameFile(file: TAbstractFile, oldPath: string): void;
 }
 export function EventListeners(layoutManager: LayoutManager, leafManager: LeafManager): EventListeners { return {
-  appLoading(setViewCreator: ViewCreatorManager['setViewCreator']) {
+  appLoading() {
     setViewCreator((leaf: WorkspaceLeaf) => new LoadingView(leaf))
   },
 
