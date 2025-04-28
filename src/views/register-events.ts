@@ -3,6 +3,9 @@ import { eventListeners as listeners } from './event-listeners'
 import MindmapTabView from './view'
 import { plugin } from 'src/core/entry'
 import views from './views'
+import Callbag from 'src/utilities/callbag'
+import { renderTabs$ } from 'src/rendering/style-features'
+
 
 export async function registerEvents() {
   listeners.appLoading()
@@ -44,4 +47,6 @@ export async function registerEvents() {
     callback: listeners.viewRequest['hotkey-open-pinned'],
     hotkeys: [],
   })
+
+  Callbag.subscribe(renderTabs$, views.renderAll)
 }
