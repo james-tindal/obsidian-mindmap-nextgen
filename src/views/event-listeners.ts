@@ -1,12 +1,12 @@
 import { TFile, MarkdownView, MarkdownFileInfo, WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs, Editor, TAbstractFile } from 'obsidian'
 import { LayoutManager } from './layout-manager'
-import { LeafManager } from './leaf-manager'
 import { LoadingView } from './loading-view'
 import MindmapTabView from './view'
 import { getActiveFile } from './get-active-file'
 import views from './views'
 import { globalSettings } from 'src/settings/filesystem'
 import { setViewCreator } from './view-creator'
+import { leafManager } from './leaf-manager'
 
 
 export type EventListeners = {
@@ -23,13 +23,13 @@ export type EventListeners = {
   fileOpen(file: TFile | null): void;
   renameFile(file: TAbstractFile, oldPath: string): void;
 }
-export function EventListeners(layoutManager: LayoutManager, leafManager: LeafManager): EventListeners { return {
+export function EventListeners(layoutManager: LayoutManager): EventListeners { return {
   appLoading() {
     setViewCreator((leaf: WorkspaceLeaf) => new LoadingView(leaf))
   },
 
   layoutReady() {
-    return layoutManager.deserialise(leafManager.replace)
+    return layoutManager.deserialise()
   },
 
   layoutChange() {
