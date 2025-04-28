@@ -8,11 +8,8 @@ import { renderTabs$ } from 'src/rendering/style-features'
 
 
 export async function registerEvents() {
-  ;[
-    app.workspace.on('editor-change', debounce(listeners.editorChange, 300, true)),
-    app.vault.on('rename', listeners.renameFile)
-  ]
-  .forEach(listener => plugin.registerEvent(listener))
+  plugin.registerEvent(
+    app.workspace.on('editor-change', debounce(listeners.editorChange, 300, true)))
 
   MindmapTabView.onPinToggle(view => {
     const subject = views.get(view)!
