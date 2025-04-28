@@ -5,15 +5,11 @@ import { plugin } from 'src/core/entry'
 import views from './views'
 import Callbag from 'src/utilities/callbag'
 import { renderTabs$ } from 'src/rendering/style-features'
+import { mmngLayoutReady } from 'src/core/events'
 
 
 export async function registerEvents() {
-  const mindmapLayoutReady = new Promise(resolve =>
-    app.workspace.onLayoutReady(() =>
-      listeners.layoutReady().then(resolve)
-    ))
-
-  await mindmapLayoutReady
+  await mmngLayoutReady
   listeners.layoutChange()
 
   plugin.registerEvent(app.workspace.on('layout-change', listeners.layoutChange))
