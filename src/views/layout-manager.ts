@@ -22,85 +22,82 @@ type FlatSubject =
 | { type: 'unpinned' }
 | { type: 'pinned', path: TFile['path'] }
 
-export type LayoutManager = ReturnType<typeof LayoutManager>
-export function LayoutManager() {
-  return {
-    serialise: () => layout.save(getLayout()),
-    deserialise
-  }
+export const layoutManager = {
+  serialise: () => layout.save(getLayout()),
+  deserialise
+}
 
-  function getLayout(): Layout {
-    const topLevel = app.workspace.rootSplit.children[0] as WorkspaceSplit | WorkspaceTabs
-    return loop(topLevel)
-  
-    function loop(node: Node): any {
-      if ('children' in node) {
-        const children = node.children as NodeList
-        return children.map(loop)
-      }
-      else {
-        if (node.view.getViewType() !== MM_VIEW_TYPE) return null
-        const view = node.view as MindmapTabView
-        const subject = views.get(view)
-        if (subject) return Subject.serialise(subject)
-        else         return null
-      }
+function getLayout(): Layout {
+  const topLevel = app.workspace.rootSplit.children[0] as WorkspaceSplit | WorkspaceTabs
+  return loop(topLevel)
+
+  function loop(node: Node): any {
+    if ('children' in node) {
+      const children = node.children as NodeList
+      return children.map(loop)
+    }
+    else {
+      if (node.view.getViewType() !== MM_VIEW_TYPE) return null
+      const view = node.view as MindmapTabView
+      const subject = views.get(view)
+      if (subject) return Subject.serialise(subject)
+      else         return null
     }
   }
+}
 
-  async function deserialise() {
-    const actualLayout = app.workspace.rootSplit.children[0] as WorkspaceSplit | WorkspaceTabs
-    const serialisedLayout = layout.load()
-    const activeTabGroup = app.workspace.activeTabGroup!
+async function deserialise() {
+  const actualLayout = app.workspace.rootSplit.children[0] as WorkspaceSplit | WorkspaceTabs
+  const serialisedLayout = layout.load()
+  const activeTabGroup = app.workspace.activeTabGroup!
 
-    type Actual = WorkspaceSplit | WorkspaceTabs
-    async function loop(
-      serialised: Layout,
-      actual: Actual
-    ) {
-      await match(serialised, actual, {
-        async split() {
-          for (const [s, a] of pairs(serialised as Split, (actual as WorkspaceSplit).children))
-            await loop(s, a as Actual)
-        },
-        async tabs() {
-          const tabs = actual as WorkspaceTabs
-          const currentTabIndex = tabs.currentTab
+  type Actual = WorkspaceSplit | WorkspaceTabs
+  async function loop(
+    serialised: Layout,
+    actual: Actual
+  ) {
+    await match(serialised, actual, {
+      async split() {
+        for (const [s, a] of pairs(serialised as Split, (actual as WorkspaceSplit).children))
+          await loop(s, a as Actual)
+      },
+      async tabs() {
+        const tabs = actual as WorkspaceTabs
+        const currentTabIndex = tabs.currentTab
 
-          let queue = Promise.resolve()
-          for (const [s, a] of pairs(serialised as Tabs, (actual as WorkspaceTabs).children)) {
-            if (s === null || a === undefined) continue
-            queue = queue.then(() => mindmap(s, a))
-          }
-          await queue
-
-          // Set currentTab of each tab group
-          const currentTab = tabs.children[currentTabIndex]
-          app.workspace.setActiveLeaf(currentTab)
-          const view = currentTab.view as MindmapTabView
-          const subject = views.get(view)
-          const file = subject === 'unpinned' ? getActiveFile() : subject
-          if (file) view.firstRender(file)
+        let queue = Promise.resolve()
+        for (const [s, a] of pairs(serialised as Tabs, (actual as WorkspaceTabs).children)) {
+          if (s === null || a === undefined) continue
+          queue = queue.then(() => mindmap(s, a))
         }
-      })
+        await queue
 
-      function mindmap(serialised: FlatSubject, actual: WorkspaceLeaf) {
-        const subject = Subject.deserialise(serialised as FlatSubject)
-        const leaf = actual as WorkspaceLeaf
-        if (subject)
-          return leafManager.replace(leaf, subject)
+        // Set currentTab of each tab group
+        const currentTab = tabs.children[currentTabIndex]
+        app.workspace.setActiveLeaf(currentTab)
+        const view = currentTab.view as MindmapTabView
+        const subject = views.get(view)
+        const file = subject === 'unpinned' ? getActiveFile() : subject
+        if (file) view.firstRender(file)
       }
+    })
+
+    function mindmap(serialised: FlatSubject, actual: WorkspaceLeaf) {
+      const subject = Subject.deserialise(serialised as FlatSubject)
+      const leaf = actual as WorkspaceLeaf
+      if (subject)
+        return leafManager.replace(leaf, subject)
     }
-
-    await loop(serialisedLayout, actualLayout)  // All tab groups done loading
-
-    const activeLeaf = activeTabGroup.children[activeTabGroup.currentTab]
-    app.workspace.setActiveLeaf(activeLeaf)
-
-    LoadingView.closeAll()
-
-    await undefined
   }
+
+  await loop(serialisedLayout, actualLayout)  // All tab groups done loading
+
+  const activeLeaf = activeTabGroup.children[activeTabGroup.currentTab]
+  app.workspace.setActiveLeaf(activeLeaf)
+
+  LoadingView.closeAll()
+
+  await undefined
 }
 
 type Matcher = {
