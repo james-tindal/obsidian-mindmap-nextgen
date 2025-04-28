@@ -13,6 +13,7 @@ import { ExtractRecord, ExtractUnion, Matcher, Stackable, Tagged, match, tr, uni
 import { parseMarkdown } from 'src/rendering/renderer-common'
 import { FileSettingsDialog } from 'src/settings/dialogs'
 import { workspace } from 'src/core/entry'
+import { fromObsidianEvent } from 'src/utilities/from-obsidian-event'
 
 
 const InputEvent = unionConstructors(
@@ -55,11 +56,10 @@ export async function codeBlockHandler(markdown: string, containerEl: HTMLDivEle
 }
 
 
-
-const layoutChange$ = Callbag.create<void>((next: () => void) => {
-  app.workspace.on('layout-change', next)
-  app.workspace.on('active-leaf-change', next)
-})
+const layoutChange$ = Callbag.merge(
+  fromObsidianEvent(app.workspace, 'layout-change'),
+  fromObsidianEvent(app.workspace, 'active-leaf-change')
+)
 
 const layout$ = Callbag.pipe(
   layoutChange$,
@@ -81,14 +81,10 @@ const layout$ = Callbag.pipe(
     ]))
 )
 
-
-const fileChange$: Source<{ file: TFile, bodyText: string }> =
-  Callbag.create(next => {
-    app.workspace.on('editor-change', (editor, info) => next({ file: info.file!, bodyText: editor.getValue() }))
-    // app.vault.on("modify", (abstractFile) =>
-    //   `search for the file in our set of open files. if found, push settings updates and renders. 
-    //    This should go in a separate stream.`);
-  })
+const fileChange$ = Callbag.pipe(
+  fromObsidianEvent(app.workspace, 'editor-change'),
+  map(([editor, info]) => ({ file: info.file!, bodyText: editor.getValue() }))
+)
 
 const file$ = Callbag.pipe(
   fileChange$,
