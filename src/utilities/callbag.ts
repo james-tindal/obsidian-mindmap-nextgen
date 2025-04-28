@@ -16,6 +16,7 @@ import startWith from 'callbag-start-with'
 import subscribe from 'callbag-subscribe'
 import take from 'callbag-take'
 import takeUntil from 'callbag-take-until'
+import { debounce } from 'callbag-debounce'
 
 import { Source, UnwrapSource } from 'callbag'
 import { consumeSource, createSource } from 'callbag-toolkit'
@@ -67,6 +68,7 @@ const subscribe2 = <T>(source: Source<T>, listener: Listener<T> | Subscriber<T>)
 const Callbag = {
   create,
   completeWhen,
+  debounce,
   distinct,
   filter,
   flatMap,
@@ -90,6 +92,7 @@ const Callbag = {
 export {
   create,
   completeWhen,
+  debounce,
   distinct,
   filter,
   flatMap,

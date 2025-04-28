@@ -1,6 +1,7 @@
 import type { Events } from 'obsidian'
 import Callbag, { map } from './callbag'
 import { plugin } from 'src/core/entry'
+import { Simplify } from 'type-fest'
 
 
 // Typing could fail if target has more than 20 events
@@ -22,9 +23,38 @@ export function fromObsidianEvent<
 
   return Object.assign(stream, {
     void: () => Callbag.pipe(stream, map(() => {})),
-    unary: () => Callbag.pipe(stream, map(args => args[0] as typeof args[0]))
+    unary: () => Callbag.pipe(stream, map(args => args[0] as typeof args[0])),
+    object: <const Keys extends MapToStrings<CallbackParams>>(...keys: Keys) =>
+      Callbag.pipe(stream, map(args => zip(keys, args)))
   })
 }
+
+type Zip<
+  K extends readonly PropertyKey[],
+  V extends readonly any[]
+> = Simplify<{
+  [I in keyof K as I extends `${number}`
+    ? K[I] extends PropertyKey
+      ? K[I]
+      : never
+    : never
+  ]: I extends keyof V
+     ? V[I]
+     : never
+}>
+function zip<
+  K extends readonly PropertyKey[],
+  V extends readonly any[]
+>( keys: K, values: V ): Zip<K, V> {
+  const out = {} as any
+  for (let i = 0; i < keys.length; i++)
+    if (i in values) out[keys[i]] = values[i]
+  return out
+}
+
+
+type MapToStrings<T extends unknown[]> =
+  { [K in keyof T]: string }
 
 type GetCallback<Params extends [...args: any], Name extends string> =
   Params extends [name: Name, callback: infer Callback, ...args: any[]]
