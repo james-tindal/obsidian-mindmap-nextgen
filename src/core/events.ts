@@ -1,4 +1,4 @@
-import Callbag, { distinct, flatMap, fromPromise, map, merge, remember } from 'src/utilities/callbag'
+import Callbag, { debounce, distinct, flatMap, fromPromise, map, merge, remember } from 'src/utilities/callbag'
 import { plugin } from './entry'
 import { layoutManager } from 'src/views/layout-manager'
 import { fromObsidianEvent } from 'src/utilities/from-obsidian-event'
@@ -35,6 +35,10 @@ export const isDarkMode = Callbag.pipe(
 
 export const fileOpen = fromObsidianEvent(app.workspace, 'file-open').unary()
 export const fileRenamed = fromObsidianEvent(app.vault, 'rename').unary()
+export const fileChanged = Callbag.pipe(
+  fromObsidianEvent(app.workspace, 'editor-change').object('editor', 'info'),
+  debounce(300)
+)
 
 export const commandOpenUnpinned = fromCommand('mindmapnextgen:unpinned', 'Open unpinned mindmap')
 export const commandOpenPinned = fromCommand('mindmapnextgen:pinned', 'Open pinned mindmap')

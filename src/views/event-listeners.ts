@@ -1,4 +1,4 @@
-import { TFile, MarkdownView, MarkdownFileInfo, WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs, Editor } from 'obsidian'
+import { TFile, WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs } from 'obsidian'
 import { layoutManager } from './layout-manager'
 import { LoadingView } from './loading-view'
 import MindmapTabView from './view'
@@ -7,7 +7,7 @@ import views from './views'
 import { globalSettings } from 'src/settings/filesystem'
 import { setViewCreator } from './view-creator'
 import { leafManager } from './leaf-manager'
-import { commandOpenPinned, commandOpenUnpinned, fileOpen, fileRenamed, layoutChange, start } from 'src/core/events'
+import { commandOpenPinned, commandOpenUnpinned, fileChanged, fileOpen, fileRenamed, layoutChange, start } from 'src/core/events'
 import Callbag from 'src/utilities/callbag'
 
 
@@ -53,24 +53,6 @@ export const eventListeners = {
       }
       else
         leafManager.replace(file, 'unpinned')
-    }
-  },
-
-  editorChange(editor: Editor, { file }: MarkdownView | MarkdownFileInfo) {
-    file = file!
-
-    if (file.extension !== 'md') return
-
-    const content = editor.getValue()
-
-    if (views.has(file)) {
-      const view = views.get(file)!
-      view.render(file, content)
-    }
-
-    if (views.has('unpinned')) {
-      const view = views.get('unpinned')!
-      view.render(file, content)
     }
   },
 }
@@ -121,4 +103,22 @@ Callbag.subscribe(commandOpenPinned, () => {
     leafManager.reveal(activeFile)
   else
     leafManager.new(activeFile)
+})
+
+Callbag.subscribe(fileChanged, ({ editor, info: { file } }) => {
+  file = file!
+
+  if (file.extension !== 'md') return
+
+  const content = editor.getValue()
+
+  if (views.has(file)) {
+    const view = views.get(file)!
+    view.render(file, content)
+  }
+
+  if (views.has('unpinned')) {
+    const view = views.get('unpinned')!
+    view.render(file, content)
+  }
 })
