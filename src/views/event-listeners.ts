@@ -7,7 +7,7 @@ import views from './views'
 import { globalSettings } from 'src/settings/filesystem'
 import { setViewCreator } from './view-creator'
 import { leafManager } from './leaf-manager'
-import { fileOpen, layoutChange, start } from 'src/core/events'
+import { fileOpen, fileRenamed, layoutChange, start } from 'src/core/events'
 import Callbag from 'src/utilities/callbag'
 
 
@@ -93,34 +93,6 @@ export const eventListeners = {
       view.render(file, content)
     }
   },
-
-  fileOpen(file: TFile | null) {
-    if (file?.extension !== 'md') return
-
-    if (views.has(file)) {
-      const view = views.get(file)!
-      view.render(file)
-    }
-
-    if (views.has('unpinned')) {
-      const view = views.get('unpinned')!
-      view.render(file)
-    }
-  },
-
-  renameFile({ path }: TAbstractFile) {
-    const activeFile = getActiveFile()
-    const unpinned = views.get('unpinned')
-    if (unpinned && activeFile?.path === path && globalSettings.titleAsRootNode)
-      unpinned.render(activeFile)
-
-    const result = views.getByPath(path)
-    if (result) {
-      const { view, file } = result
-      view.setDisplayText(file.basename)
-      view.render(file)
-    }
-  }
 }
 
 Callbag.subscribe(fileOpen, file => {
@@ -133,6 +105,20 @@ Callbag.subscribe(fileOpen, file => {
 
   if (views.has('unpinned')) {
     const view = views.get('unpinned')!
+    view.render(file)
+  }
+})
+
+Callbag.subscribe(fileRenamed, ({ path }) => {
+  const activeFile = getActiveFile()
+  const unpinned = views.get('unpinned')
+  if (unpinned && activeFile?.path === path && globalSettings.titleAsRootNode)
+    unpinned.render(activeFile)
+
+  const result = views.getByPath(path)
+  if (result) {
+    const { view, file } = result
+    view.setDisplayText(file.basename)
     view.render(file)
   }
 })

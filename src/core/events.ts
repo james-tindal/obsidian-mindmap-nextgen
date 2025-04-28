@@ -31,6 +31,8 @@ export const isDarkMode = Callbag.pipe(
 )
 
 export const fileOpen = fromObsidianEvent(app.workspace, 'file-open').unary()
+export const fileRenamed = fromObsidianEvent(app.vault, 'rename').unary()
+
 
 Callbag.subscribe(isDarkMode, isDarkMode => {
   const method = isDarkMode ? 'add' : 'remove'
