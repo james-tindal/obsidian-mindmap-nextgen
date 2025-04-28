@@ -1,4 +1,4 @@
-import Callbag, { completeWhen, distinct, map, merge, remember } from 'src/utilities/callbag'
+import Callbag, { completeWhen, distinct, flatMap, fromPromise, map, merge, remember } from 'src/utilities/callbag'
 import { plugin } from './entry'
 import { layoutManager } from 'src/views/layout-manager'
 
@@ -9,7 +9,16 @@ export const start = Callbag.create<void>(
 export const layoutReady = new Promise<void>(resolve =>
   app.workspace.onLayoutReady(resolve))
 
-export const mmngLayoutReady = layoutReady.then(layoutManager.deserialise)
+const mmngLayoutReady = layoutReady.then(layoutManager.deserialise)
+
+export const layoutChange = Callbag.pipe(
+  fromPromise(mmngLayoutReady),
+  flatMap(() => Callbag.create<void>((next, error, complete) => {
+    next()
+    plugin.registerEvent(app.workspace.on('layout-change', next))
+    plugin.register(complete)
+  }))
+)
 
 export const pluginUnload = Callbag.create<void>(
   (next, error, complete) =>
