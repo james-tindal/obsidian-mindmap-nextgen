@@ -1,4 +1,4 @@
-import { TFile, MarkdownView, MarkdownFileInfo, WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs, Editor, TAbstractFile } from 'obsidian'
+import { TFile, MarkdownView, MarkdownFileInfo, WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs, Editor } from 'obsidian'
 import { layoutManager } from './layout-manager'
 import { LoadingView } from './loading-view'
 import MindmapTabView from './view'
@@ -7,7 +7,7 @@ import views from './views'
 import { globalSettings } from 'src/settings/filesystem'
 import { setViewCreator } from './view-creator'
 import { leafManager } from './leaf-manager'
-import { fileOpen, fileRenamed, layoutChange, start } from 'src/core/events'
+import { commandOpenPinned, commandOpenUnpinned, fileOpen, fileRenamed, layoutChange, start } from 'src/core/events'
 import Callbag from 'src/utilities/callbag'
 
 
@@ -36,26 +36,6 @@ Callbag.subscribe(layoutChange, () => {
 
 export const eventListeners = {
   viewRequest: {
-    'hotkey-open-unpinned' () {
-      const activeFile = getActiveFile()
-      if (activeFile === null) return
-
-      if (views.has('unpinned'))
-        leafManager.reveal('unpinned')
-      else
-        leafManager.new('unpinned')
-    },
-
-    'hotkey-open-pinned' () {
-      const activeFile = getActiveFile()
-      if (activeFile === null) return
-
-      if (views.has(activeFile))
-        leafManager.reveal(activeFile)
-      else
-        leafManager.new(activeFile)
-    },
-
     'menu-pin' () {
       const activeFile = getActiveFile()!
       if (views.has(activeFile)) {
@@ -121,4 +101,24 @@ Callbag.subscribe(fileRenamed, ({ path }) => {
     view.setDisplayText(file.basename)
     view.render(file)
   }
+})
+
+Callbag.subscribe(commandOpenUnpinned, () => {
+  const activeFile = getActiveFile()
+  if (activeFile === null) return
+
+  if (views.has('unpinned'))
+    leafManager.reveal('unpinned')
+  else
+    leafManager.new('unpinned')
+})
+
+Callbag.subscribe(commandOpenPinned, () => {
+  const activeFile = getActiveFile()
+  if (activeFile === null) return
+
+  if (views.has(activeFile))
+    leafManager.reveal(activeFile)
+  else
+    leafManager.new(activeFile)
 })

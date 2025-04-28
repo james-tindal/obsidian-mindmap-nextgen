@@ -16,18 +16,4 @@ export async function registerEvents() {
     else
       listeners.viewRequest['menu-unpin'](subject)
   })
-
-  plugin.addCommand({
-    id: 'mindmapnextgen:unpinned',
-    name: 'Open unpinned mindmap',
-    callback: listeners.viewRequest['hotkey-open-unpinned'],
-    hotkeys: [],
-  })
-
-  plugin.addCommand({
-    id: 'mindmapnextgen:pinned',
-    name: 'Open pinned mindmap',
-    callback: listeners.viewRequest['hotkey-open-pinned'],
-    hotkeys: [],
-  })
 }
