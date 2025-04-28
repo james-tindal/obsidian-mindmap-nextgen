@@ -7,7 +7,7 @@ import views from './views'
 import { globalSettings } from 'src/settings/filesystem'
 import { setViewCreator } from './view-creator'
 import { leafManager } from './leaf-manager'
-import { layoutChange, start } from 'src/core/events'
+import { fileOpen, layoutChange, start } from 'src/core/events'
 import Callbag from 'src/utilities/callbag'
 
 
@@ -122,3 +122,17 @@ export const eventListeners = {
     }
   }
 }
+
+Callbag.subscribe(fileOpen, file => {
+  if (file?.extension !== 'md') return
+
+  if (views.has(file)) {
+    const view = views.get(file)!
+    view.render(file)
+  }
+
+  if (views.has('unpinned')) {
+    const view = views.get('unpinned')!
+    view.render(file)
+  }
+})
