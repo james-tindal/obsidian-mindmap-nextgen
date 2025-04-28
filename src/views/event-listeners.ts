@@ -9,21 +9,7 @@ import { setViewCreator } from './view-creator'
 import { leafManager } from './leaf-manager'
 
 
-export type EventListeners = {
-  appLoading(): void;
-  layoutReady(): Promise<void>;
-  layoutChange(): void;
-  viewRequest: {
-    'hotkey-open-unpinned'()           : void;
-    'hotkey-open-pinned'  ()           : void;
-    'menu-pin'            ()           : void;
-    'menu-unpin'          (file: TFile): void;
-  }
-  editorChange(editor: Editor, info: MarkdownView | MarkdownFileInfo): any;
-  fileOpen(file: TFile | null): void;
-  renameFile(file: TAbstractFile, oldPath: string): void;
-}
-export function EventListeners(): EventListeners { return {
+export const eventListeners = {
   appLoading() {
     setViewCreator((leaf: WorkspaceLeaf) => new LoadingView(leaf))
   },
@@ -83,7 +69,7 @@ export function EventListeners(): EventListeners { return {
         leafManager.replace('unpinned', activeFile)
     },
 
-    'menu-unpin' (file) {
+    'menu-unpin' (file: TFile) {
       if (views.has('unpinned')) {
         leafManager.close('unpinned')
         leafManager.replace(file, 'unpinned')
@@ -93,7 +79,7 @@ export function EventListeners(): EventListeners { return {
     }
   },
 
-  editorChange(editor, { file }) {
+  editorChange(editor: Editor, { file }: MarkdownView | MarkdownFileInfo) {
     file = file!
 
     if (file.extension !== 'md') return
@@ -111,7 +97,7 @@ export function EventListeners(): EventListeners { return {
     }
   },
 
-  fileOpen(file) {
+  fileOpen(file: TFile | null) {
     if (file?.extension !== 'md') return
 
     if (views.has(file)) {
@@ -125,7 +111,7 @@ export function EventListeners(): EventListeners { return {
     }
   },
 
-  renameFile({ path }) {
+  renameFile({ path }: TAbstractFile) {
     const activeFile = getActiveFile()
     const unpinned = views.get('unpinned')
     if (unpinned && activeFile?.path === path && globalSettings.titleAsRootNode)
@@ -138,4 +124,4 @@ export function EventListeners(): EventListeners { return {
       view.render(file)
     }
   }
-}}
+}
