@@ -1,5 +1,5 @@
 import type { Events } from 'obsidian'
-import Callbag from './callbag'
+import Callbag, { map } from './callbag'
 import { plugin } from 'src/core/entry'
 
 
@@ -13,14 +13,19 @@ export function fromObsidianEvent<
   type Callback = GetCallback<OnMethodParams, Name>
   type CallbackParams = Parameters<Callback>
 
-  return Callbag.create<CallbackParams>((next, error, complete) => {
+  const stream = Callbag.create<CallbackParams>((next, error, complete) => {
     const sendArgsArray = (...args: CallbackParams) => next(args)
     const ref = target.on(name, sendArgsArray)
     plugin.registerEvent(ref)
     plugin.register(complete)
   })
+
+  return Object.assign(stream, {
+    void: () => Callbag.pipe(stream, map(() => {})),
+    unary: () => Callbag.pipe(stream, map(args => args[0] as typeof args[0]))
+  })
 }
-  
+
 type GetCallback<Params extends [...args: any], Name extends string> =
   Params extends [name: Name, callback: infer Callback, ...args: any[]]
     ? Callback : never
