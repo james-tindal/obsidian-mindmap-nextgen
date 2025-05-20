@@ -3,6 +3,7 @@ import { ItemView, Menu, WorkspaceLeaf } from 'obsidian'
 import { MM_VIEW_TYPE } from 'src/constants'
 import { TabRenderer } from 'src/rendering/renderer-tab'
 import Callbag from 'src/utilities/callbag'
+import { DbSet } from 'src/workspace/db-schema'
 
 
 export default class MindmapTabView extends ItemView {
@@ -13,8 +14,12 @@ export default class MindmapTabView extends ItemView {
   public render: TabRenderer['render']
   public firstRender: TabRenderer['firstRender']
 
-  constructor(leaf: WorkspaceLeaf, displayText: string, pinned: boolean) {
+  public static instances = new DbSet<MindmapTabView>()
+
+  constructor(public leaf: WorkspaceLeaf, displayText: string, pinned: boolean) {
     super(leaf)
+    MindmapTabView.instances.add(this)
+
     this.displayText = displayText
     this.pinned = pinned
 

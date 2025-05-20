@@ -6,8 +6,10 @@ import GrayMatter from 'gray-matter'
 
 import { CodeBlockSettings, FileSettings } from 'src/settings/filesystem'
 import { parseInternalLinks } from 'src/internal-links/parse-internal-links'
-export const transformer = new Transformer([ ...builtInPlugins ])
+import { embedPlugin } from 'src/embeds/embeds'
 
+
+export const transformer = new Transformer([ ...builtInPlugins, embedPlugin ])
 
 export function parseMarkdown<Type extends 'file' | 'codeBlock'>(text: string) {
   ;(GrayMatter as typeof GrayMatter & { clearCache: Function }).clearCache()
