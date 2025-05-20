@@ -2,6 +2,52 @@ import 'obsidian'
 
 declare module 'obsidian' {
 
+  interface MarkdownPreviewView {
+    rerender(full?: boolean): void;
+  }
+  interface App {
+    viewRegistry: ViewRegistry;
+    embedRegistry: EmbedRegistry;
+  }
+  interface ViewRegistry {
+    typeByExtension: Record<string, string>;
+    viewByType: Record<string, ViewCreator>;
+    getTypeByExtension(ext: string): string | undefined;
+    getViewCreatorByType(type: string): ViewCreator | undefined;
+    isExtensionRegistered(ext: string): boolean;
+    registerExtensions(exts: string[], type: string): void;
+    registerViewWithExtensions(
+      exts: string[],
+      type: string,
+      viewCreator: ViewCreator,
+    ): void;
+    unregisterExtensions(exts: string[]): void;
+    unregisterView(viewType: string): void;
+  }
+
+  interface EmbedInfo {
+    app: App;
+    containerEl: HTMLDivElement;
+    depth: number;
+    displayMode: boolean;
+    linktext: string;
+    showInline: boolean;
+    sourcePath: string;
+  }
+  interface EmbedCreator {
+    (info: EmbedInfo, file: TFile, subpath: string): EmbedComponent;
+  }
+  interface EmbedRegistry {
+    embedByExtension: Record<string, EmbedCreator>;
+    registerExtension(ext: string, creator: EmbedCreator): void;
+    registerExtensions(exts: string[], creator: EmbedCreator): void;
+    unregisterExtensions(exts: string[]): void;
+    unregisterExtension(ext: string): void;
+  }
+  interface EmbedComponent extends Component {
+    loadFile(): any;
+  }
+
   export class CustomCss extends Component {
     // Properties
     app: App
