@@ -1,4 +1,3 @@
-import { Markmap } from 'markmap-view'
 import { ButtonComponent, EditorPosition } from 'obsidian'
 import autoBind from 'auto-bind'
 import GrayMatter from 'gray-matter'
@@ -6,7 +5,7 @@ import GrayMatter from 'gray-matter'
 import { CodeBlockSettings, FileSettings, globalSettings, GlobalSettings } from 'src/settings/filesystem'
 import { cssClasses } from 'src/constants'
 import { CodeBlock, FileTab } from 'src/workspace/types'
-import { getOptions, parseMarkdown } from 'src/rendering/renderer-common'
+import { createMarkmap, getOptions, parseMarkdown } from 'src/rendering/renderer-common'
 import { renderCodeblocks$ } from 'src/rendering/style-features'
 import Callbag, { flatMap, fromEvent, map, pairwise, takeUntil } from 'src/utilities/callbag'
 import { CodeBlockSettingsDialog } from 'src/settings/dialogs'
@@ -19,8 +18,7 @@ export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
 export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, fileSettings: FileSettings, tabRow: TabRow) {
   const { markdown, containerEl } = codeBlock
 
-  const { markmap, svg } = createMarkmap(containerEl)
-
+  const { markmap, svg } = createMarkmap({ parent: containerEl, toolbar: false })
   svgs.set(svg, tabView.file)
 
   const { rootNode, settings: codeBlockSettings } = parseMarkdown<'codeBlock'>(markdown)
@@ -63,16 +61,6 @@ export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, f
       : classList.remove(cssClasses.highlight)
   }
 }
-
-function createMarkmap(containerEl: CodeBlock['containerEl']) {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-  const markmap = Markmap.create(svg, {})
-
-  containerEl.append(svg)
-
-  return { svg, markmap }
-}
-
 
 class SettingsManager {
   private newHeight: number | undefined

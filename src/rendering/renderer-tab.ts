@@ -1,18 +1,18 @@
-import { IMarkmapOptions, Markmap } from 'markmap-view'
+import { IMarkmapOptions } from 'markmap-view'
 import { TFile } from 'obsidian'
-import { Toolbar } from 'markmap-toolbar'
 import { IPureNode } from 'markmap-common'
 
 import { FileSettings, globalSettings } from 'src/settings/filesystem'
 import { ScreenshotColors, takeScreenshot } from 'src/rendering/screenshot'
-import { getOptions, parseMarkdown } from './renderer-common'
+import { createMarkmap, getOptions, parseMarkdown } from './renderer-common'
 import { MindmapTab } from 'src/workspace/types'
 import { svgs } from 'src/core/entry'
 
 
 export type TabRenderer = ReturnType<typeof TabRenderer>
 export function TabRenderer(containerEl: MindmapTab.View['containerEl']) {
-  const { markmap, svg, toolbar } = createMarkmap(containerEl)
+  const contentEl = containerEl.children[1]
+  const { svg, markmap, toolbar } = createMarkmap({ parent: contentEl, toolbar: true })
 
   const state: {
     hasRendered: boolean
@@ -71,15 +71,4 @@ export function TabRenderer(containerEl: MindmapTab.View['containerEl']) {
     if (root.content == '') root.content = title
     else root = { content: title, children: [root] }
   }
-}
-
-function createMarkmap(containerEl: MindmapTab.View['containerEl']) {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-  const markmap = Markmap.create(svg, {})
-  const toolbar = Toolbar.create(markmap).el
-
-  const contentEl = containerEl.children[1]
-  contentEl.append(svg, toolbar)
-
-  return { svg, markmap, toolbar }
 }
