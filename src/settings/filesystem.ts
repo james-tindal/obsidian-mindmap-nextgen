@@ -40,7 +40,6 @@ export const defaultSettings: v2['settings'] = {
   screenshotTextColor: '#fdf6e3',
   screenshotTextColorEnabled: false,
   titleAsRootNode: true,
-  useThemeFont: false,
 }
 
 type SettingsV2 = {
@@ -71,7 +70,6 @@ type SettingsV2 = {
 
   coloring: Coloring
   titleAsRootNode: boolean
-  useThemeFont: boolean
 }
 
 export type v2 = {
@@ -92,7 +90,6 @@ const useDefaultsForMissingKeys =
 
 type OmitFromFileSettings =
 | 'splitDirection'
-| 'useThemeFont'
 | 'screenshotTextColor'
 | 'screenshotTextColorEnabled'
 | 'screenshotBgStyle'

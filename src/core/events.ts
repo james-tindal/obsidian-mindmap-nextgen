@@ -11,7 +11,7 @@ import MindmapTabView from 'src/views/view'
 export const start = Callbag.create<void>(
   (next, error, complete) => { next(); complete() })
 
-export const layoutReady = new Promise<void>(resolve =>
+const layoutReady = new Promise<void>(resolve =>
   app.workspace.onLayoutReady(resolve))
 
 const mmngLayoutReady = layoutReady.then(layoutManager.deserialise)

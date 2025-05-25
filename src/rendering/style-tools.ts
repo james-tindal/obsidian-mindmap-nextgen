@@ -1,17 +1,8 @@
-import { globalSettings, GlobalSettings, settingChanges } from 'src/settings/filesystem'
+import { GlobalSettings, settingChanges } from 'src/settings/filesystem'
 import { plugin } from 'src/core/entry'
 
 
-export function toggleBodyClass(setting: keyof GlobalSettings, className: string) {
-  const fn = yes => yes
-    ? document.body.classList.add(className)
-    : document.body.classList.remove(className)
-  settingChanges.listen(setting, fn)
-  fn(globalSettings[setting])
-}
-
 export type Trigger = (next: () => void) => void
-export const themeChange = next => app.workspace.on('css-change', next)
 export const settingTriggers = new Proxy(<Record<keyof GlobalSettings, Trigger>>{}, {
   get: (_, key: keyof GlobalSettings) => settingChanges.listen(key)
 })
