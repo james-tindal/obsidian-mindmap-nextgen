@@ -30,13 +30,6 @@ const TitleAsRootNode = SettingComponent({
   control: 'toggle'
 })
 
-const UseThemeFont = SettingComponent({
-  name: 'Use theme font',
-  description: 'Should mindmaps use the same font as your Obsidian theme, or the default?',
-  key: 'useThemeFont',
-  control: 'toggle'
-})
-
 
 
 // -- SectionColoring -- //
@@ -322,7 +315,6 @@ const GlobalPage = () => fragment([
     SplitDirection.global(),
     HighlightInlineMindmap.global(),
     TitleAsRootNode.global(),
-    UseThemeFont.global(),
   ]),
   SectionColoringGlobal(),
   fragment([

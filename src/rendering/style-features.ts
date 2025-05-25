@@ -1,8 +1,6 @@
-import { cssClasses } from 'src/constants'
 import { globalSettings, settingChanges } from 'src/settings/filesystem'
 import Callbag from 'src/utilities/callbag'
-import { globalStyle, toggleBodyClass, settingTriggers as t, themeChange } from './style-tools'
-import { layoutReady } from 'src/core/events'
+import { globalStyle, settingTriggers as t } from './style-tools'
 
 
 const { source: renderCodeblocks$, push: renderCodeblocks } = Callbag.subject<void>()
@@ -12,22 +10,8 @@ const renderAll = () => { renderTabs(); renderCodeblocks() }
 
 export function loadStyleFeatures() {
   globalStyle.registerStyleElement()
-  useThemeFont()
   lineThickness()
   lineHeight()
-}
-
-async function useThemeFont() {
-  await layoutReady
-
-  globalStyle.add([t.useThemeFont, themeChange], () => {
-    const { font } = getComputedStyle(document.body)
-    return `body.mmng-use-theme-font .markmap {font: ${font}}`
-  }, () => {
-    renderAll()
-  })
-
-  toggleBodyClass('useThemeFont', cssClasses.useThemeFont)
 }
 
 async function lineThickness() {
