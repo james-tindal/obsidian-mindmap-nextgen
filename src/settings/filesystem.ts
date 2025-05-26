@@ -81,10 +81,10 @@ export type v2 = {
 const useDefaultsForMissingKeys =
 (data: any): v2 => ({
   version: '2.0',
-  layout: data.layout || [],
+  layout: data?.layout || [],
   settings: {
     ...defaultSettings,
-    ...data.settings
+    ...data?.settings
   }
 })
 
