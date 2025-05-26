@@ -3,6 +3,7 @@ import { builtInPlugins, IFeatures, Transformer } from 'markmap-lib'
 import { deriveOptions, IMarkmapOptions, Markmap } from 'markmap-view'
 import { pick } from 'ramda'
 import GrayMatter from 'gray-matter'
+import 'markmap-toolbar/dist/style.css'
 
 import { CodeBlockSettings, FileSettings } from 'src/settings/filesystem'
 import { parseInternalLinks } from 'src/internal-links/parse-internal-links'
@@ -95,9 +96,10 @@ export function createMarkmap({ parent, toolbar }: { parent: ParentNode, toolbar
   })
 
   if (toolbar) {
-    const toolbar = Toolbar.create(markmap).el
-    parent.append(toolbar)
-    return { svg, markmap, toolbar }
+    const toolbar = Toolbar.create(markmap)
+    toolbar.setBrand(false)
+    parent.append(toolbar.el)
+    return { svg, markmap, toolbar: toolbar.el }
   }
   else
     return { svg, markmap }
