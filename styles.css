@@ -27,6 +27,10 @@
 
 .katex-html { display: none }
 
+.workspace-leaf-content[data-type="mindmap-nextgen-plugin"] .view-content {
+    padding: 0
+}
+
 
 /* Code blocks inside mindmaps */
 
@@ -39,21 +43,6 @@
 /* Hide language tag shown by some themes */
 .markmap-foreign pre[class*='language-']::after {
     display: none;
-}
-
-
-/* Checkboxes */
-
-.mm-ng-checkbox {
-    font-weight: bold;
-}
-
-.mm-ng-checkbox-checked {
-    color: green;
-}
-
-.mm-ng-checkbox-unchecked {
-    color: red;
 }
 
 
@@ -181,31 +170,7 @@
 /* Toolbars */
 
 .mm-toolbar {
-    position: absolute;
-    bottom: 2rem;
-    right: 1rem;
-    background-color: white;
-    border-radius: 0.5rem;
-    padding: 0.2rem;
-    box-shadow: 0 0 0.4rem 0 white;
-    z-index: 1;
-    border: 1px solid #ccc;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.mm-toolbar .mm-toolbar-brand {
-    display: none;
-}
-
-.mm-toolbar .mm-toolbar-item {
-    height: 20px;
-    color: black;
-}
-
-.mm-toolbar .mm-toolbar-item.active,
-.mm-toolbar .mm-toolbar-item:hover {
-    color: brown;
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
 }
