@@ -12,8 +12,6 @@ import { Toolbar } from 'markmap-toolbar'
 import { nextTick } from 'src/utilities/utilities'
 
 
-
-
 const styleEl = createEl('style', {
   parent: document.head,
   text: globalCSS
