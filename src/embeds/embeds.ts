@@ -1,7 +1,9 @@
 import { ITransformPlugin } from 'markmap-lib'
-import { EmbedInfo, MarkdownRenderer, parseLinktext, TFile } from 'obsidian'
+import { EmbedInfo, getLinkpath, MarkdownRenderer, parseLinktext, TFile } from 'obsidian'
 
 import { plugin } from 'src/core/entry'
+import { iife } from 'src/utilities/utilities'
+import { getActiveFile } from 'src/views/get-active-file'
 import MindmapTabView from 'src/views/view'
 import views from 'src/views/views'
 
@@ -117,6 +119,14 @@ function getSourcePath(embedElement: EmbedElement) {
   const view =
     MindmapTabView.instances.find(view =>
       view.leaf.containerEl === leafElement)
-  const file = views.get(view!) as TFile
+  if (!view) throw new Error('Couldn\'t get view')
+  const subject = views.get(view)
+  if (!subject) throw new Error('Couldn\'t get subject')
+  const file =
+    subject !== 'unpinned'
+    ? subject
+    : getActiveFile()
+  if (!file) throw new Error('Couldn\'t get file')
+
   return file.path
 }

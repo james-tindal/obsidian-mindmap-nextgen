@@ -58,3 +58,5 @@ export class Map<K, V> extends globalThis.Map<K, V> {
 
 export const isObjectEmpty = (object: Object) =>
   Object.keys(object).length === 0
+
+export const iife = <Return>(fn: () => Return) => fn()
