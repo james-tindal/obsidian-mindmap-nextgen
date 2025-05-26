@@ -1,6 +1,6 @@
 import { loadJS, loadCSS, INode } from 'markmap-common'
 import { builtInPlugins, IFeatures, Transformer } from 'markmap-lib'
-import { deriveOptions, IMarkmapOptions, Markmap } from 'markmap-view'
+import { deriveOptions, globalCSS, IMarkmapOptions, Markmap } from 'markmap-view'
 import { pick } from 'ramda'
 import GrayMatter from 'gray-matter'
 import 'markmap-toolbar/dist/style.css'
@@ -10,6 +10,20 @@ import { parseInternalLinks } from 'src/internal-links/parse-internal-links'
 import { embedPlugin } from 'src/embeds/embeds'
 import { Toolbar } from 'markmap-toolbar'
 import { nextTick } from 'src/utilities/utilities'
+
+
+
+
+const styleEl = createEl('style', {
+  parent: document.head,
+  text: globalCSS
+})
+nextTick().then(() => {
+  const sheet = new Stylesheet(styleEl)
+  const rule = sheet.getRule('.markmap')!
+  rule.removeProperty('color')
+  rule.removeProperty('font')
+})
 
 
 export const transformer = new Transformer([ ...builtInPlugins, embedPlugin ])
@@ -37,9 +51,6 @@ export function loadAssets(features: IFeatures) {
 }
 
 export function getOptions(settings: CodeBlockSettings): Partial<IMarkmapOptions> {
-  // Use colors from global settings:
-  // const { color: branchColoring } = deriveOptions({ ...settings, color: settings.color?.length ? settings.color : [settings.depth1Color, settings.depth2Color, settings.depth3Color] })
-
   const { color: branchColoring } = deriveOptions(pick(['color', 'colorFreezeLevel'], settings))
   const colorFn = {
     branch: branchColoring,
@@ -49,7 +60,6 @@ export function getOptions(settings: CodeBlockSettings): Partial<IMarkmapOptions
 
   return {
     autoFit: false,
-    embedGlobalCSS: true,
     fitRatio: 1,
     duration: settings.animationDuration,
     ...pick([
@@ -82,18 +92,8 @@ export function createMarkmap(options: { parent: ParentNode, toolbar: false }): 
 export function createMarkmap(options: { parent: ParentNode, toolbar: true }): { svg: SVGSVGElement, markmap: Markmap, toolbar: HTMLDivElement }
 export function createMarkmap({ parent, toolbar }: { parent: ParentNode, toolbar: boolean }): any {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-  const markmap = Markmap.create(svg, {})
-
+  const markmap = Markmap.create(svg, { embedGlobalCSS: false })
   parent.append(svg)
-  // wait for markmap to add text to the style element
-  nextTick().then(() => {
-    const style = markmap.styleNode._groups[0][0] as SVGStyleElement
-    const sheet = new Stylesheet(style)
-    const rule = sheet.getRule('.markmap')!
-    rule.removeProperty('color')
-    rule.removeProperty('font')
-    rule.removeProperty('--markmap-font')
-  })
 
   if (toolbar) {
     const toolbar = Toolbar.create(markmap)
@@ -108,7 +108,7 @@ export function createMarkmap({ parent, toolbar }: { parent: ParentNode, toolbar
 class Stylesheet {
   private sheet: CSSStyleSheet
   private rules: CSSRule[]
-  constructor(styleElement: SVGStyleElement) {
+  constructor(styleElement: HTMLStyleElement) {
     this.sheet = styleElement.sheet!
     this.rules = Array.from(this.sheet.cssRules)
   }

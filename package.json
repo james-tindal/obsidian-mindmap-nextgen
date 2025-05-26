@@ -30,6 +30,7 @@
     "@babel/preset-env": "^7.26.0",
     "@codemirror/state": "^6.2.0",
     "@codemirror/view": "^6.7.3",
+    "@types/d3": "^7.4.3",
     "@types/d3-zoom": "^3.0.2",
     "@types/markdown-it": "^14.1.2",
     "auto-bind": "^5.0.1",
