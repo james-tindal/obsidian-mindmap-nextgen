@@ -204,4 +204,66 @@ declare module 'obsidian' {
       linktext: string
     })
   }
+
+  export type Recycler = (a: unknown, b: unknown) => void
+
+  export class MarkdownPreviewRenderer {
+    static codeBlockPostProcessors: Record<string, MarkdownPostProcessor>
+    static postProcessors: Array<MarkdownPostProcessor>
+    static recyclers: Array<Recycler>
+
+    static belongsToMe(e: unknown, t: unknown, n: unknown): boolean
+    static registerCodeBlockPostProcessor(postProcessor: MarkdownPostProcessor, sortOrder?: number): void
+    static registerDomEvents(t: unknown, n: unknown, i: unknown): void
+    static registerRecycler(e: Recycler): void
+    static unregisterRecycler(e: Recycler): void
+
+    addFooter(): unknown
+    addHeader(): unknown
+    applyFoldInfo(e: unknown): unknown
+    applyScroll(e: unknown, t: unknown): unknown
+    applyScrollDelayed(e: unknown, t: unknown, n: unknown): unknown
+    applyScrollSection(e: unknown): unknown
+    belongsToMe(t: unknown): boolean
+    cleanupParentComponents(): void
+    clear(): void
+    foldAllHeadings(): void
+    foldAllLists(): void
+    getFoldInfo(): unknown
+    getInternalLinkHref(e: unknown): unknown
+    getScroll(): unknown
+    getSectionContainer(e: unknown): unknown
+    getSectionForElement(e: unknown): unknown
+    getSectionInfo(e: unknown): unknown
+    getSectionTop(e: unknown): unknown
+    handleDetached(e: unknown): unknown
+    highlightEl(e: unknown): unknown
+    measureSection(e: unknown): unknown
+    onCheckboxClick(e: unknown, t: unknown): unknown
+    onFootnoteLinkClick(e: unknown, t: unknown): unknown
+    onHeadingCollapseClick(e: unknown, t: unknown): unknown
+    onListCollapseClick(e: unknown, t: unknown): unknown
+    onRender(): unknown
+    onRendered(e: unknown): unknown
+    onResize(): unknown
+    onScroll(): unknown
+    parseAsync(): unknown
+    parseFinish(e: unknown, t: unknown): unknown
+    parseSync(): unknown
+    queueRender(): unknown
+    removeFooter(): unknown
+    removeHeader(): unknown
+    renderHighlights(e: unknown, t: unknown): unknown
+    rerender(e: unknown): unknown
+    selectRange(e: unknown): unknown
+    set(e: unknown): unknown
+    setListCollapse(e: unknown, t: unknown): unknown
+    showSection(e: unknown): unknown
+    unfoldAllHeadings(): unknown
+    unfoldAllLists(): unknown
+    updateFooter(): unknown
+    updateHeader(): unknown
+    updateShownSections(): unknown
+    updateVirtualDisplay(e: unknown): unknown
+  }
 }
