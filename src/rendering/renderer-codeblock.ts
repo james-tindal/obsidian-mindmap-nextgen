@@ -7,11 +7,12 @@ import { cssClasses } from 'src/constants'
 import { CodeBlock, FileTab } from 'src/workspace/types'
 import { createMarkmap, getOptions, parseMarkdown } from 'src/rendering/renderer-common'
 import { renderCodeblocks$ } from 'src/rendering/style-features'
-import Callbag, { flatMap, fromEvent, map, pairwise, takeUntil } from 'src/utilities/callbag'
+import Callbag, { fromEvent } from 'src/utilities/callbag'
 import { CodeBlockSettingsDialog } from 'src/settings/dialogs'
 import { isObjectEmpty } from 'src/utilities/utilities'
 import { TabRow } from 'src/workspace/db-schema'
 import { svgs } from 'src/core/entry'
+import { dragAndDrop } from 'src/utilities/drag-and-drop'
 
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
@@ -144,20 +145,10 @@ function SizeManager(containerEl: CodeBlock['containerEl'], svg: SVGSVGElement, 
   containerEl.prepend(resizeHandle)
   resizeHandle.classList.add('workspace-leaf-resize-handle')
 
-  const yOffset$ = Callbag.pipe(
-    fromEvent(resizeHandle, 'mousedown'),
-    map(ev => ev.clientY),
-    flatMap(startY => Callbag.pipe(
-      fromEvent(document, 'mousemove'),
-      map(ev => (ev.preventDefault(), ev.clientY - startY)),
-      takeUntil(fromEvent(document, 'mouseup')),
-      pairwise,
-      map(([a, b]) => b - a),
-    ))
-  )
+  const drag$ = dragAndDrop(resizeHandle)
 
-  Callbag.subscribe(yOffset$, offset => {
-    settings.height += offset
+  Callbag.subscribe(drag$, drag => {
+    settings.height += drag.changeFromPrevious.y
     svg.style.height = settings.height + 'px'
   })
 
