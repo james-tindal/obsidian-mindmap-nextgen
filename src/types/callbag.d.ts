@@ -32,6 +32,20 @@ declare module 'callbag-reject' {
   export default reject
 }
 
+declare module 'callbag-scan' {
+  import { Source } from 'callbag'
+
+  function scan<I, O>(
+    reducer: (acc: O, d: I) => O,
+    seed: O,
+  ): (source: Source<I>) => Source<O>
+  function scan<IO>(
+    reducer: (acc: IO, d: IO) => IO,
+  ): (source: Source<IO>) => Source<IO>
+
+  export default scan
+}
+
 declare module 'callbag-start-with' {
   import { Source } from 'callbag'
 

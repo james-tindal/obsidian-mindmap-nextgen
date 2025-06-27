@@ -12,6 +12,7 @@ import partition from 'callbag-partition'
 import pipe from 'callbag-pipe'
 import reject from 'callbag-reject'
 import remember from 'callbag-remember'
+import scan from 'callbag-scan'
 import share from 'callbag-share'
 import startWith from 'callbag-start-with'
 import subscribe from 'callbag-subscribe'
@@ -56,6 +57,14 @@ const completeWhen = (trigger: Source<unknown>) => <T>(subject: Source<T>): Sour
     }
   })
 
+const tap = <T>(fn: (value: T) => void) => (source: Source<T>) => {
+  pipe(source, subscribe(fn))
+  return source
+}
+
+const preventDefault = <E extends Event>(event$: Source<E>) =>
+  pipe(event$, tap(event => event.preventDefault()))
+
 type Listener<T> = (data: T) => any
 type Subscriber<T> = {
   next?: Listener<T>,
@@ -81,14 +90,17 @@ const Callbag = {
   pairwise,
   partition,
   pipe,
+  preventDefault,
   reject,
   remember,
+  scan,
   share,
   startWith,
   subject,
   subscribe: subscribe2,
   take,
-  takeUntil
+  takeUntil,
+  tap,
 }
 
 export {
@@ -106,14 +118,17 @@ export {
   pairwise,
   partition,
   pipe,
+  preventDefault,
   reject,
   remember,
+  scan,
   share,
   startWith,
   subject,
   subscribe,
   take,
-  takeUntil
+  takeUntil,
+  tap,
 }
 
 export default Callbag
