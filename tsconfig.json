@@ -22,8 +22,7 @@
     ],
     "paths": {
       "obsidian": ["src/types/obsidian.d.ts"]
-    },
-    "types": ["vitest/globals"]
+    }
   },
   "include": [
     "**/*.ts",

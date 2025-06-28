@@ -1,5 +1,6 @@
 import { Transformer } from 'markmap-lib'
 import { parseInternalLinks } from './parse-internal-links'
+import { describe, expect, test } from 'vitest'
 
 describe('markmap plugins: internal links', () => {
   const transformer = new Transformer()
