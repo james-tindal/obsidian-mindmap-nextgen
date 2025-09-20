@@ -2,7 +2,7 @@ import { MarkdownPostProcessorContext, MarkdownRenderChild, TFile } from 'obsidi
 import GrayMatter from 'gray-matter'
 
 import { FileSettings } from 'src/settings/filesystem'
-import Callbag, { flatMap, map, merge, pairwise, Source, startWith } from 'src/utilities/callbag'
+import Callbag, { filter, flatMap, map, merge, pairwise, Source, startWith } from 'src/utilities/callbag'
 import { ImmutableSet } from 'src/utilities/immutable-set'
 import { FileMap, getLayout } from './get-layout'
 import { CodeBlockRow, FileRow, TabRow } from './db-schema'
@@ -83,16 +83,20 @@ const layout$ = Callbag.pipe(
 )
 
 const fileChange$ = Callbag.pipe(
-  fromObsidianEvent(app.workspace, 'editor-change'),
-  map(([editor, info]) => ({ file: info.file!, bodyText: editor.getValue() }))
+  fromObsidianEvent(app.metadataCache, 'changed'),
+  map(([file, data, cache]) => ({ file, data, cache }))
 )
 
 const file$ = Callbag.pipe(
   fileChange$,
-  map(({ file, bodyText }) => ({ file, ...parseMarkdown<'file'>(bodyText) }))
+  map(({ cache, data, file }) => ({ file, frontmatter: cache.frontmatter as object, body: data.slice(cache.frontmatterPosition?.start.offset) }))
 )
 
-const fileSettings$ = Callbag.pipe(file$, map(InputEvent.fileSettings))
+const fileSettings$ = Callbag.pipe(fileChange$,
+  map(({ file, cache }) => ({ file, settings: (cache.frontmatter as { markmap?: FileSettings } | undefined)?.markmap })),
+  filter(x => x.settings && typeof x.settings === 'object'),
+  map(InputEvent.fileSettings)
+)
 
 const inputEvent$: Source<InputEvent> = Callbag.share(merge(layout$, codeBlock$, fileSettings$))
 
