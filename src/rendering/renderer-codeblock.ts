@@ -40,12 +40,7 @@ export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, f
   render()
   Callbag.subscribe(renderCodeblocks$, render)
 
-  return { render, fit, updateGlobalSettings, updateFileSettings }
-
-  function updateGlobalSettings(globalSettings: GlobalSettings) {
-    settings.global = globalSettings
-    render()
-  }
+  return { render, fit, updateFileSettings }
 
   function updateFileSettings(fileSettings: FileSettings) {
     settings.file = fileSettings
