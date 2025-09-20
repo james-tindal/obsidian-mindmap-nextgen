@@ -69,7 +69,7 @@ Callbag.subscribe(fileOpen, file => {
 Callbag.subscribe(fileRenamed, ({ path }) => {
   const activeFile = getActiveFile()
   const unpinned = views.get('unpinned')
-  if (unpinned && activeFile?.path === path && globalSettings.titleAsRootNode)
+  if (unpinned && activeFile && activeFile.path === path && globalSettings.titleAsRootNode)
     unpinned.render(activeFile)
 
   const result = views.getByPath(path)

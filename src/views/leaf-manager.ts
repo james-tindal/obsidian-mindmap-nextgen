@@ -1,8 +1,9 @@
-import { WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs, WorkspaceParent } from 'obsidian'
+import { WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs, WorkspaceItem } from 'obsidian'
 import { MindmapSubject } from './layout-manager'
 import views from './views'
 import { globalSettings } from 'src/settings/filesystem'
 import { constructView } from './view-creator'
+import { assert, exists } from 'src/workspace/types'
 
 
 export const leafManager = {
@@ -20,7 +21,11 @@ async function replace(remove: MindmapSubject | WorkspaceLeaf, add: MindmapSubje
   const tabGroup = leafToRemove.parent
   const index = tabGroup.children.indexOf(leafToRemove)
 
-  const newLeaf = createLeafIn.tabGroup(tabGroup, index)
+  const newLeaf = createLeafIn.tabGroup(
+    // @ts-expect-error: ignoring mobile problems for now
+    tabGroup,
+    index
+  )
 
   await constructView(newLeaf, add)
   leafToRemove.detach()
@@ -48,11 +53,12 @@ function newLeaf() {
   if (noSplit)
     return createLeafIn.newSplit()
   
-  const activeLeaf = app.workspace.activeLeaf!
+  const activeLeaf = app.workspace.activeLeaf
+  assert(exists, activeLeaf)
   const thisTabGroup = activeLeaf.parent
-  const parentSplit = thisTabGroup.parent as WorkspaceSplit
-  const isTabGroup = (parent: WorkspaceParent): parent is WorkspaceTabs =>
-    parent.type === 'tabs'
+  const parentSplit = thisTabGroup.parent
+  const isTabGroup = (item: WorkspaceItem): item is WorkspaceTabs =>
+    item.type === 'tabs'
   const notParentOfActiveLeaf = (tabGroup: WorkspaceTabs) =>
     !tabGroup.children.includes(activeLeaf)
   const siblingTabGroup = parentSplit.children
@@ -61,7 +67,10 @@ function newLeaf() {
   if (siblingTabGroup)
     return createLeafIn.tabGroup(siblingTabGroup, -1)
   else
-    return createLeafIn.tabGroup(thisTabGroup, thisTabGroup.children.indexOf(activeLeaf) + 1)
+    return createLeafIn.tabGroup(
+      // @ts-expect-error: ignoring mobile problems for now
+      thisTabGroup,
+      thisTabGroup.children.indexOf(activeLeaf) + 1)
 }
 
 const createLeafIn = {
