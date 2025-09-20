@@ -31,11 +31,25 @@ export class LocalEvents<EventName extends string> {
   }
 }
 
-export function PromiseSubject<T>(): [(value: T | PromiseLike<T>) => void, Promise<T>] {
-  let resolver
-  const promise = new Promise<T>(resolve => resolver = resolve)
-  return [ resolver, promise ]
+
+declare global {
+  interface PromiseConstructor {
+    withResolvers<T>(): {
+      promise: Promise<T>
+      resolve: (value: T | PromiseLike<T>) => void
+      reject: (reason?: unknown) => void
+    }
+  }
 }
+if (!Promise.withResolvers)
+  Promise.withResolvers = () => {
+    let resolve, reject
+    const promise = new Promise((res, rej) => {
+      resolve = res
+      reject = rej
+    })
+    return { promise, resolve, reject } as any
+  }
 
 export const nextTick = () => new Promise<void>(setImmediate)
 

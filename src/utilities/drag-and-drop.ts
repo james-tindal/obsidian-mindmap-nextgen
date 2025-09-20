@@ -29,7 +29,7 @@ interface Coordinates {
   x: number
   y: number
 }
-const coordinateDifference = (a: Coordinates, b) =>
+const coordinateDifference = (a: Coordinates, b: Coordinates) =>
   ({ x: a.x - b.x, y: a.y - b.y })
 
 const eventCoordinates = (e: MouseEvent) =>

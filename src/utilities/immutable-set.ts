@@ -43,11 +43,11 @@ export class ImmutableSet<T> {
 
   static filter<Out extends In, In>(predicate: (v: In) => v is Out): ((set: ImmutableSet<In>) => ImmutableSet<Out>)
   static filter<T>(predicate: (v: T) => any): ((set: ImmutableSet<T>) => ImmutableSet<T>)
-  static filter(predicate) { return set => set.filter(predicate) }
+  static filter(predicate: any) { return (set: any) => set.filter(predicate) }
 
   filter<Out extends T>(predicate: (v: T) => v is Out): ImmutableSet<Out>
   filter(predicate: (v: T) => any): ImmutableSet<T>
-  filter(predicate) {
+  filter(predicate: any) {
     return new ImmutableSet((function*(set) {
       for (const value of set)
         if (predicate(value))

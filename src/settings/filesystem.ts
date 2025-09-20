@@ -1,5 +1,5 @@
 import type { SplitDirection } from 'obsidian'
-import { LocalEvents, PromiseSubject } from 'src/utilities/utilities'
+import { LocalEvents } from 'src/utilities/utilities'
 import { Layout } from 'src/views/layout-manager'
 import { plugin } from 'src/core/entry'
 
@@ -99,7 +99,7 @@ export type GlobalSettings = v2['settings']
 export type FileSettings = Omit<GlobalSettings, OmitFromFileSettings> & { color?: string[] }
 export type CodeBlockSettings = Omit<FileSettings, 'titleAsRootNode'> & { height?: number }
 
-const [ resolve, settingsLoaded ] = PromiseSubject<GlobalSettings>()
+const { resolve, promise: settingsLoaded } = Promise.withResolvers<GlobalSettings>()
 export { settingsLoaded }
 
 const events = new LocalEvents<keyof GlobalSettings>()
@@ -117,8 +117,8 @@ plugin.loadData()
   plugin.saveData(fsd)
 
   globalSettings = new Proxy<GlobalSettings>(fsd.settings, {
-    get: (_, key) => fsd.settings[key],
-    set<K extends keyof GlobalSettings>(_, key: K, value: GlobalSettings[K]) {
+    get: (_, key: keyof GlobalSettings) => fsd.settings[key],
+    set<K extends keyof GlobalSettings>(_: any, key: K, value: GlobalSettings[K]) {
       fsd.settings[key] = value
       events.emit(key, value)
       plugin.saveData(fsd)

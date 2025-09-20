@@ -61,7 +61,9 @@ export class CodeBlockSettingsDialog extends Modal {
     autoBind(this)
 
     const inheritSettings = new Proxy({} as GlobalSettings, {
-      get: (_, key) => fileSettings[key] || globalSettings[key],
+      // When I wrote this, FileSettings was a subset of GlobalSettings
+      // not sure exactly what this is supposed to do
+      get: (_, key: keyof GlobalSettings) => key in fileSettings ? (fileSettings as any)[key] : globalSettings[key],
       set: () => false
     })
 

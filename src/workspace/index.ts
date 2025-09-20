@@ -15,6 +15,7 @@ import { parseMarkdown } from 'src/rendering/renderer-common'
 import { FileSettingsDialog } from 'src/settings/dialogs'
 import { workspace } from 'src/core/entry'
 import { fromObsidianEvent } from 'src/utilities/from-obsidian-event'
+import { Simplify } from 'type-fest'
 
 
 const InputEvent = unionConstructors(
@@ -126,14 +127,14 @@ const matcher: EventMatcher = {
     // this should really be moved to after the matcher
     // --
     const fileSettingsProxy = new Proxy({} as FileSettings, {
-      get: (_, key) => tabRow.file.settings[key],
+      get: (_, key: keyof FileSettings) => tabRow.file.settings[key],
       has: (_, key) => key in tabRow.file.settings,
-      set(_, key, value) {
+      set<Key extends keyof FileSettings>(_: unknown, key: Key, value: FileSettings[Key]) {
         tabRow.file.settings[key] = value
         updateFrontmatter()
         return true
       },
-      deleteProperty(_, key) {
+      deleteProperty(_, key: keyof FileSettings) {
         delete tabRow.file.settings[key]
         updateFrontmatter()
         return true
@@ -152,7 +153,9 @@ const matcher: EventMatcher = {
     return workspace.codeBlocksWaiting
       .filter(codeBlock => leaf.containerEl.contains(codeBlock.containerEl))
       .map(codeBlock => {
+        matcher
         workspace.codeBlocksWaiting.delete(codeBlock)
+        // @ts-expect-error: Don't know what's going on with these types but this is obviously fine
         return matcher['codeBlock created'](codeBlock)
       })
   },
