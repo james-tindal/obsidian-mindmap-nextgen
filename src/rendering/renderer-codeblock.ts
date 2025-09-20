@@ -152,14 +152,14 @@ function SizeManager(containerEl: CodeBlock['containerEl'], svg: SVGSVGElement, 
 
 function SettingsDialog(codeBlock: CodeBlock, tabRow: TabRow, codeBlockSettings: CodeBlockSettings) {
   const fileSettings = new Proxy({} as FileSettings, {
-    get: (_, key) => tabRow.file.settings[key],
+    get: (_, key: keyof FileSettings) => tabRow.file.settings[key],
     has: (_, key) => key in tabRow.file.settings,
-    set(_, key, value) {
+    set<Key extends keyof FileSettings>(_: unknown, key: Key, value: FileSettings[Key]) {
       tabRow.file.settings[key] = value
       updateFileFrontmatter()
       return true
     },
-    deleteProperty(_, key) {
+    deleteProperty(_, key: keyof FileSettings) {
       delete tabRow.file.settings[key]
       updateFileFrontmatter()
       return true
@@ -172,12 +172,12 @@ function SettingsDialog(codeBlock: CodeBlock, tabRow: TabRow, codeBlockSettings:
   }
 
   const codeBlockProxy = new Proxy(codeBlockSettings, {
-    set(_, key, newValue) {
-      codeBlockSettings[key] = newValue
+    set<Key extends keyof CodeBlockSettings>(_: unknown, key: Key, value: CodeBlockSettings[Key]) {
+      codeBlockSettings[key] = value
       updateCodeBlockFrontmatter()
       return true
     },
-    deleteProperty(_, key) {
+    deleteProperty(_, key: keyof CodeBlockSettings) {
       delete codeBlockSettings[key]
       updateCodeBlockFrontmatter()
       return true
