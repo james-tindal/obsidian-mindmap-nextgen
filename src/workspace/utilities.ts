@@ -28,7 +28,7 @@ export const match = <Event extends Tagged<string, any>, Return>
   (event: Event, matcher: Matcher<Event, Return>) =>
     matcher[event.tag](event.data)
 
-const isIterable = <T>(x): x is Iterable<T> => !!x?.[Symbol.iterator]
+const isIterable = <T>(x: any): x is Iterable<T> => !!x?.[Symbol.iterator]
 
 export type Stackable<T> = void | T | Iterable<void | T>
 export const Stackable = {

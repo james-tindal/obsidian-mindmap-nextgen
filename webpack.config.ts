@@ -1,11 +1,11 @@
 import CopyPlugin from 'copy-webpack-plugin'
 import { resolve } from 'path'
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
-import { type Configuration } from 'webpack'
 import webpack from 'webpack'
 import ForkTsCheckerPlugin from 'fork-ts-checker-webpack-plugin'
+import { type CallableWebpackConfiguration } from 'webpack-cli'
 
-export default (env, argv): Configuration => ({
+const config: CallableWebpackConfiguration = (env, argv) => ({
   mode: getMode(argv.mode),
   entry: './src/core/entry.ts',
   output: {
@@ -47,8 +47,9 @@ export default (env, argv): Configuration => ({
   devtool: argv.mode === 'production' && 'eval-source-map',
   optimization: { splitChunks: false }
 })
+export default config
 
-function getMode(mode) {
+function getMode(mode: string) {
   if (['development', 'production'].includes(mode))
     return mode as 'development' | 'production'
   else
