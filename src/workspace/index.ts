@@ -6,10 +6,11 @@ import Callbag, { flatMap, map, merge, pairwise, Source, startWith } from 'src/u
 import { ImmutableSet } from 'src/utilities/immutable-set'
 import { FileMap, getLayout } from './get-layout'
 import { CodeBlockRow, FileRow, TabRow } from './db-schema'
-import { CodeBlock, FileTab } from './types'
+import { CodeBlock, FileTab, leafHasFile } from './types'
 import { CodeBlockRenderer } from 'src/rendering/renderer-codeblock'
 import { isObjectEmpty, nextTick } from 'src/utilities/utilities'
 import { ExtractRecord, ExtractUnion, Matcher, Stackable, Tagged, match, tr, unionConstructors } from './utilities'
+import { assert } from './types'
 import { parseMarkdown } from 'src/rendering/renderer-common'
 import { FileSettingsDialog } from 'src/settings/dialogs'
 import { workspace } from 'src/core/entry'
@@ -99,6 +100,7 @@ type EventMatcher = Matcher<InputEvent, Stackable<CodeBlockEvent>>
 
 const matcher: EventMatcher = {
   'tab opened': leaf => {
+    assert(leafHasFile, leaf)
     const fileHandle = leaf.view.file
     const fileRowInDb = workspace.files.find(row => row.handle === fileHandle)
     let fileRow: FileRow

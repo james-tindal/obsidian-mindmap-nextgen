@@ -1,0 +1,13 @@
+diff --git a/obsidian.d.ts b/obsidian.d.ts
+index 6b78a9fde6e03c18f8cf5f7c8ad8f02e706f30f1..e36e69c91b61c919e79704c3030a7f06fe119653 100644
+--- a/obsidian.d.ts
++++ b/obsidian.d.ts
+@@ -3758,7 +3758,7 @@ export class Setting {
+     /**
+      * @public
+      */
+-    constructor(containerEl: HTMLElement);
++    constructor(containerEl: Node);
+     /**
+      * @public
+      */

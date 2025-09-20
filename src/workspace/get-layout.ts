@@ -1,6 +1,7 @@
-import { TFile, WorkspaceLeaf as TabLeaf, WorkspaceParent, WorkspaceSplit, WorkspaceTabs as TabGroup } from 'obsidian'
+import { TFile, WorkspaceLeaf as TabLeaf, WorkspaceSplit, WorkspaceTabs as TabGroup, WorkspaceItem } from 'obsidian'
 import { ImmutableSet } from 'src/utilities/immutable-set'
-import { FileTab, Tab } from './types'
+import { FileTab, leafHasFile, Tab } from './types'
+import { assert } from './types'
 
 
 
@@ -27,7 +28,10 @@ export function getLayout() {
   const tabs =        new ImmutableSet(getTabs       (tabGroups)) .filter(isFileTab)
   const currentTabs = new ImmutableSet(getCurrentTabs(tabGroups)) .filter(isFileTab)
 
-  const files = new FileMap([...tabs.values()].map(leaf => [ leaf, leaf.view.file ]))
+  const files = new FileMap([...tabs.values()].map(leaf => {
+    assert(leafHasFile, leaf)
+    return [ leaf, leaf.view.file ]
+  }))
 
   return { tabs, currentTabs, files }
 }
@@ -44,18 +48,18 @@ function* getCurrentTabs(tabGroups: Iterable<TabGroup>) {
   }
 }
 
-function* getTabGroups(parent: WorkspaceParent = app.workspace.rootSplit.children[0]): Generator<TabGroup> {
-  if (isSplit(parent))
-    for (const child of parent.children)
+function* getTabGroups(item: WorkspaceItem = app.workspace.rootSplit.children[0]): Generator<TabGroup> {
+  if (isSplit(item))
+    for (const child of item.children)
       yield* getTabGroups(child)
-  if (isTabGroup(parent))
-    yield parent
+  if (isTabGroup(item))
+    yield item
 }
 
-function isTabGroup(parent: WorkspaceParent): parent is TabGroup {
-  return parent.type === 'tabs'
+function isTabGroup(item: WorkspaceItem): item is TabGroup {
+  return item.type === 'tabs'
 }
 
-function isSplit(parent: WorkspaceParent): parent is WorkspaceSplit {
-  return parent.type === 'split'
+function isSplit(item: WorkspaceItem): item is WorkspaceSplit {
+  return item.type === 'split'
 }
