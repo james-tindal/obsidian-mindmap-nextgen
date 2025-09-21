@@ -2,9 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "noEmit": true,
-    "strictNullChecks": true,
-    "strictBindCallApply": true,
-    "noImplicitAny": true,
+    "strict": true,
     "inlineSourceMap": true,
     "inlineSources": true,
     "module": "ESNext",

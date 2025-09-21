@@ -16,7 +16,7 @@ export function fromObsidianEvent<
 
   const stream = Callbag.create<CallbackParams>((next, error, complete) => {
     const sendArgsArray = (...args: CallbackParams) => next(args)
-    const ref = target.on(name, sendArgsArray)
+    const ref = target.on(name, sendArgsArray as any)
     plugin.registerEvent(ref)
     plugin.register(complete)
   })

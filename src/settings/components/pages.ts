@@ -118,11 +118,11 @@ const SectionColoringGlobal = () => {
 
   function setApproach(coloring: Coloring) {
     all.forEach(x => x.node.hidden = true)
-    ~{branch, depth, single}[coloring].forEach(x => {
-      x.node.hidden = false
-      if ('update' in x)
-        (x.update as Function)()
-    })
+    for (const component of { branch, depth, single }[coloring]) {
+      component.node.hidden = false
+      if ('update' in component)
+        (component.update as Function)()
+    }
   }
 
   setApproach(globalSettings.coloring)
@@ -227,14 +227,14 @@ const ScreenshotBackgroundStyle = (settings: Pick<GlobalSettings, 'screenshotBgS
   HtmlComponent(new Setting(createFragment())
     .setName('Screenshot background style')
     .setDesc('Select the background style for the screenshot, when using "Color" the color picker value will be used')
-    .addDropdown(dropdown => dropdown
+    .addDropdown<ScreenshotBgStyle>(dropdown => dropdown
       .addOptions({
         [ScreenshotBgStyle.Transparent]: 'Transparent',
         [ScreenshotBgStyle.Color]: 'Color',
         [ScreenshotBgStyle.Theme]: 'Theme',
       })
       .setValue(settings.screenshotBgStyle)
-      .onChange((value: ScreenshotBgStyle) =>
+      .onChange(value =>
         settings.screenshotBgStyle = value ))
     .addColorPicker(colPicker => colPicker
       .setValue(settings.screenshotBgColor)
@@ -242,8 +242,6 @@ const ScreenshotBackgroundStyle = (settings: Pick<GlobalSettings, 'screenshotBgS
         settings.screenshotBgColor = value ))
     .settingEl
   )
-
-
 
 // -- SectionMarkmap -- //
 

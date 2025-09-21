@@ -745,7 +745,7 @@ declare module 'obsidian' {
   }
 
 
-export interface ColorComponent extends ValueComponent<string> {
+  export interface ColorComponent extends ValueComponent<string> {
     colorPickerEl: HTMLInputElement
 
     /**
@@ -782,5 +782,5 @@ export interface ColorComponent extends ValueComponent<string> {
      * @public
      */
     onChange(callback: (value: string) => any): this
-}
+  }
 }

@@ -1,4 +1,4 @@
-import { TFile, WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs } from 'obsidian'
+import { TFile, WorkspaceItem, WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs } from 'obsidian'
 import { layoutManager } from './layout-manager'
 import { LoadingView } from './loading-view'
 import MindmapTabView from './view'
@@ -17,13 +17,13 @@ Callbag.subscribe(start, () =>
 Callbag.subscribe(layoutChange, () => {
   layoutManager.serialise()
 
-  const topLevel = app.workspace.rootSplit.children[0] as WorkspaceSplit | WorkspaceTabs;
+  const topLevel = app.workspace.rootSplit.children[0]
 
-  (function loop(parent: WorkspaceSplit | WorkspaceTabs) {
-    if (parent.type === 'split')
-      parent.children.map(loop)
-    else {
-      const currentTab = parent.children[parent.currentTab]
+  function loop(item: WorkspaceItem) {
+    if (item instanceof WorkspaceSplit)
+      item.children.map(loop)
+    if (item instanceof WorkspaceTabs) {
+      const currentTab = item.children[item.currentTab]
       const view = currentTab.view
       const loaded = view instanceof MindmapTabView
       if (!loaded) return
@@ -31,7 +31,8 @@ Callbag.subscribe(layoutChange, () => {
       const file = subject === 'unpinned' ? getActiveFile() : subject
       if (file) view.firstRender(file)
     }
-  })(topLevel)
+  }
+  loop(topLevel)
 })
 
 Callbag.subscribe(pin, () => {
