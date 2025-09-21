@@ -1,13 +1,75 @@
 diff --git a/obsidian.d.ts b/obsidian.d.ts
-index 6b78a9fde6e03c18f8cf5f7c8ad8f02e706f30f1..e36e69c91b61c919e79704c3030a7f06fe119653 100644
+index 6b78a9fde6e03c18f8cf5f7c8ad8f02e706f30f1..15d884a27b0729cdceac5d79b2890d4800e13cdf 100644
 --- a/obsidian.d.ts
 +++ b/obsidian.d.ts
-@@ -3758,7 +3758,7 @@ export class Setting {
+@@ -1147,43 +1147,15 @@ export interface Debouncer<T extends unknown[], V> {
+  */
+ export function displayTooltip(newTargetEl: HTMLElement, content: string | DocumentFragment, options?: TooltipOptions): void;
+ 
+-/**
+- * @public
+- */
+-export class DropdownComponent extends ValueComponent<string> {
+-    /**
+-     * @public
+-     */
+-    selectEl: HTMLSelectElement;
+-
+-    /**
+-     * @public
+-     */
+-    constructor(containerEl: HTMLElement);
+-    /**
+-     * @public
+-     */
+-    setDisabled(disabled: boolean): this;
+-    /**
+-     * @public
+-     */
+-    addOption(value: string, display: string): this;
+-    /**
+-     * @public
+-     */
+-    addOptions(options: Record<string, string>): this;
+-    /**
+-     * @public
+-     */
+-    getValue(): string;
+-    /**
+-     * @public
+-     */
+-    setValue(value: string): this;
+-    /**
+-     * @public
+-     */
+-    onChange(callback: (value: string) => any): this;
++export class DropdownComponent<T extends string = string> extends ValueComponent<T> {
++    selectEl: HTMLSelectElement
++    constructor(containerEl: HTMLElement)
++    onChange(callback: (value: T) => void): this
++    getValue(): T
++    setValue(value: T): this
++    setDisabled(disabled: boolean): this
++    addOption(value: T, display: string): this
++    addOptions(options: Record<T, string>): this
+ }
+ 
+ /**
+@@ -3758,7 +3730,7 @@ export class Setting {
      /**
       * @public
       */
 -    constructor(containerEl: HTMLElement);
 +    constructor(containerEl: Node);
+     /**
+      * @public
+      */
+@@ -3815,7 +3787,7 @@ export class Setting {
+     /**
+      * @public
+      */
+-    addDropdown(cb: (component: DropdownComponent) => any): this;
++    addDropdown<T extends string>(cb: (component: DropdownComponent<T>) => void): this
      /**
       * @public
       */

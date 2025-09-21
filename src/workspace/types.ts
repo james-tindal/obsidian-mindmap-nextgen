@@ -28,7 +28,7 @@ export const leafHasFile = Object.assign(
 export class CodeBlock {
   constructor(
     public markdown: string,
-    public containerEl: HTMLDivElement,
+    public containerEl: HTMLElement,
     public getSectionInfo: () => MarkdownSectionInformation
   ) {}
 }

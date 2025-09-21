@@ -15,7 +15,7 @@ import { parseMarkdown } from 'src/rendering/renderer-common'
 import { FileSettingsDialog } from 'src/settings/dialogs'
 import { workspace } from 'src/core/entry'
 import { fromObsidianEvent } from 'src/utilities/from-obsidian-event'
-import { Simplify } from 'type-fest'
+import { Merge } from 'type-fest'
 
 
 const InputEvent = unionConstructors(
@@ -42,7 +42,7 @@ type CodeBlockEvent = ExtractUnion<typeof CodeBlockEvent>
 
 const { source: codeBlock$, push: codeBlockEvent } = Callbag.subject<InputEvents[`codeBlock ${'created' | 'deleted'}`]>()
 
-export async function codeBlockHandler(markdown: string, containerEl: HTMLDivElement, ctx: MarkdownPostProcessorContext) {
+export async function codeBlockHandler(markdown: string, containerEl: HTMLElement, ctx: MarkdownPostProcessorContext) {
   const childComponent = new MarkdownRenderChild(containerEl)
   ctx.addChild(childComponent)
 
@@ -66,7 +66,7 @@ const layoutChange$ = Callbag.merge(
 const layout$ = Callbag.pipe(
   layoutChange$,
   map(getLayout),
-  startWith({ tabs: new ImmutableSet, currentTabs: new ImmutableSet, files: new FileMap }),
+  startWith({ tabs: new ImmutableSet<FileTab.Leaf>, currentTabs: new ImmutableSet<FileTab.Leaf>, files: new FileMap }),
   pairwise,
   map(([a, b]) => ({
     tabs:        ImmutableSet.diff(a.tabs, b.tabs),
@@ -95,7 +95,8 @@ const file$ = Callbag.pipe(
 
 const fileSettings$ = Callbag.pipe(fileChange$,
   map(({ file, cache }) => ({ file, settings: (cache.frontmatter as { markmap?: FileSettings } | undefined)?.markmap })),
-  filter(x => x.settings && typeof x.settings === 'object'),
+  filter((x): x is Merge<typeof x, { settings: FileSettings }> =>
+    'settings' in x && typeof x.settings === 'object'),
   map(InputEvent.fileSettings)
 )
 

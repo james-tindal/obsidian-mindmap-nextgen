@@ -1,7 +1,6 @@
-import { ValueComponent, ExtraButtonComponent, DropdownComponent, TextComponent } from 'obsidian'
-import { globalSettings, GlobalSettings } from '../filesystem'
+import { ValueComponent, ExtraButtonComponent, DropdownComponent, TextComponent, Setting } from 'obsidian'
+import { globalSettings, GlobalSettings } from 'src/settings/filesystem'
 import { Resolve } from 'src/workspace/utilities'
-import { Setting } from './setting-constructor'
 
 
 interface ControlComponent<T> extends ValueComponent<T> {
@@ -31,7 +30,7 @@ export const SettingComponent = (options: SettingOptions) => {
     options.description && setting.setDesc(options.description)
 
     const controlType = typeof options.control === 'string' ? options.control : options.control.tag
-    let control = Resolve<ControlComponent<GlobalSettings[keyof GlobalSettings]>>(resolve => ({
+    let control = Resolve<ControlComponent<any>>(resolve => ({
       text: () => setting.addText(resolve),
       numberText: () => setting.addText(resolve),
       colorPicker: () => setting.addColorPicker(resolve),
@@ -50,15 +49,15 @@ export const SettingComponent = (options: SettingOptions) => {
       control = newControl
     }
 
-    type Listener = (value: string | number | boolean) => any
-    let changeListener: Listener
+    type Listener<T extends string | number | boolean = string | number | boolean> = (value: T) => void
+    let changeListener: Listener<any>
     const originalOnChange = control.onChange.bind(control)
     control.onChange = cb =>
       originalOnChange(value => {
         changeListener?.(value)
         cb(value)
       })
-    function onChange(listener: Listener) { changeListener = listener }
+    function onChange<T extends string | number | boolean>(listener: Listener<T>) { changeListener = listener }
     const fireChangeEvent = () => changeListener?.(control.getValue())
 
     const result = { node: setting.settingEl, control, key: options.key, onChange, fireChangeEvent }
