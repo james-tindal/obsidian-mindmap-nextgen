@@ -1,5 +1,5 @@
 import { Setting } from 'obsidian'
-import { CodeBlockSettings, Coloring, FileSettings, globalSettings, GlobalSettings, ScreenshotBgStyle } from '../filesystem'
+import { CodeBlockSettings, Coloring, FileSettings, globalSettings, GlobalSettings, ScreenshotBgStyle } from 'src/settings/filesystem'
 import { Heading, HtmlComponent, fragment } from './various'
 import { SettingComponent, dropdown, numberText, text } from './SettingComponent'
 
