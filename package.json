@@ -77,7 +77,6 @@
   },
   "pnpm": {
     "patchedDependencies": {
-      "d3-svg-to-png": "patches/d3-svg-to-png.patch",
       "obsidian": "patches/obsidian.patch"
     }
   }
