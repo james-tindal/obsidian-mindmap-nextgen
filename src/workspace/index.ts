@@ -1,5 +1,6 @@
 import { TFile } from 'obsidian'
 import GrayMatter from 'gray-matter'
+import { Merge } from 'type-fest'
 
 import { FileSettings } from 'src/settings/filesystem'
 import Callbag, { filter, flatMap, map, merge, pairwise, Source, startWith } from 'src/utilities/callbag'
@@ -11,17 +12,14 @@ import { CodeBlockRenderer } from 'src/rendering/renderer-codeblock'
 import { isObjectEmpty } from 'src/utilities/utilities'
 import { ExtractRecord, ExtractUnion, Matcher, Stackable, Tagged, match, tr, unionConstructors } from './utilities'
 import { assert } from './types'
-import { parseMarkdown } from 'src/rendering/renderer-common'
 import { FileSettingsDialog } from 'src/settings/dialogs'
 import { workspace } from 'src/core/entry'
 import { fromObsidianEvent } from 'src/utilities/from-obsidian-event'
-import { Merge } from 'type-fest'
-import { CodeBlock, codeBlockCreated, codeBlockDeleted } from 'src/new/codeBlockHandler'
+import { CodeBlock, codeBlockCreated } from 'src/new/codeBlockHandler'
 
 
 const InputEvent = unionConstructors(
   Tagged('codeBlock created', tr as CodeBlock),
-  Tagged('codeBlock deleted', tr as CodeBlock),
   Tagged('tab opened',      tr as MarkdownTab.Leaf),
   Tagged('tab closed',      tr as MarkdownTab.Leaf),
   Tagged('tab current',     tr as MarkdownTab.Leaf),
@@ -33,7 +31,7 @@ type InputEvent = ExtractUnion<typeof InputEvent>
 type InputEvents = ExtractRecord<typeof InputEvent>
 
 const CodeBlockEvent = unionConstructors(
-  Tagged('start',          tr as { codeBlock: CodeBlock, fileSettings: FileSettings, isCurrent: boolean, fileRow: FileRow }),
+  Tagged('start',          tr as { codeBlock: CodeBlock, fileSettings: FileSettings, isCurrent: boolean }),
   Tagged('current',        tr as { codeBlock: CodeBlock }),
   Tagged('fileSettings',   tr as { codeBlock: CodeBlock, fileSettings: FileSettings }),
   Tagged('end',            tr as { codeBlock: CodeBlock }),
@@ -42,7 +40,6 @@ type CodeBlockEvent = ExtractUnion<typeof CodeBlockEvent>
 
 const codeBlock$ = Callbag.merge(
   map(InputEvent['codeBlock created'])(codeBlockCreated),
-  map(InputEvent['codeBlock deleted'])(codeBlockDeleted),
 )
 
 const layoutChange$ = Callbag.merge(
@@ -102,7 +99,7 @@ const matcher: EventMatcher = {
       fileRow = fileRowInDb
     else {
       const fileText = leaf.view.editor.getValue()
-      fileRow = FileRow({ handle: fileHandle, ...parseMarkdown<'file'>(fileText) })
+      fileRow = FileRow({ handle: fileHandle, ...splitMarkdown(fileText) })
       workspace.files.add(fileRow)
     }
 
@@ -160,7 +157,7 @@ const matcher: EventMatcher = {
     else {
       // Create new FileRow
       const fileText = tabLeaf.view.editor.getValue()
-      newFileRow = FileRow({ handle: newFileHandle, ...parseMarkdown<'file'>(fileText) })
+      newFileRow = FileRow({ handle: newFileHandle, ...splitMarkdown(fileText) })
       // Add it to the db
       workspace.files.add(newFileRow)
     }
@@ -210,19 +207,9 @@ const matcher: EventMatcher = {
 
     const fileSettings = tabRow.file.settings
     const isCurrent = tabRow.isCurrent
-    const tabView = tabRow.view
-    const fileRow = tabRow.file
 
-    return CodeBlockEvent.start({ codeBlock, fileSettings, isCurrent, fileRow })
+    return CodeBlockEvent.start({ codeBlock, fileSettings, isCurrent })
 
-  },
-  'codeBlock deleted': codeBlock => {
-    const codeBlockRow = workspace.codeBlocks.find(row => row.codeBlock === codeBlock)!
-
-    workspace.codeBlocks.delete(codeBlockRow)
-    codeBlockRow.tab.codeBlocks.delete(codeBlockRow)
-
-    return CodeBlockEvent.end({ codeBlock })
   },
   'fileSettings' ({ file, settings }) {
     const fileRow = workspace.files.find(row => row.handle === file)!
@@ -245,8 +232,8 @@ const codeBlockEvent$ = Callbag.pipe(
 
 const renderers = new Map<CodeBlock, CodeBlockRenderer>()
 Callbag.subscribe(codeBlockEvent$, event => match(event, {
-  'start' ({ codeBlock, fileSettings, isCurrent, fileRow }) {
-    const renderer = CodeBlockRenderer(codeBlock, fileSettings, fileRow)
+  'start' ({ codeBlock, fileSettings, isCurrent }) {
+    const renderer = CodeBlockRenderer(codeBlock, fileSettings)
     if (isCurrent) renderer.fit()
     renderers.set(codeBlock, renderer)
   },
@@ -260,3 +247,11 @@ Callbag.subscribe(codeBlockEvent$, event => match(event, {
     renderers.delete(codeBlock)
   }
 }))
+
+function splitMarkdown(text: string) {
+  const gm = GrayMatter(text)
+  const frontmatter = gm.data
+  const settings = (frontmatter?.markmap || {}) as FileSettings
+
+  return { settings, body: gm.content }
+}

@@ -10,14 +10,13 @@ import { renderCodeblocks$ } from 'src/rendering/style-features'
 import Callbag, { fromEvent } from 'src/utilities/callbag'
 import { CodeBlockSettingsDialog } from 'src/settings/dialogs'
 import { isObjectEmpty } from 'src/utilities/utilities'
-import { FileRow } from 'src/workspace/db-schema'
 import { svgs } from 'src/core/entry'
 import { dragAndDrop } from 'src/utilities/drag-and-drop'
 import { CodeBlock } from 'src/new/codeBlockHandler'
 
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
-export function CodeBlockRenderer(codeBlock: CodeBlock, fileSettings: FileSettings, fileRow: FileRow) {
+export function CodeBlockRenderer(codeBlock: CodeBlock, fileSettings: FileSettings) {
   const { markdown, containerEl, ctx: { sourcePath }} = codeBlock
   const file = app.vault.getFileByPath(sourcePath)
   assert(exists, file)
@@ -31,14 +30,14 @@ export function CodeBlockRenderer(codeBlock: CodeBlock, fileSettings: FileSettin
   const { markmap, svg } = createMarkmap({ parent: containerEl, toolbar: false })
   svgs.set(svg, file)
 
-  const { rootNode, settings: codeBlockSettings } = parseMarkdown<'codeBlock'>(markdown)
+  const { rootNode, settings: codeBlockSettings, body } = parseMarkdown<'codeBlock'>(markdown)
 
   const settings = new SettingsManager(markdownView, codeBlock, fileSettings, codeBlockSettings)
 
   SizeManager(containerEl, svg, settings)
 
   if (markdownView.getMode() === 'source')
-    SettingsDialog(codeBlock, fileRow, codeBlockSettings, fileSettings, markdownView.editor)
+    SettingsDialog(codeBlock, body, codeBlockSettings, fileSettings, markdownView.editor)
 
   let hasFit = false
   function fit() {
@@ -160,7 +159,7 @@ function SizeManager(containerEl: CodeBlock['containerEl'], svg: SVGSVGElement, 
   Callbag.subscribe(fromEvent(document, 'mouseup'), settings.saveHeight)
 }
 
-function SettingsDialog(codeBlock: CodeBlock, file: FileRow, codeBlockSettings: CodeBlockSettings, fileSettings: FileSettings, editor: Editor) {
+function SettingsDialog(codeBlock: CodeBlock, body: string, codeBlockSettings: CodeBlockSettings, fileSettings: FileSettings, editor: Editor) {
   const fileSettingsProxy = new Proxy({} as FileSettings, {
     get: (_, key: keyof FileSettings) => fileSettings[key],
     has: (_, key) => key in fileSettings,
@@ -178,7 +177,7 @@ function SettingsDialog(codeBlock: CodeBlock, file: FileRow, codeBlockSettings: 
 
   function updateFileFrontmatter() {
     const frontmatter = isObjectEmpty(fileSettings) ? {} : { markmap: fileSettings }
-    editor.setValue(GrayMatter.stringify(file.body, frontmatter))
+    editor.setValue(GrayMatter.stringify(body, frontmatter))
   }
 
   const codeBlockProxy = new Proxy(codeBlockSettings, {
