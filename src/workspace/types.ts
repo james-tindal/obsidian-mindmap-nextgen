@@ -1,4 +1,4 @@
-import { WorkspaceLeaf, ItemView, MarkdownView, MarkdownSectionInformation, TFile } from 'obsidian'
+import { WorkspaceLeaf, ItemView, MarkdownView, MarkdownSectionInformation, TFile, MarkdownPostProcessorContext } from 'obsidian'
 import MindmapTabView from 'src/views/view'
 
 
@@ -25,12 +25,11 @@ export const leafHasFile = Object.assign(
   { message: 'Leaf has no file' as const }
 )
 
-export class CodeBlock {
-  constructor(
-    public markdown: string,
-    public containerEl: HTMLElement,
-    public getSectionInfo: () => MarkdownSectionInformation
-  ) {}
+export interface CodeBlock {
+  markdown: string,
+  containerEl: HTMLElement,
+  getSectionInfo(): MarkdownSectionInformation | null
+  ctx: MarkdownPostProcessorContext
 }
 
 type AssertPredicate<In, Out extends In> = ((x: In) => x is Out) & { message?: string} 

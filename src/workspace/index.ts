@@ -46,7 +46,10 @@ export async function codeBlockHandler(markdown: string, containerEl: HTMLElemen
   const childComponent = new MarkdownRenderChild(containerEl)
   ctx.addChild(childComponent)
 
-  const codeBlock = new CodeBlock(markdown, containerEl, () => ctx.getSectionInfo(containerEl)!)
+  const codeBlock = {
+    markdown, containerEl, ctx,
+    getSectionInfo: () => ctx.getSectionInfo(containerEl)
+  }
 
   // elements aren't added to the DOM until after this function returns.
   // this puts "codeBlock created" after "tab opened"
