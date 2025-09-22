@@ -9,10 +9,8 @@ import { FileMap, getLayout } from './get-layout'
 import { CodeBlockRow, FileRow, TabRow } from './db-schema'
 import { MarkdownTab, leafHasFile } from './types'
 import { CodeBlockRenderer } from 'src/rendering/renderer-codeblock'
-import { isObjectEmpty } from 'src/utilities/utilities'
 import { ExtractRecord, ExtractUnion, Matcher, Stackable, Tagged, match, tr, unionConstructors } from './utilities'
 import { assert } from './types'
-import { FileSettingsDialog } from 'src/settings/dialogs'
 import { workspace } from 'src/core/entry'
 import { fromObsidianEvent } from 'src/utilities/from-obsidian-event'
 import { CodeBlock, codeBlockCreated } from 'src/new/codeBlockHandler'
@@ -106,34 +104,6 @@ const matcher: EventMatcher = {
     const tabRow = TabRow({ leaf, view: leaf.view, containerEl: leaf.containerEl, file: fileRow })
     workspace.tabs.add(tabRow)
     fileRow.tabs.add(tabRow)
-
-    // --
-    // as an external effect,
-    // this should really be moved to after the matcher
-    // --
-    const fileSettingsProxy = new Proxy({} as FileSettings, {
-      get: (_, key: keyof FileSettings) => tabRow.file.settings[key],
-      has: (_, key) => key in tabRow.file.settings,
-      set<Key extends keyof FileSettings>(_: unknown, key: Key, value: FileSettings[Key]) {
-        tabRow.file.settings[key] = value
-        updateFrontmatter()
-        return true
-      },
-      deleteProperty(_, key: keyof FileSettings) {
-        delete tabRow.file.settings[key]
-        updateFrontmatter()
-        return true
-      }
-    })
-    const dialog = new FileSettingsDialog(fileSettingsProxy)
-    tabRow.view.addAction('dot-network', 'Edit mindmap settings', dialog.open)
-
-    function updateFrontmatter() {
-      const frontmatter = isObjectEmpty(tabRow.file.settings)
-        ? {} : { markmap: tabRow.file.settings }
-      tabRow.view.editor.setValue(GrayMatter.stringify(tabRow.file.body, frontmatter))
-    }
-    // --
 
     return workspace.codeBlocksWaiting
       .filter(codeBlock => leaf.containerEl.contains(codeBlock.containerEl))

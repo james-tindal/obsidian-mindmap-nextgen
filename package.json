@@ -73,7 +73,8 @@
     "type-fest": "^4.40.1",
     "vitest": "^3.0.4",
     "webpack": "^5.97.1",
-    "webpack-cli": "^6.0.1"
+    "webpack-cli": "^6.0.1",
+    "yaml": "^2.8.1"
   },
   "pnpm": {
     "patchedDependencies": {
