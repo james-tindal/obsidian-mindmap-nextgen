@@ -1,38 +1,46 @@
-import { ButtonComponent, Editor, EditorPosition } from 'obsidian'
+import { ButtonComponent, Editor, EditorPosition, MarkdownView } from 'obsidian'
 import autoBind from 'auto-bind'
 import GrayMatter from 'gray-matter'
 
 import { CodeBlockSettings, FileSettings, globalSettings, GlobalSettings } from 'src/settings/filesystem'
 import { cssClasses } from 'src/constants'
-import { assert, exists, FileTab } from 'src/workspace/types'
+import { assert, exists } from 'src/workspace/types'
 import { createMarkmap, getOptions, parseMarkdown } from 'src/rendering/renderer-common'
 import { renderCodeblocks$ } from 'src/rendering/style-features'
 import Callbag, { fromEvent } from 'src/utilities/callbag'
 import { CodeBlockSettingsDialog } from 'src/settings/dialogs'
 import { isObjectEmpty } from 'src/utilities/utilities'
-import { FileRow, TabRow } from 'src/workspace/db-schema'
+import { FileRow } from 'src/workspace/db-schema'
 import { svgs } from 'src/core/entry'
 import { dragAndDrop } from 'src/utilities/drag-and-drop'
 import { CodeBlock } from 'src/new/codeBlockHandler'
+import views from 'src/views/views'
 
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
-export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, fileSettings: FileSettings, tabRow: TabRow) {
+export function CodeBlockRenderer(codeBlock: CodeBlock, markdownView: MarkdownView, fileSettings: FileSettings, fileRow: FileRow) {
   const { markdown, containerEl, ctx: { sourcePath }} = codeBlock
   const file = app.vault.getFileByPath(sourcePath)
   assert(exists, file)
+  const mindmapView = views.get(file)
+  assert(exists, mindmapView)
+
+  const markdownView =
+    app.workspace.getLeavesOfType('markdown')
+    .filter(leaf => (leaf.view as MarkdownView).file === file)
+    .map(leaf => (leaf.view as MarkdownView).file)
 
   const { markmap, svg } = createMarkmap({ parent: containerEl, toolbar: false })
   svgs.set(svg, file)
 
   const { rootNode, settings: codeBlockSettings } = parseMarkdown<'codeBlock'>(markdown)
 
-  const settings = new SettingsManager(tabView, codeBlock, fileSettings, codeBlockSettings)
+  const settings = new SettingsManager(markdownView, codeBlock, fileSettings, codeBlockSettings)
 
   SizeManager(containerEl, svg, settings)
 
-  if (tabView.getMode() === 'source')
-    SettingsDialog(codeBlock, tabRow.file, codeBlockSettings, fileSettings, tabRow.view.editor)
+  if (markdownView.getMode() === 'source')
+    SettingsDialog(codeBlock, fileRow, codeBlockSettings, fileSettings, markdownView.editor)
 
   let hasFit = false
   function fit() {
@@ -71,7 +79,7 @@ class SettingsManager {
   }
 
   constructor(
-    private tabView: FileTab.View,
+    private markdownView: MarkdownView,
     private __codeBlock: CodeBlock,
     fileSettings: FileSettings,
     codeBlockSettings: CodeBlockSettings
@@ -115,7 +123,7 @@ class SettingsManager {
   }
 
   private updateFrontmatter(update: (settings: CodeBlockSettings) => void) {
-    const editor = this.tabView.editor
+    const editor = this.markdownView.editor
     const sectionInfo = this.__codeBlock.getSectionInfo()
     assert(exists, sectionInfo)
     const lineStart = EditorLine(sectionInfo.lineStart + 1)

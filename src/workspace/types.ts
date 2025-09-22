@@ -1,5 +1,5 @@
 import { WorkspaceLeaf, ItemView, MarkdownView, TFile } from 'obsidian'
-import MindmapTabView from 'src/views/view'
+import MindmapView from 'src/views/view'
 
 
 export namespace Tab {
@@ -9,11 +9,11 @@ export namespace Tab {
 
 export namespace MindmapTab {
   export interface Leaf extends WorkspaceLeaf { view: View }
-  export const View = MindmapTabView 
-  export interface View extends MindmapTabView {}
+  export const View = MindmapView 
+  export interface View extends MindmapView {}
 }
 
-export namespace FileTab {
+export namespace MarkdownTab {
   export interface Leaf extends WorkspaceLeaf { view: View }
   export const View = MarkdownView
   export interface View extends MarkdownView {}

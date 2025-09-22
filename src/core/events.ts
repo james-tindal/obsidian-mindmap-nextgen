@@ -5,7 +5,7 @@ import { fromObsidianEvent } from 'src/utilities/from-obsidian-event'
 import { renderTabs$ } from 'src/rendering/style-features'
 import views from 'src/views/views'
 import { fromCommand } from 'src/utilities/from-command'
-import MindmapTabView from 'src/views/view'
+import MindmapView from 'src/views/view'
 
 
 export const start = Callbag.create<void>(
@@ -42,7 +42,7 @@ export const fileChanged = Callbag.pipe(
 )
 
 export const [pin, unpin] =
-  Callbag.pipe(MindmapTabView.togglePinned$,
+  Callbag.pipe(MindmapView.togglePinned$,
     map(views.get),
     filter(x => !!x),
     partition(subject => subject === 'unpinned'),

@@ -6,7 +6,7 @@ import Callbag from 'src/utilities/callbag'
 import { DbSet } from 'src/workspace/db-schema'
 
 
-export default class MindmapTabView extends ItemView {
+export default class MindmapView extends ItemView {
   private displayText: string
   private pinned: boolean
   
@@ -14,13 +14,13 @@ export default class MindmapTabView extends ItemView {
   public render: TabRenderer['render']
   public firstRender: TabRenderer['firstRender']
 
-  public static instances = new DbSet<MindmapTabView>()
+  public static instances = new DbSet<MindmapView>()
 
   constructor(public leaf: WorkspaceLeaf, displayText: string, pinned: boolean) {
     super(leaf)
-    MindmapTabView.instances.add(this)
+    MindmapView.instances.add(this)
     this.register(() =>
-      MindmapTabView.instances.delete(this))
+      MindmapView.instances.delete(this))
 
     this.displayText = displayText
     this.pinned = pinned
@@ -30,10 +30,10 @@ export default class MindmapTabView extends ItemView {
     this.firstRender = this.renderer.firstRender
   }
 
-  private static togglePinnedSubject = Callbag.subject<MindmapTabView>()
+  private static togglePinnedSubject = Callbag.subject<MindmapView>()
   public static togglePinned$ = this.togglePinnedSubject.source
   private togglePinned() {
-    MindmapTabView.togglePinnedSubject.push(this)
+    MindmapView.togglePinnedSubject.push(this)
   }
 
   public getViewType() { return MM_VIEW_TYPE }

@@ -1,7 +1,7 @@
 import { TFile } from 'obsidian'
 
 import { FileSettings } from 'src/settings/filesystem'
-import { FileTab } from './types'
+import { MarkdownTab } from './types'
 import { IPureNode } from 'markmap-common'
 import { CodeBlock } from 'src/new/codeBlockHandler'
 
@@ -37,8 +37,8 @@ export class DbSet<T> extends Set<T> {
 
 
 export type TabRow = {
-  leaf: FileTab.Leaf
-  view: FileTab.View
+  leaf: MarkdownTab.Leaf
+  view: MarkdownTab.View
   containerEl: HTMLElement
   isCurrent: boolean
   file: FileRow

@@ -1,7 +1,7 @@
 import { ViewCreator, WorkspaceLeaf } from 'obsidian'
 import { MM_VIEW_TYPE } from 'src/constants'
 import { MindmapSubject } from './layout-manager'
-import MindmapTabView from './view'
+import MindmapView from './view'
 import { plugin } from 'src/core/entry'
 import { getActiveFile } from './get-active-file'
 import views from './views'
@@ -16,13 +16,13 @@ export function constructView(leaf: WorkspaceLeaf, subject: MindmapSubject) {
     const displayText = pinned ? subject.basename : 'Mindmap'
 
     viewCreator = () => {
-      const view = new MindmapTabView(leaf, displayText, pinned)
+      const view = new MindmapView(leaf, displayText, pinned)
       views.set(subject, view)
       return view
     }
     await leaf.setViewState({ type: MM_VIEW_TYPE, active: true })
 
-    const view = leaf.view as MindmapTabView
+    const view = leaf.view as MindmapView
     const file = pinned ? subject : getActiveFile()
 
     waitUntilActive(leaf)
