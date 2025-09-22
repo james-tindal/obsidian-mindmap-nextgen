@@ -1,4 +1,4 @@
-import { MarkdownView, TFile } from 'obsidian'
+import { TFile } from 'obsidian'
 import GrayMatter from 'gray-matter'
 
 import { FileSettings } from 'src/settings/filesystem'
@@ -33,7 +33,7 @@ type InputEvent = ExtractUnion<typeof InputEvent>
 type InputEvents = ExtractRecord<typeof InputEvent>
 
 const CodeBlockEvent = unionConstructors(
-  Tagged('start',          tr as { codeBlock: CodeBlock, fileSettings: FileSettings, isCurrent: boolean, markdownView: MarkdownView, fileRow: FileRow }),
+  Tagged('start',          tr as { codeBlock: CodeBlock, fileSettings: FileSettings, isCurrent: boolean, fileRow: FileRow }),
   Tagged('current',        tr as { codeBlock: CodeBlock }),
   Tagged('fileSettings',   tr as { codeBlock: CodeBlock, fileSettings: FileSettings }),
   Tagged('end',            tr as { codeBlock: CodeBlock }),
@@ -213,7 +213,7 @@ const matcher: EventMatcher = {
     const tabView = tabRow.view
     const fileRow = tabRow.file
 
-    return CodeBlockEvent.start({ codeBlock, fileSettings, isCurrent, markdownView: tabView, fileRow })
+    return CodeBlockEvent.start({ codeBlock, fileSettings, isCurrent, fileRow })
 
   },
   'codeBlock deleted': codeBlock => {
@@ -245,8 +245,8 @@ const codeBlockEvent$ = Callbag.pipe(
 
 const renderers = new Map<CodeBlock, CodeBlockRenderer>()
 Callbag.subscribe(codeBlockEvent$, event => match(event, {
-  'start' ({ codeBlock, fileSettings, isCurrent, markdownView, fileRow }) {
-    const renderer = CodeBlockRenderer(codeBlock, markdownView, fileSettings, fileRow)
+  'start' ({ codeBlock, fileSettings, isCurrent, fileRow }) {
+    const renderer = CodeBlockRenderer(codeBlock, fileSettings, fileRow)
     if (isCurrent) renderer.fit()
     renderers.set(codeBlock, renderer)
   },

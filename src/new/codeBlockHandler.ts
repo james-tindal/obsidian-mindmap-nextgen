@@ -20,6 +20,7 @@ export const getCodeBlocks = (filePath: string) =>
   )
 
 export interface CodeBlock {
+  component: MarkdownRenderChild
   markdown: string,
   containerEl: HTMLElement,
   getSectionInfo(): MarkdownSectionInformation | null
@@ -27,11 +28,11 @@ export interface CodeBlock {
 }
 
 export async function codeBlockHandler(markdown: string, containerEl: HTMLElement, ctx: MarkdownPostProcessorContext) {
-  const childComponent = new MarkdownRenderChild(containerEl)
-  ctx.addChild(childComponent)
+  const component = new MarkdownRenderChild(containerEl)
+  ctx.addChild(component)
 
   const codeBlock = {
-    markdown, containerEl, ctx,
+    component, markdown, containerEl, ctx,
     getSectionInfo: () => ctx.getSectionInfo(containerEl)
   }
 
@@ -40,6 +41,6 @@ export async function codeBlockHandler(markdown: string, containerEl: HTMLElemen
   await nextTick()
 
   _codeBlockCreated.push(codeBlock)
-  childComponent.register(() =>
+  component.register(() =>
     _codeBlockDeleted.push(codeBlock))
 }
