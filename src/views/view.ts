@@ -19,6 +19,8 @@ export default class MindmapTabView extends ItemView {
   constructor(public leaf: WorkspaceLeaf, displayText: string, pinned: boolean) {
     super(leaf)
     MindmapTabView.instances.add(this)
+    this.register(() =>
+      MindmapTabView.instances.delete(this))
 
     this.displayText = displayText
     this.pinned = pinned
