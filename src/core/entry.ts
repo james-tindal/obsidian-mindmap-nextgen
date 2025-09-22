@@ -23,6 +23,7 @@ export default class Plugin extends ObsidianPlugin {
   }
 
   private async setup() {
+    await import('src/new/file-settings-button')
     const { settingsLoaded } = await import('src/settings/filesystem')
     await settingsLoaded
     const { loadStyleFeatures } = await import('src/rendering/style-features')

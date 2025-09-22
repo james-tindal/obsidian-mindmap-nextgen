@@ -80,10 +80,15 @@ declare module 'callbag-partition' {
 declare module 'callbag-take-until' {
   import { Source } from 'callbag'
 
-  // const takeUntil: <T>(source: Source<T>) => Source<[T, T]>
   const takeUntil: <I>(notifier: Source<unknown>) => (source: Source<I>) => Source<I>
-
 
   export default takeUntil
 }
 
+declare module 'callbag-drop-repeats' {
+  import { Source } from 'callbag'
+
+  const dropRepeats: <I>(shouldDrop?: (previous: I, latest: I) => boolean) => (source: Source<I>) => Source<I>
+
+  export default dropRepeats
+}

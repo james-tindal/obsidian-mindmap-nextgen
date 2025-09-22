@@ -1,5 +1,6 @@
-import { PluginSettingTab, Modal } from 'obsidian'
+import { PluginSettingTab, Modal, Editor, getFrontMatterInfo, parseYaml, EditorPosition } from 'obsidian'
 import autoBind from 'auto-bind'
+import * as yaml from 'yaml'
 
 import { globalSettings, GlobalSettings } from './filesystem'
 import { PageSelector } from './components/PageSelector'
@@ -33,9 +34,10 @@ export class GlobalSettingsDialog extends PluginSettingTab {
 import { FileSettings } from './filesystem'
 
 export class FileSettingsDialog extends Modal {
-  constructor(fileSettings: Partial<FileSettings>) {
+  constructor(editor: Editor) {
     super(app)
-    autoBind(this)
+  
+    const fileSettings = createFileSettingsProxy(editor)
 
     this.containerEl.classList.add('mmng-settings-modal')
 
@@ -49,6 +51,45 @@ export class FileSettingsDialog extends Modal {
     this.onClose = () => this.contentEl.empty()
     this.onOpen = () => appendContent(this.contentEl)
   }
+}
+
+function createFileSettingsProxy(editor: Editor) {
+  const markdown = editor.getValue()
+  const { frontmatter } = getFrontMatterInfo(markdown)
+  const parsed = parseYaml(frontmatter) ?? {}
+  const fileSettings = ('markmap' in parsed ? parsed.markmap : {}) as FileSettings
+
+  const persist = (() => {
+    const markdown = editor.getValue()
+    const { exists, frontmatter, ...info} = getFrontMatterInfo(markdown)
+    const doc = yaml.parseDocument(frontmatter)
+    const from = editor.offsetToPos(info.from)
+    const to = editor.offsetToPos(info.to)
+    const _persist = () => {
+      const output = exists ? doc.toString() : `---\n${doc.toString()}\n---\n`
+      editor.replaceRange(output, from, to)
+    }
+    const set: yaml.Document['setIn'] = (path, value) => {
+      doc.setIn(path, value)
+      _persist()
+    }
+    const delete_: yaml.Document['deleteIn'] = path => {
+      const ret = doc.deleteIn(path)
+      _persist()
+      return ret
+    }
+    return { set, delete: delete_ }
+  })()
+
+  return new Proxy(fileSettings, { 
+    set<Key extends keyof FileSettings>(_: unknown, key: Key, value: FileSettings[Key]) {
+      persist.set(['markmap', key], value)
+      return true
+    },
+    deleteProperty(_: unknown, key: keyof FileSettings) {
+      return persist.delete(['markmap', key])
+    },
+  })
 }
 
 
