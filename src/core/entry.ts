@@ -27,11 +27,12 @@ export default class Plugin extends ObsidianPlugin {
     await settingsLoaded
     const { loadStyleFeatures } = await import('src/rendering/style-features')
     const { GlobalSettingsDialog } = await import('src/settings/dialogs')
-    const { codeBlockHandler } = await import('src/workspace')
+    const { codeBlockHandler } = await import('src/new/codeBlockHandler')
 
     this.addSettingTab(new GlobalSettingsDialog())
     this.registerMarkdownCodeBlockProcessor('markmap', codeBlockHandler)
     loadStyleFeatures()
+    import('src/workspace')
   }
 
   public async onunload() {

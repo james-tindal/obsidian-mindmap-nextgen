@@ -4,7 +4,7 @@ import GrayMatter from 'gray-matter'
 
 import { CodeBlockSettings, FileSettings, globalSettings, GlobalSettings } from 'src/settings/filesystem'
 import { cssClasses } from 'src/constants'
-import { assert, CodeBlock, exists, FileTab } from 'src/workspace/types'
+import { assert, exists, FileTab } from 'src/workspace/types'
 import { createMarkmap, getOptions, parseMarkdown } from 'src/rendering/renderer-common'
 import { renderCodeblocks$ } from 'src/rendering/style-features'
 import Callbag, { fromEvent } from 'src/utilities/callbag'
@@ -13,6 +13,7 @@ import { isObjectEmpty } from 'src/utilities/utilities'
 import { TabRow } from 'src/workspace/db-schema'
 import { svgs } from 'src/core/entry'
 import { dragAndDrop } from 'src/utilities/drag-and-drop'
+import { CodeBlock } from 'src/new/codeBlockHandler'
 
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
