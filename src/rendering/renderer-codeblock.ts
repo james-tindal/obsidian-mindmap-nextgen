@@ -4,7 +4,7 @@ import GrayMatter from 'gray-matter'
 
 import { CodeBlockSettings, FileSettings, globalSettings, GlobalSettings } from 'src/settings/filesystem'
 import { cssClasses } from 'src/constants'
-import { CodeBlock, FileTab } from 'src/workspace/types'
+import { assert, CodeBlock, exists, FileTab } from 'src/workspace/types'
 import { createMarkmap, getOptions, parseMarkdown } from 'src/rendering/renderer-common'
 import { renderCodeblocks$ } from 'src/rendering/style-features'
 import Callbag, { fromEvent } from 'src/utilities/callbag'
@@ -114,6 +114,7 @@ class SettingsManager {
   private updateFrontmatter(update: (settings: CodeBlockSettings) => void) {
     const editor = this.tabView.editor
     const sectionInfo = this.__codeBlock.getSectionInfo()
+    assert(exists, sectionInfo)
     const lineStart = EditorLine(sectionInfo.lineStart + 1)
     const lineEnd   = EditorLine(sectionInfo.lineEnd)
 
@@ -187,6 +188,7 @@ function SettingsDialog(codeBlock: CodeBlock, tabRow: TabRow, codeBlockSettings:
   function updateCodeBlockFrontmatter() {
     const editor = tabRow.view.editor
     const sectionInfo = codeBlock.getSectionInfo()
+    assert(exists, sectionInfo)
     const lineStart = EditorLine(sectionInfo.lineStart + 1)
     const lineEnd   = EditorLine(sectionInfo.lineEnd)
 
