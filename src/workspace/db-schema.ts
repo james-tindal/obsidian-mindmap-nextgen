@@ -1,9 +1,9 @@
 import { TFile } from 'obsidian'
 
 import { FileSettings } from 'src/settings/filesystem'
-import { CodeBlock } from './types'
 import { FileTab } from './types'
 import { IPureNode } from 'markmap-common'
+import { CodeBlock } from 'src/new/codeBlockHandler'
 
 
 export class DbSet<T> extends Set<T> {

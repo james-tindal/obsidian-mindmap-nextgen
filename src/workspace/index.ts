@@ -1,4 +1,4 @@
-import { MarkdownPostProcessorContext, MarkdownRenderChild, TFile } from 'obsidian'
+import { TFile } from 'obsidian'
 import GrayMatter from 'gray-matter'
 
 import { FileSettings } from 'src/settings/filesystem'
@@ -6,9 +6,9 @@ import Callbag, { filter, flatMap, map, merge, pairwise, Source, startWith } fro
 import { ImmutableSet } from 'src/utilities/immutable-set'
 import { FileMap, getLayout } from './get-layout'
 import { CodeBlockRow, FileRow, TabRow } from './db-schema'
-import { CodeBlock, FileTab, leafHasFile } from './types'
+import { FileTab, leafHasFile } from './types'
 import { CodeBlockRenderer } from 'src/rendering/renderer-codeblock'
-import { isObjectEmpty, nextTick } from 'src/utilities/utilities'
+import { isObjectEmpty } from 'src/utilities/utilities'
 import { ExtractRecord, ExtractUnion, Matcher, Stackable, Tagged, match, tr, unionConstructors } from './utilities'
 import { assert } from './types'
 import { parseMarkdown } from 'src/rendering/renderer-common'
@@ -16,6 +16,7 @@ import { FileSettingsDialog } from 'src/settings/dialogs'
 import { workspace } from 'src/core/entry'
 import { fromObsidianEvent } from 'src/utilities/from-obsidian-event'
 import { Merge } from 'type-fest'
+import { CodeBlock, codeBlockCreated, codeBlockDeleted } from 'src/new/codeBlockHandler'
 
 
 const InputEvent = unionConstructors(
@@ -39,27 +40,10 @@ const CodeBlockEvent = unionConstructors(
 )
 type CodeBlockEvent = ExtractUnion<typeof CodeBlockEvent>
 
-
-const { source: codeBlock$, push: codeBlockEvent } = Callbag.subject<InputEvents[`codeBlock ${'created' | 'deleted'}`]>()
-
-export async function codeBlockHandler(markdown: string, containerEl: HTMLElement, ctx: MarkdownPostProcessorContext) {
-  const childComponent = new MarkdownRenderChild(containerEl)
-  ctx.addChild(childComponent)
-
-  const codeBlock = {
-    markdown, containerEl, ctx,
-    getSectionInfo: () => ctx.getSectionInfo(containerEl)
-  }
-
-  // elements aren't added to the DOM until after this function returns.
-  // this puts "codeBlock created" after "tab opened"
-  await nextTick()
-
-  codeBlockEvent(InputEvent['codeBlock created'](codeBlock))
-  childComponent.register(() =>
-    codeBlockEvent(InputEvent['codeBlock deleted'](codeBlock)))
-}
-
+const codeBlock$ = Callbag.merge(
+  map(InputEvent['codeBlock created'])(codeBlockCreated),
+  map(InputEvent['codeBlock deleted'])(codeBlockDeleted),
+)
 
 const layoutChange$ = Callbag.merge(
   fromObsidianEvent(app.workspace, 'layout-change'),
