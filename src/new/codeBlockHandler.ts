@@ -8,6 +8,16 @@ export const codeBlockCreated = _codeBlockCreated.source
 const _codeBlockDeleted = Callbag.subject<CodeBlock>()
 export const codeBlockDeleted = _codeBlockCreated.source
 
+const codeBlocks = new Set<CodeBlock>
+Callbag.subscribe(codeBlockCreated, codeBlock =>
+  codeBlocks.add(codeBlock))
+Callbag.subscribe(codeBlockDeleted, codeBlock =>
+  codeBlocks.delete(codeBlock))
+
+export const getCodeBlocks = (filePath: string) =>
+  [...codeBlocks].filter(codeBlock =>
+    codeBlock.ctx.sourcePath === filePath
+  )
 
 export interface CodeBlock {
   markdown: string,
