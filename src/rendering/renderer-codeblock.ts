@@ -1,4 +1,4 @@
-import { ButtonComponent, EditorPosition } from 'obsidian'
+import { ButtonComponent, Editor, EditorPosition } from 'obsidian'
 import autoBind from 'auto-bind'
 import GrayMatter from 'gray-matter'
 
@@ -10,7 +10,7 @@ import { renderCodeblocks$ } from 'src/rendering/style-features'
 import Callbag, { fromEvent } from 'src/utilities/callbag'
 import { CodeBlockSettingsDialog } from 'src/settings/dialogs'
 import { isObjectEmpty } from 'src/utilities/utilities'
-import { TabRow } from 'src/workspace/db-schema'
+import { FileRow, TabRow } from 'src/workspace/db-schema'
 import { svgs } from 'src/core/entry'
 import { dragAndDrop } from 'src/utilities/drag-and-drop'
 import { CodeBlock } from 'src/new/codeBlockHandler'
@@ -18,10 +18,12 @@ import { CodeBlock } from 'src/new/codeBlockHandler'
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
 export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, fileSettings: FileSettings, tabRow: TabRow) {
-  const { markdown, containerEl } = codeBlock
+  const { markdown, containerEl, ctx: { sourcePath }} = codeBlock
+  const file = app.vault.getFileByPath(sourcePath)
+  assert(exists, file)
 
   const { markmap, svg } = createMarkmap({ parent: containerEl, toolbar: false })
-  svgs.set(svg, tabView.file)
+  svgs.set(svg, file)
 
   const { rootNode, settings: codeBlockSettings } = parseMarkdown<'codeBlock'>(markdown)
 
@@ -30,7 +32,7 @@ export function CodeBlockRenderer(codeBlock: CodeBlock, tabView: FileTab.View, f
   SizeManager(containerEl, svg, settings)
 
   if (tabView.getMode() === 'source')
-    SettingsDialog(codeBlock, tabRow, codeBlockSettings)
+    SettingsDialog(codeBlock, tabRow.file, codeBlockSettings, fileSettings, tabRow.view.editor)
 
   let hasFit = false
   function fit() {
@@ -152,25 +154,25 @@ function SizeManager(containerEl: CodeBlock['containerEl'], svg: SVGSVGElement, 
   Callbag.subscribe(fromEvent(document, 'mouseup'), settings.saveHeight)
 }
 
-function SettingsDialog(codeBlock: CodeBlock, tabRow: TabRow, codeBlockSettings: CodeBlockSettings) {
-  const fileSettings = new Proxy({} as FileSettings, {
-    get: (_, key: keyof FileSettings) => tabRow.file.settings[key],
-    has: (_, key) => key in tabRow.file.settings,
+function SettingsDialog(codeBlock: CodeBlock, file: FileRow, codeBlockSettings: CodeBlockSettings, fileSettings: FileSettings, editor: Editor) {
+  const fileSettingsProxy = new Proxy({} as FileSettings, {
+    get: (_, key: keyof FileSettings) => fileSettings[key],
+    has: (_, key) => key in fileSettings,
     set<Key extends keyof FileSettings>(_: unknown, key: Key, value: FileSettings[Key]) {
-      tabRow.file.settings[key] = value
+      fileSettings[key] = value
       updateFileFrontmatter()
       return true
     },
     deleteProperty(_, key: keyof FileSettings) {
-      delete tabRow.file.settings[key]
+      delete fileSettings[key]
       updateFileFrontmatter()
       return true
     }
   })
 
   function updateFileFrontmatter() {
-    const frontmatter = isObjectEmpty(tabRow.file.settings) ? {} : { markmap: tabRow.file.settings }
-    tabRow.view.editor.setValue(GrayMatter.stringify(tabRow.file.body, frontmatter))
+    const frontmatter = isObjectEmpty(fileSettings) ? {} : { markmap: fileSettings }
+    editor.setValue(GrayMatter.stringify(file.body, frontmatter))
   }
 
   const codeBlockProxy = new Proxy(codeBlockSettings, {
@@ -187,7 +189,6 @@ function SettingsDialog(codeBlock: CodeBlock, tabRow: TabRow, codeBlockSettings:
   })
 
   function updateCodeBlockFrontmatter() {
-    const editor = tabRow.view.editor
     const sectionInfo = codeBlock.getSectionInfo()
     assert(exists, sectionInfo)
     const lineStart = EditorLine(sectionInfo.lineStart + 1)
@@ -204,7 +205,7 @@ function SettingsDialog(codeBlock: CodeBlock, tabRow: TabRow, codeBlockSettings:
     )
   }
 
-  const dialog = new CodeBlockSettingsDialog(fileSettings, codeBlockProxy)
+  const dialog = new CodeBlockSettingsDialog(fileSettingsProxy, codeBlockProxy)
 
   const button = new ButtonComponent(codeBlock.containerEl.parentElement!)
     .setClass('edit-block-button')
