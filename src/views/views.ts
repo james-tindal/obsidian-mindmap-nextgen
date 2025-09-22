@@ -1,20 +1,20 @@
 import { getActiveFile } from './get-active-file'
 import { MindmapSubject } from './layout-manager'
-import MindmapTabView from './view'
+import MindmapView from './view'
 
-type Get<MSV extends MindmapSubject | MindmapTabView> = MSV extends MindmapTabView ? MindmapSubject : MindmapTabView
+type Get<MSV extends MindmapSubject | MindmapView> = MSV extends MindmapView ? MindmapSubject : MindmapView
 
 
-const subject2view = new Map<MindmapSubject, MindmapTabView>()
-const view2subject = new Map<MindmapTabView, MindmapSubject>()
+const subject2view = new Map<MindmapSubject, MindmapView>()
+const view2subject = new Map<MindmapView, MindmapSubject>()
 
 const views = {
   has: (subject: MindmapSubject) => subject2view.has(subject),
-  get: <MSV extends MindmapSubject | MindmapTabView>(msv: MSV): Get<MSV> | undefined =>
-    msv instanceof MindmapTabView
+  get: <MSV extends MindmapSubject | MindmapView>(msv: MSV): Get<MSV> | undefined =>
+    msv instanceof MindmapView
       ? <Get<MSV>> view2subject.get(msv)
       : <Get<MSV>> subject2view.get(msv),
-  set(subject: MindmapSubject, view: MindmapTabView) {
+  set(subject: MindmapSubject, view: MindmapView) {
     views.delete(view)
     views.delete(subject)
     subject2view.set(subject, view)
@@ -22,8 +22,8 @@ const views = {
 
     view.register(() =>  views.delete(view))
   },
-  delete(msv: MindmapSubject | MindmapTabView) {
-    if (msv instanceof MindmapTabView) {
+  delete(msv: MindmapSubject | MindmapView) {
+    if (msv instanceof MindmapView) {
       const view = msv
       const subject = view2subject.get(view)!
       view2subject.delete(view)

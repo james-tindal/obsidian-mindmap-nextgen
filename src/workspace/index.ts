@@ -1,4 +1,4 @@
-import { TFile } from 'obsidian'
+import { MarkdownView, TFile } from 'obsidian'
 import GrayMatter from 'gray-matter'
 
 import { FileSettings } from 'src/settings/filesystem'
@@ -6,7 +6,7 @@ import Callbag, { filter, flatMap, map, merge, pairwise, Source, startWith } fro
 import { ImmutableSet } from 'src/utilities/immutable-set'
 import { FileMap, getLayout } from './get-layout'
 import { CodeBlockRow, FileRow, TabRow } from './db-schema'
-import { FileTab, leafHasFile } from './types'
+import { MarkdownTab, leafHasFile } from './types'
 import { CodeBlockRenderer } from 'src/rendering/renderer-codeblock'
 import { isObjectEmpty } from 'src/utilities/utilities'
 import { ExtractRecord, ExtractUnion, Matcher, Stackable, Tagged, match, tr, unionConstructors } from './utilities'
@@ -22,18 +22,18 @@ import { CodeBlock, codeBlockCreated, codeBlockDeleted } from 'src/new/codeBlock
 const InputEvent = unionConstructors(
   Tagged('codeBlock created', tr as CodeBlock),
   Tagged('codeBlock deleted', tr as CodeBlock),
-  Tagged('tab opened',      tr as FileTab.Leaf),
-  Tagged('tab closed',      tr as FileTab.Leaf),
-  Tagged('tab current',     tr as FileTab.Leaf),
-  Tagged('tab not current', tr as FileTab.Leaf),
-  Tagged('tab changed file', tr as [ FileTab.Leaf, TFile ]),
+  Tagged('tab opened',      tr as MarkdownTab.Leaf),
+  Tagged('tab closed',      tr as MarkdownTab.Leaf),
+  Tagged('tab current',     tr as MarkdownTab.Leaf),
+  Tagged('tab not current', tr as MarkdownTab.Leaf),
+  Tagged('tab changed file', tr as [ MarkdownTab.Leaf, TFile ]),
   Tagged('fileSettings',     tr as { file: TFile, settings: FileSettings }),
 )
 type InputEvent = ExtractUnion<typeof InputEvent>
 type InputEvents = ExtractRecord<typeof InputEvent>
 
 const CodeBlockEvent = unionConstructors(
-  Tagged('start',          tr as { codeBlock: CodeBlock, fileSettings: FileSettings, isCurrent: boolean, tabView: FileTab.View, tabRow: TabRow }),
+  Tagged('start',          tr as { codeBlock: CodeBlock, fileSettings: FileSettings, isCurrent: boolean, markdownView: MarkdownView, fileRow: FileRow }),
   Tagged('current',        tr as { codeBlock: CodeBlock }),
   Tagged('fileSettings',   tr as { codeBlock: CodeBlock, fileSettings: FileSettings }),
   Tagged('end',            tr as { codeBlock: CodeBlock }),
@@ -53,7 +53,7 @@ const layoutChange$ = Callbag.merge(
 const layout$ = Callbag.pipe(
   layoutChange$,
   map(getLayout),
-  startWith({ tabs: new ImmutableSet<FileTab.Leaf>, currentTabs: new ImmutableSet<FileTab.Leaf>, files: new FileMap }),
+  startWith({ tabs: new ImmutableSet<MarkdownTab.Leaf>, currentTabs: new ImmutableSet<MarkdownTab.Leaf>, files: new FileMap }),
   pairwise,
   map(([a, b]) => ({
     tabs:        ImmutableSet.diff(a.tabs, b.tabs),
@@ -211,8 +211,9 @@ const matcher: EventMatcher = {
     const fileSettings = tabRow.file.settings
     const isCurrent = tabRow.isCurrent
     const tabView = tabRow.view
+    const fileRow = tabRow.file
 
-    return CodeBlockEvent.start({ codeBlock, fileSettings, isCurrent, tabView, tabRow })
+    return CodeBlockEvent.start({ codeBlock, fileSettings, isCurrent, markdownView: tabView, fileRow })
 
   },
   'codeBlock deleted': codeBlock => {
@@ -244,8 +245,8 @@ const codeBlockEvent$ = Callbag.pipe(
 
 const renderers = new Map<CodeBlock, CodeBlockRenderer>()
 Callbag.subscribe(codeBlockEvent$, event => match(event, {
-  'start' ({ codeBlock, fileSettings, isCurrent, tabView, tabRow }) {
-    const renderer = CodeBlockRenderer(codeBlock, tabView, fileSettings, tabRow)
+  'start' ({ codeBlock, fileSettings, isCurrent, markdownView, fileRow }) {
+    const renderer = CodeBlockRenderer(codeBlock, markdownView, fileSettings, fileRow)
     if (isCurrent) renderer.fit()
     renderers.set(codeBlock, renderer)
   },

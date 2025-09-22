@@ -1,14 +1,14 @@
-import { TFile, WorkspaceLeaf as TabLeaf, WorkspaceSplit, WorkspaceTabs as TabGroup, WorkspaceItem } from 'obsidian'
+import { TFile, WorkspaceLeaf as TabLeaf, WorkspaceSplit, WorkspaceTabs as TabGroup, WorkspaceItem, MarkdownView } from 'obsidian'
 import { ImmutableSet } from 'src/utilities/immutable-set'
-import { FileTab, leafHasFile, Tab } from './types'
+import { MarkdownTab, leafHasFile, Tab } from './types'
 import { assert } from './types'
 
 
 
-export class FileMap extends Map<FileTab.Leaf, TFile> {
+export class FileMap extends Map<MarkdownTab.Leaf, TFile> {
   diff(new_: FileMap) {
     const old = this
-    const changed: [FileTab.Leaf, TFile][] = []
+    const changed: [MarkdownTab.Leaf, TFile][] = []
 
     for (const [leaf, old_file] of old) {
       const new_file = new_.get(leaf)
@@ -21,7 +21,7 @@ export class FileMap extends Map<FileTab.Leaf, TFile> {
   static diff(a: FileMap, b: FileMap) { return a.diff(b) }
 }
 
-const isFileTab = (leaf: Tab.Leaf): leaf is FileTab.Leaf => leaf.view instanceof FileTab.View
+const isFileTab = (leaf: Tab.Leaf): leaf is MarkdownTab.Leaf => leaf.view instanceof MarkdownView
 
 export function getLayout() {
   const tabGroups =   new ImmutableSet(getTabGroups  ())

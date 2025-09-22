@@ -1,10 +1,9 @@
 import { ITransformPlugin } from 'markmap-lib'
-import { EmbedInfo, getLinkpath, MarkdownRenderer, parseLinktext, TFile } from 'obsidian'
+import { EmbedInfo, MarkdownRenderer, parseLinktext, TFile } from 'obsidian'
 
 import { plugin } from 'src/core/entry'
-import { iife } from 'src/utilities/utilities'
 import { getActiveFile } from 'src/views/get-active-file'
-import MindmapTabView from 'src/views/view'
+import MindmapView from 'src/views/view'
 import views from 'src/views/views'
 
 
@@ -117,7 +116,7 @@ function deleteText(parent: ParentNode) {
 function getSourcePath(embedElement: EmbedElement) {
   const leafElement = embedElement.closest('.workspace-leaf')
   const view =
-    MindmapTabView.instances.find(view =>
+    MindmapView.instances.find(view =>
       view.leaf.containerEl === leafElement)
   if (!view) throw new Error('Couldn\'t get view')
   const subject = views.get(view)

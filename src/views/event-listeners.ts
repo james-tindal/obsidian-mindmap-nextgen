@@ -1,7 +1,7 @@
 import { TFile, WorkspaceItem, WorkspaceLeaf, WorkspaceSplit, WorkspaceTabs } from 'obsidian'
 import { layoutManager } from './layout-manager'
 import { LoadingView } from './loading-view'
-import MindmapTabView from './view'
+import MindmapView from './view'
 import { getActiveFile } from './get-active-file'
 import views from './views'
 import { globalSettings } from 'src/settings/filesystem'
@@ -25,7 +25,7 @@ Callbag.subscribe(layoutChange, () => {
     if (item instanceof WorkspaceTabs) {
       const currentTab = item.children[item.currentTab]
       const view = currentTab.view
-      const loaded = view instanceof MindmapTabView
+      const loaded = view instanceof MindmapView
       if (!loaded) return
       const subject = views.get(view)!
       const file = subject === 'unpinned' ? getActiveFile() : subject
