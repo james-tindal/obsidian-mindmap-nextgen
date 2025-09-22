@@ -49,7 +49,6 @@ export type FileRow = {
   handle: TFile
   settings: FileSettings
   body: string
-  rootNode: IPureNode
   tabs: DbSet<TabRow>
 }
 
