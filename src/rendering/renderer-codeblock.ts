@@ -14,21 +14,19 @@ import { FileRow } from 'src/workspace/db-schema'
 import { svgs } from 'src/core/entry'
 import { dragAndDrop } from 'src/utilities/drag-and-drop'
 import { CodeBlock } from 'src/new/codeBlockHandler'
-import views from 'src/views/views'
 
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
-export function CodeBlockRenderer(codeBlock: CodeBlock, markdownView: MarkdownView, fileSettings: FileSettings, fileRow: FileRow) {
+export function CodeBlockRenderer(codeBlock: CodeBlock, fileSettings: FileSettings, fileRow: FileRow) {
   const { markdown, containerEl, ctx: { sourcePath }} = codeBlock
   const file = app.vault.getFileByPath(sourcePath)
   assert(exists, file)
-  const mindmapView = views.get(file)
-  assert(exists, mindmapView)
 
-  const markdownView =
+  const markdownViewLeaf =
     app.workspace.getLeavesOfType('markdown')
-    .filter(leaf => (leaf.view as MarkdownView).file === file)
-    .map(leaf => (leaf.view as MarkdownView).file)
+    .find(leaf => leaf.containerEl.contains(containerEl))
+  assert(exists, markdownViewLeaf)
+  const markdownView = markdownViewLeaf.view as MarkdownView
 
   const { markmap, svg } = createMarkmap({ parent: containerEl, toolbar: false })
   svgs.set(svg, file)
