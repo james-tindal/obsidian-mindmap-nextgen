@@ -74,3 +74,10 @@ export const isObjectEmpty = (object: Object) =>
   Object.keys(object).length === 0
 
 export const iife = <Return>(fn: () => Return) => fn()
+
+export function Resolve<T>(fn: (resolve: (v: T) => void) => void): T {
+  let result!: T
+  const resolve = (v: T) => result = v
+  fn(resolve)
+  return result
+}

@@ -5,7 +5,7 @@ import yaml from 'yaml'
 
 import { CodeBlockSettings, FileSettings, globalSettings, GlobalSettings } from 'src/settings/filesystem'
 import { cssClasses } from 'src/constants'
-import { assert, exists } from 'src/workspace/types'
+import { assert, exists } from 'src/utilities/types'
 import { createMarkmap, getOptions, parseMarkdown } from 'src/rendering/renderer-common'
 import { renderCodeblocks$ } from 'src/rendering/style-features'
 import Callbag, { fromEvent, take } from 'src/utilities/callbag'

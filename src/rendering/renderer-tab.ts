@@ -5,7 +5,7 @@ import { IPureNode } from 'markmap-common'
 import { FileSettings, globalSettings } from 'src/settings/filesystem'
 import { ScreenshotColors, takeScreenshot } from 'src/rendering/screenshot'
 import { createMarkmap, getOptions, parseMarkdown } from './renderer-common'
-import { MindmapTab } from 'src/workspace/types'
+import { MindmapTab } from 'src/utilities/types'
 import { svgs } from 'src/core/main'
 
 

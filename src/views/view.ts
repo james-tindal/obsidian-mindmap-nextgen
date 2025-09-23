@@ -3,7 +3,7 @@ import { ItemView, Menu, WorkspaceLeaf } from 'obsidian'
 import { MM_VIEW_TYPE } from 'src/constants'
 import { TabRenderer } from 'src/rendering/renderer-tab'
 import Callbag from 'src/utilities/callbag'
-import { DbSet } from 'src/workspace/db-schema'
+import { Set } from 'src/utilities/set'
 
 
 export default class MindmapView extends ItemView {
@@ -14,7 +14,7 @@ export default class MindmapView extends ItemView {
   public render: TabRenderer['render']
   public firstRender: TabRenderer['firstRender']
 
-  public static instances = new DbSet<MindmapView>()
+  public static instances = new Set<MindmapView>()
 
   constructor(public leaf: WorkspaceLeaf, displayText: string, pinned: boolean) {
     super(leaf)
