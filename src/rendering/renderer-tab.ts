@@ -62,9 +62,9 @@ export function TabRenderer(containerEl: MindmapTab.View['containerEl']) {
     if (settings.titleAsRootNode)
       addTitleToRootNode(rootNode, file.basename)
 
-    markmap.setData(rootNode, markmapOptions)
-
     state.markmapOptions = markmapOptions
+
+    await markmap.setData(rootNode, markmapOptions)
   }
 
   function addTitleToRootNode(root: IPureNode, title: string) {
