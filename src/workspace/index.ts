@@ -8,7 +8,7 @@ import { MarkdownTab, leafHasFile } from './types'
 import { CodeBlockRenderer } from 'src/rendering/renderer-codeblock'
 import { ExtractRecord, ExtractUnion, Matcher, Stackable, Tagged, match, tr, unionConstructors } from './utilities'
 import { assert } from './types'
-import { workspace } from 'src/core/entry'
+import { workspace } from 'src/core/main'
 import { fromObsidianEvent } from 'src/utilities/from-obsidian-event'
 import { CodeBlock, codeBlockCreated } from 'src/new/codeBlockHandler'
 

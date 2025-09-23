@@ -1,5 +1,5 @@
 import { GlobalSettings, settingChanges } from 'src/settings/filesystem'
-import { plugin } from 'src/core/entry'
+import { plugin } from 'src/core/main'
 
 
 export type Trigger = (next: () => void) => void
