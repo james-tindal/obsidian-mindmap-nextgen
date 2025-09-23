@@ -1,4 +1,4 @@
-import { PluginSettingTab, Modal, Editor, getFrontMatterInfo, parseYaml, EditorPosition } from 'obsidian'
+import { PluginSettingTab, Modal, Editor, getFrontMatterInfo } from 'obsidian'
 import autoBind from 'auto-bind'
 import * as yaml from 'yaml'
 
@@ -56,7 +56,7 @@ export class FileSettingsDialog extends Modal {
 function createFileSettingsProxy(editor: Editor) {
   const markdown = editor.getValue()
   const { frontmatter } = getFrontMatterInfo(markdown)
-  const parsed = parseYaml(frontmatter) ?? {}
+  const parsed = yaml.parse(frontmatter) ?? {}
   const fileSettings = ('markmap' in parsed ? parsed.markmap : {}) as FileSettings
 
   const persist = (() => {

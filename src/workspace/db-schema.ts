@@ -1,8 +1,6 @@
 import { TFile } from 'obsidian'
 
-import { FileSettings } from 'src/settings/filesystem'
 import { MarkdownTab } from './types'
-import { IPureNode } from 'markmap-common'
 import { CodeBlock } from 'src/new/codeBlockHandler'
 
 
@@ -47,8 +45,6 @@ export type TabRow = {
 
 export type FileRow = {
   handle: TFile
-  settings: FileSettings
-  body: string
   tabs: DbSet<TabRow>
 }
 
