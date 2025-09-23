@@ -1,5 +1,5 @@
 import Callbag from 'src/utilities/callbag'
-import { newActiveMarkdownView$ } from './new-active-markdown-view-stream'
+import { newActiveMarkdownView$ } from './active-markdown-view'
 import { FileSettingsDialog } from 'src/settings/dialogs'
 
 

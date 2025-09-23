@@ -170,11 +170,7 @@ const renderers = new Map<CodeBlock, CodeBlockRenderer>()
 Callbag.subscribe(codeBlockEvent$, event => match(event, {
   'start' ({ codeBlock, isCurrent }) {
     const renderer = CodeBlockRenderer(codeBlock)
-    if (isCurrent) renderer.fit()
     renderers.set(codeBlock, renderer)
-  },
-  'current' ({ codeBlock }) {
-    renderers.get(codeBlock)!.fit()
   },
   'end' ({ codeBlock }) {
     renderers.delete(codeBlock)

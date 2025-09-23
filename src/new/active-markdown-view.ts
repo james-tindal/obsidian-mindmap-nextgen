@@ -1,12 +1,13 @@
 import { MarkdownView } from 'obsidian'
-import Callbag, { filter, map, reject } from 'src/utilities/callbag'
+import Callbag, { filter, map, reject, remember } from 'src/utilities/callbag'
 import { fromObsidianEvent } from 'src/utilities/from-obsidian-event'
 
 
-const activeMarkdownView$ = Callbag.pipe(
+export const activeMarkdownView$ = Callbag.pipe(
   fromObsidianEvent(app.workspace, 'active-leaf-change').unary(),
   map(leaf => leaf?.view),
-  filter(view => view instanceof MarkdownView)
+  filter(view => view instanceof MarkdownView),
+  remember
 )
 
 const views = new Set<MarkdownView>()
