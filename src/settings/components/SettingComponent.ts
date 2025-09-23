@@ -1,6 +1,6 @@
 import { ValueComponent, ExtraButtonComponent, DropdownComponent, TextComponent, Setting } from 'obsidian'
 import { globalSettings, GlobalSettings } from 'src/settings/filesystem'
-import { Resolve } from 'src/workspace/utilities'
+import { Resolve } from 'src/utilities/utilities'
 
 
 interface ControlComponent<T> extends ValueComponent<T> {

@@ -1,6 +1,6 @@
 import { ButtonComponent, Setting } from 'obsidian'
 import { Component, div, fragment } from './various'
-import { Resolve } from 'src/workspace/utilities'
+import { Resolve } from 'src/utilities/utilities'
 import { fromEntries } from 'src/utilities/entries'
 
 type Level = 'global' | 'file' | 'codeBlock'
