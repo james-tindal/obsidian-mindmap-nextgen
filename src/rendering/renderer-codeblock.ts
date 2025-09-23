@@ -17,18 +17,20 @@ import { CodeBlock } from 'src/new/codeBlockHandler'
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
 export function CodeBlockRenderer(codeBlock: CodeBlock, fileSettings: FileSettings) {
-  const { markdown, containerEl, ctx: { sourcePath }} = codeBlock
+  const { component, markdown, containerEl, ctx: { sourcePath }} = codeBlock
   const file = app.vault.getFileByPath(sourcePath)
   assert(exists, file)
+
+  const { markmap, svg } = createMarkmap({ parent: containerEl, toolbar: false })
+  svgs.set(svg, file)
+  component.register(() =>
+    svgs.delete(svg))
 
   const markdownViewLeaf =
     app.workspace.getLeavesOfType('markdown')
     .find(leaf => leaf.containerEl.contains(containerEl))
   assert(exists, markdownViewLeaf)
   const markdownView = markdownViewLeaf.view as MarkdownView
-
-  const { markmap, svg } = createMarkmap({ parent: containerEl, toolbar: false })
-  svgs.set(svg, file)
 
   const { rootNode, settings: codeBlockSettings, body } = parseMarkdown<'codeBlock'>(markdown)
 
