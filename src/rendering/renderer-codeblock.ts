@@ -8,12 +8,13 @@ import { cssClasses } from 'src/constants'
 import { assert, exists } from 'src/workspace/types'
 import { createMarkmap, getOptions, parseMarkdown } from 'src/rendering/renderer-common'
 import { renderCodeblocks$ } from 'src/rendering/style-features'
-import Callbag, { fromEvent } from 'src/utilities/callbag'
+import Callbag, { fromEvent, take } from 'src/utilities/callbag'
 import { CodeBlockSettingsDialog } from 'src/settings/dialogs'
 import { isObjectEmpty } from 'src/utilities/utilities'
 import { svgs } from 'src/core/entry'
 import { dragAndDrop } from 'src/utilities/drag-and-drop'
 import { CodeBlock } from 'src/new/codeBlockHandler'
+import { activeMarkdownView$ } from 'src/new/active-markdown-view'
 
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
@@ -47,15 +48,16 @@ export function CodeBlockRenderer(codeBlock: CodeBlock) {
   if (markdownView.getMode() === 'source')
     SettingsDialog(codeBlock, body, codeBlockSettings, fileSettings, markdownView.editor)
 
-  let hasFit = false
-  function fit() {
-    if (!hasFit) markmap.fit()
-    hasFit = true
-  }
+  const renderered = render()
 
-  render()
+  Callbag.subscribe(take(1)(activeMarkdownView$), async activeMarkdownView => {
+    if (markdownView !== activeMarkdownView) return
+    await renderered
+    markmap.fit()
+  })
+
   Callbag.subscribe(renderCodeblocks$, render)
-  return { render, fit, updateFileSettings }
+  return { render, updateFileSettings }
 
   function updateFileSettings(fileSettings: FileSettings) {
     settings.file = fileSettings
@@ -64,12 +66,14 @@ export function CodeBlockRenderer(codeBlock: CodeBlock) {
 
   function render() {
     const markmapOptions = getOptions(settings.merged)
-    markmap.setData(rootNode, markmapOptions)
+    const promise = markmap.setData(rootNode, markmapOptions)
 
     const { classList } = containerEl.parentElement!
     settings.merged.highlight
       ? classList.add   (cssClasses.highlight)
       : classList.remove(cssClasses.highlight)
+
+    return promise
   }
 }
 
