@@ -1,4 +1,4 @@
-import { plugin } from 'src/core/entry'
+import { plugin } from 'src/core/main'
 import Callbag from './callbag'
 
 export const fromCommand = (id: string, name: string) =>

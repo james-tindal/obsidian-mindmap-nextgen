@@ -5,7 +5,7 @@ import * as yaml from 'yaml'
 import { globalSettings, GlobalSettings } from './filesystem'
 import { PageSelector } from './components/PageSelector'
 import { CodeBlockPage, FilePage, GlobalPage } from './components/pages'
-import { plugin } from 'src/core/entry'
+import { plugin } from 'src/core/main'
 
 
 export class GlobalSettingsDialog extends PluginSettingTab {

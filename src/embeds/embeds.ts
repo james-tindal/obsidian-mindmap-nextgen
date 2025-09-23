@@ -1,7 +1,7 @@
 import { ITransformPlugin } from 'markmap-lib'
 import { EmbedInfo, MarkdownRenderer, parseLinktext, TFile } from 'obsidian'
 
-import { plugin } from 'src/core/entry'
+import { plugin } from 'src/core/main'
 import { getActiveFile } from 'src/views/get-active-file'
 import MindmapView from 'src/views/view'
 import views from 'src/views/views'

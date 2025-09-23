@@ -1,4 +1,4 @@
-import { plugin, svgs } from 'src/core/entry'
+import { plugin, svgs } from 'src/core/main'
 
 
 const workspace = document.querySelector('.workspace' as 'div')!

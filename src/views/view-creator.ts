@@ -2,7 +2,7 @@ import { ViewCreator, WorkspaceLeaf } from 'obsidian'
 import { MM_VIEW_TYPE } from 'src/constants'
 import { MindmapSubject } from './layout-manager'
 import MindmapView from './view'
-import { plugin } from 'src/core/entry'
+import { plugin } from 'src/core/main'
 import { getActiveFile } from './get-active-file'
 import views from './views'
 
