@@ -55,7 +55,6 @@ export function CodeBlockRenderer(codeBlock: CodeBlock) {
 
   render()
   Callbag.subscribe(renderCodeblocks$, render)
-
   return { render, fit, updateFileSettings }
 
   function updateFileSettings(fileSettings: FileSettings) {

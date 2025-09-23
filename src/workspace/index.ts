@@ -1,8 +1,6 @@
 import { TFile } from 'obsidian'
-import { Merge } from 'type-fest'
 
-import { FileSettings } from 'src/settings/filesystem'
-import Callbag, { filter, flatMap, map, merge, pairwise, Source, startWith } from 'src/utilities/callbag'
+import Callbag, { flatMap, map, merge, pairwise, Source, startWith } from 'src/utilities/callbag'
 import { ImmutableSet } from 'src/utilities/immutable-set'
 import { FileMap, getLayout } from './get-layout'
 import { CodeBlockRow, FileRow, TabRow } from './db-schema'
@@ -22,7 +20,6 @@ const InputEvent = unionConstructors(
   Tagged('tab current',     tr as MarkdownTab.Leaf),
   Tagged('tab not current', tr as MarkdownTab.Leaf),
   Tagged('tab changed file', tr as [ MarkdownTab.Leaf, TFile ]),
-  Tagged('fileSettings',     tr as { file: TFile, settings: FileSettings }),
 )
 type InputEvent = ExtractUnion<typeof InputEvent>
 type InputEvents = ExtractRecord<typeof InputEvent>
@@ -30,7 +27,6 @@ type InputEvents = ExtractRecord<typeof InputEvent>
 const CodeBlockEvent = unionConstructors(
   Tagged('start',          tr as { codeBlock: CodeBlock, isCurrent: boolean }),
   Tagged('current',        tr as { codeBlock: CodeBlock }),
-  Tagged('fileSettings',   tr as { codeBlock: CodeBlock, fileSettings: FileSettings }),
   Tagged('end',            tr as { codeBlock: CodeBlock }),
 )
 type CodeBlockEvent = ExtractUnion<typeof CodeBlockEvent>
@@ -64,24 +60,7 @@ const layout$ = Callbag.pipe(
     ]))
 )
 
-const fileChange$ = Callbag.pipe(
-  fromObsidianEvent(app.metadataCache, 'changed'),
-  map(([file, data, cache]) => ({ file, data, cache }))
-)
-
-const file$ = Callbag.pipe(
-  fileChange$,
-  map(({ cache, data, file }) => ({ file, frontmatter: cache.frontmatter as object, body: data.slice(cache.frontmatterPosition?.start.offset) }))
-)
-
-const fileSettings$ = Callbag.pipe(fileChange$,
-  map(({ file, cache }) => ({ file, settings: (cache.frontmatter as { markmap?: FileSettings } | undefined)?.markmap })),
-  filter((x): x is Merge<typeof x, { settings: FileSettings }> =>
-    'settings' in x && typeof x.settings === 'object'),
-  map(InputEvent.fileSettings)
-)
-
-const inputEvent$: Source<InputEvent> = Callbag.share(merge(layout$, codeBlock$, fileSettings$))
+const inputEvent$: Source<InputEvent> = Callbag.share(merge(layout$, codeBlock$))
 
 type EventMatcher = Matcher<InputEvent, Stackable<CodeBlockEvent>>
 
@@ -176,14 +155,6 @@ const matcher: EventMatcher = {
 
     return CodeBlockEvent.start({ codeBlock, isCurrent })
 
-  },
-  'fileSettings' ({ file, settings }) {
-    const fileRow = workspace.files.find(row => row.handle === file)!
-
-    return fileRow.tabs.flatMap(tabRow =>
-      tabRow.codeBlocks.map(({ codeBlock }) =>
-        CodeBlockEvent.fileSettings({ codeBlock, fileSettings: settings })
-      ))
   }
 }
 
@@ -204,9 +175,6 @@ Callbag.subscribe(codeBlockEvent$, event => match(event, {
   },
   'current' ({ codeBlock }) {
     renderers.get(codeBlock)!.fit()
-  },
-  'fileSettings' ({ codeBlock, fileSettings }) {
-    renderers.get(codeBlock)!.updateFileSettings(fileSettings)
   },
   'end' ({ codeBlock }) {
     renderers.delete(codeBlock)
