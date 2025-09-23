@@ -5,29 +5,20 @@
   "scripts": {
     "dev": "webpack --mode development --watch",
     "build": "webpack --mode production",
-    "coverage": "nyc -r lcov -e .ts -x \"*.test.ts\" npm run test",
     "test": "vitest"
   },
   "type": "module",
   "devDependencies": {
-    "@babel/preset-typescript": "^7.26.0",
-    "@rollup/plugin-commonjs": "^28.0.2",
-    "@rollup/plugin-node-resolve": "^16.0.0",
-    "@rollup/plugin-typescript": "^12.1.1",
     "@stylistic/eslint-plugin": "^2.13.0",
     "@types/node": "^22.10.7",
     "@types/ramda": "^0.30.2",
     "@typescript-eslint/parser": "^8.21.0",
     "eslint": "^9.18.0",
-    "moment": "^2.29.4",
-    "nyc": "^17.1.0",
     "obsidian": "^1.8.7",
     "tslib": "^2.8.1",
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "@babel/core": "^7.26.0",
-    "@babel/preset-env": "^7.26.0",
     "@codemirror/state": "^6.2.0",
     "@codemirror/view": "^6.7.3",
     "@types/d3": "^7.4.3",
