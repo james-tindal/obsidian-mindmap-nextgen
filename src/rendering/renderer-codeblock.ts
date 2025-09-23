@@ -1,6 +1,7 @@
-import { ButtonComponent, Editor, EditorPosition, MarkdownView } from 'obsidian'
+import { ButtonComponent, Editor, EditorPosition, getFrontMatterInfo, MarkdownView } from 'obsidian'
 import autoBind from 'auto-bind'
 import GrayMatter from 'gray-matter'
+import yaml from 'yaml'
 
 import { CodeBlockSettings, FileSettings, globalSettings, GlobalSettings } from 'src/settings/filesystem'
 import { cssClasses } from 'src/constants'
@@ -16,7 +17,7 @@ import { CodeBlock } from 'src/new/codeBlockHandler'
 
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
-export function CodeBlockRenderer(codeBlock: CodeBlock, fileSettings: FileSettings) {
+export function CodeBlockRenderer(codeBlock: CodeBlock) {
   const { component, markdown, containerEl, ctx: { sourcePath }} = codeBlock
   const file = app.vault.getFileByPath(sourcePath)
   assert(exists, file)
@@ -31,6 +32,11 @@ export function CodeBlockRenderer(codeBlock: CodeBlock, fileSettings: FileSettin
     .find(leaf => leaf.containerEl.contains(containerEl))
   assert(exists, markdownViewLeaf)
   const markdownView = markdownViewLeaf.view as MarkdownView
+
+  const fileText = markdownView.editor.getValue()
+  const { frontmatter } = getFrontMatterInfo(fileText)
+  const parsed = yaml.parse(frontmatter) ?? {}
+  const fileSettings = ('markmap' in parsed ? parsed.markmap : {}) as FileSettings
 
   const { rootNode, settings: codeBlockSettings, body } = parseMarkdown<'codeBlock'>(markdown)
 

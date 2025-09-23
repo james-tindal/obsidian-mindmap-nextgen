@@ -1,5 +1,4 @@
 import { TFile } from 'obsidian'
-import GrayMatter from 'gray-matter'
 import { Merge } from 'type-fest'
 
 import { FileSettings } from 'src/settings/filesystem'
@@ -29,7 +28,7 @@ type InputEvent = ExtractUnion<typeof InputEvent>
 type InputEvents = ExtractRecord<typeof InputEvent>
 
 const CodeBlockEvent = unionConstructors(
-  Tagged('start',          tr as { codeBlock: CodeBlock, fileSettings: FileSettings, isCurrent: boolean }),
+  Tagged('start',          tr as { codeBlock: CodeBlock, isCurrent: boolean }),
   Tagged('current',        tr as { codeBlock: CodeBlock }),
   Tagged('fileSettings',   tr as { codeBlock: CodeBlock, fileSettings: FileSettings }),
   Tagged('end',            tr as { codeBlock: CodeBlock }),
@@ -96,8 +95,7 @@ const matcher: EventMatcher = {
     if (fileRowInDb)
       fileRow = fileRowInDb
     else {
-      const fileText = leaf.view.editor.getValue()
-      fileRow = FileRow({ handle: fileHandle, ...splitMarkdown(fileText) })
+      fileRow = FileRow({ handle: fileHandle })
       workspace.files.add(fileRow)
     }
 
@@ -126,8 +124,7 @@ const matcher: EventMatcher = {
       newFileRow = newFileRowInDb
     else {
       // Create new FileRow
-      const fileText = tabLeaf.view.editor.getValue()
-      newFileRow = FileRow({ handle: newFileHandle, ...splitMarkdown(fileText) })
+      newFileRow = FileRow({ handle: newFileHandle })
       // Add it to the db
       workspace.files.add(newFileRow)
     }
@@ -175,15 +172,13 @@ const matcher: EventMatcher = {
     workspace.codeBlocks.add(codeBlockRow)
     tabRow.codeBlocks.add(codeBlockRow)
 
-    const fileSettings = tabRow.file.settings
     const isCurrent = tabRow.isCurrent
 
-    return CodeBlockEvent.start({ codeBlock, fileSettings, isCurrent })
+    return CodeBlockEvent.start({ codeBlock, isCurrent })
 
   },
   'fileSettings' ({ file, settings }) {
     const fileRow = workspace.files.find(row => row.handle === file)!
-    fileRow.settings = settings
 
     return fileRow.tabs.flatMap(tabRow =>
       tabRow.codeBlocks.map(({ codeBlock }) =>
@@ -202,8 +197,8 @@ const codeBlockEvent$ = Callbag.pipe(
 
 const renderers = new Map<CodeBlock, CodeBlockRenderer>()
 Callbag.subscribe(codeBlockEvent$, event => match(event, {
-  'start' ({ codeBlock, fileSettings, isCurrent }) {
-    const renderer = CodeBlockRenderer(codeBlock, fileSettings)
+  'start' ({ codeBlock, isCurrent }) {
+    const renderer = CodeBlockRenderer(codeBlock)
     if (isCurrent) renderer.fit()
     renderers.set(codeBlock, renderer)
   },
@@ -217,11 +212,3 @@ Callbag.subscribe(codeBlockEvent$, event => match(event, {
     renderers.delete(codeBlock)
   }
 }))
-
-function splitMarkdown(text: string) {
-  const gm = GrayMatter(text)
-  const frontmatter = gm.data
-  const settings = (frontmatter?.markmap || {}) as FileSettings
-
-  return { settings, body: gm.content }
-}
