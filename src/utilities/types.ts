@@ -43,7 +43,7 @@ export const toAssert = <In, Out extends In>(
   message_?: string
 ) => assert(predicate, x, message ?? message_)
 
-export const exists = Object.assign(
+export const notNullish = Object.assign(
   <T>(x: T): x is NonNullable<T> =>
     x !== null && x !== undefined,
   { message: 'Must not be null or undefined' }
