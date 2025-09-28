@@ -4,7 +4,7 @@ import GrayMatter from 'gray-matter'
 
 import { CodeBlockSettings, FileSettings, globalSettings, GlobalSettings } from 'src/settings/filesystem'
 import { cssClasses } from 'src/constants'
-import { assert, exists } from 'src/utilities/types'
+import { assert, notNullish } from 'src/utilities/types'
 import { createMarkmap, getOptions, transformMarkdown, splitMarkdown } from 'src/rendering/renderer-common'
 import { renderCodeblocks$ } from 'src/rendering/style-features'
 import Callbag, { fromEvent } from 'src/utilities/callbag'
@@ -116,7 +116,7 @@ class SettingsManager {
   private updateFrontmatter(update: (settings: CodeBlockSettings) => void) {
     const editor = this.markdownView.editor
     const sectionInfo = this.__codeBlock.getSectionInfo()
-    assert(exists, sectionInfo)
+    assert(notNullish, sectionInfo)
     const lineStart = EditorLine(sectionInfo.lineStart + 1)
     const lineEnd   = EditorLine(sectionInfo.lineEnd)
 
@@ -189,7 +189,7 @@ function SettingsDialog(codeBlock: CodeBlock, body: string, codeBlockSettings: C
 
   function updateCodeBlockFrontmatter() {
     const sectionInfo = codeBlock.getSectionInfo()
-    assert(exists, sectionInfo)
+    assert(notNullish, sectionInfo)
     const lineStart = EditorLine(sectionInfo.lineStart + 1)
     const lineEnd   = EditorLine(sectionInfo.lineEnd)
 
@@ -217,7 +217,7 @@ function SettingsDialog(codeBlock: CodeBlock, body: string, codeBlockSettings: C
 
 function getFileByPath(sourcePath: string) {
   const file = app.vault.getFileByPath(sourcePath)
-  assert(exists, file)
+  assert(notNullish, file)
   return file
 }
 
@@ -225,6 +225,6 @@ function getMarkdownView(codeBlock: CodeBlock) {
   const markdownViewLeaf =
     app.workspace.getLeavesOfType('markdown')
     .find(leaf => leaf.containerEl.contains(codeBlock.containerEl))
-  assert(exists, markdownViewLeaf)
+  assert(notNullish, markdownViewLeaf)
   return markdownViewLeaf.view as MarkdownView
 }

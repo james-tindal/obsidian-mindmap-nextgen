@@ -3,7 +3,7 @@ import { MindmapSubject } from './layout-manager'
 import views from './views'
 import { globalSettings } from 'src/settings/filesystem'
 import { constructView } from './view-creator'
-import { assert, exists } from 'src/utilities/types'
+import { assert, notNullish } from 'src/utilities/types'
 
 
 export const leafManager = {
@@ -54,7 +54,7 @@ function newLeaf() {
     return createLeafIn.newSplit()
   
   const activeLeaf = app.workspace.activeLeaf
-  assert(exists, activeLeaf)
+  assert(notNullish, activeLeaf)
   const thisTabGroup = activeLeaf.parent
   const parentSplit = thisTabGroup.parent
   const isTabGroup = (item: WorkspaceItem): item is WorkspaceTabs =>
