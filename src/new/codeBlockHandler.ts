@@ -14,7 +14,7 @@ Callbag.subscribe(codeBlockCreated, codeBlock =>
 Callbag.subscribe(codeBlockDeleted, codeBlock =>
   codeBlocks.delete(codeBlock))
 
-export const getCodeBlocks = (filePath: string) =>
+export const getCodeBlocksByPath = (filePath: string) =>
   [...codeBlocks].filter(codeBlock =>
     codeBlock.ctx.sourcePath === filePath
   )
