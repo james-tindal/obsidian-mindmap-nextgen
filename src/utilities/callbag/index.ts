@@ -21,17 +21,18 @@ import takeUntil from 'callbag-take-until'
 import { debounce } from 'callbag-debounce'
 
 import { Source, UnwrapSource } from 'callbag'
-import { subject } from './subject'
+import { subject, Subject } from './subject'
 import { completeWhen } from './complete-when'
 import { tap } from './tap'
 import { preventDefault } from './prevent-default'
 import { dragAndDrop } from './drag-and-drop'
 import { fromCommand } from './from-command'
 import { fromObsidianEvent } from './from-obsidian-event'
+import { groupBy } from './group-by'
 
 
-type Listener<T> = (data: T) => any
-type Subscriber<T> = {
+export type Listener<T> = (data: T) => any
+export type Subscriber<T> = {
   next?: Listener<T>,
   error?: (err: any) => any,
   complete?: () => any,
@@ -51,6 +52,7 @@ const Callbag = {
   fromEvent,
   fromObsidianEvent,
   fromPromise,
+  groupBy,
   map,
   merge,
   of,
@@ -82,6 +84,7 @@ export {
   fromEvent,
   fromObsidianEvent,
   fromPromise,
+  groupBy,
   map,
   merge,
   of,
@@ -102,4 +105,4 @@ export {
 }
 
 export default Callbag
-export type { Source, UnwrapSource }
+export type { Source, UnwrapSource, Subject }
