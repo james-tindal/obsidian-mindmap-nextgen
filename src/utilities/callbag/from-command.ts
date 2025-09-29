@@ -1,5 +1,5 @@
 import { plugin } from 'src/core/main'
-import Callbag from './callbag'
+import Callbag from '.'
 
 export const fromCommand = (id: string, name: string) =>
   Callbag.create<void>((next, error, complete) => {

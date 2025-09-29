@@ -1,10 +1,9 @@
 import Callbag, { debounce, distinct, filter, flatMap, fromPromise, map, merge, partition, remember } from 'src/utilities/callbag'
 import { plugin } from './main'
 import { layoutManager } from 'src/views/layout-manager'
-import { fromObsidianEvent } from 'src/utilities/from-obsidian-event'
 import { renderTabs$ } from 'src/rendering/style-features'
 import views from 'src/views/views'
-import { fromCommand } from 'src/utilities/from-command'
+import { fromCommand, fromObsidianEvent } from 'src/utilities/callbag'
 import MindmapTabView from 'src/views/view'
 
 
