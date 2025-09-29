@@ -21,49 +21,14 @@ import takeUntil from 'callbag-take-until'
 import { debounce } from 'callbag-debounce'
 
 import { Source, UnwrapSource } from 'callbag'
-import { consumeSource, createSource } from 'callbag-toolkit'
+import { subject } from './subject'
+import { completeWhen } from './complete-when'
+import { tap } from './tap'
+import { preventDefault } from './prevent-default'
+import { dragAndDrop } from './drag-and-drop'
+import { fromCommand } from './from-command'
+import { fromObsidianEvent } from './from-obsidian-event'
 
-
-const subject = <T>(): { source: Source<T>, push: (v: T) => void } => {
-  let next: ((v: T) => void) | undefined
-  return {
-    source: share(create<T>(next_ => {next = next_})),
-    push: (v: T) => next && next(v)
-  }
-}
-
-const completeWhen = (trigger: Source<unknown>) => <T>(subject: Source<T>): Source<T> =>
-  createSource(({ complete, ...rest }) => {
-    const subjectConsumption = consumeSource(subject, {
-      complete() {
-        triggerConsumption.stop()
-        subjectConsumption.stop()
-      },
-      ...rest
-    })
-    const triggerConsumption = consumeSource(trigger, {
-      next() {
-        triggerConsumption.stop()
-        subjectConsumption.stop()
-        complete()
-      },
-      complete() {
-        triggerConsumption.stop()
-      }
-    })
-    return () => {
-      triggerConsumption.stop()
-      subjectConsumption.stop()
-    }
-  })
-
-const tap = <T>(fn: (value: T) => void) => (source: Source<T>) => {
-  pipe(source, subscribe(fn))
-  return source
-}
-
-const preventDefault = <E extends Event>(event$: Source<E>) =>
-  pipe(event$, tap(event => event.preventDefault()))
 
 type Listener<T> = (data: T) => any
 type Subscriber<T> = {
@@ -74,15 +39,17 @@ type Subscriber<T> = {
 const subscribe2 = <T>(source: Source<T>, listener: Listener<T> | Subscriber<T>) => pipe(source, subscribe(listener))
 
 
-
 const Callbag = {
   create,
   completeWhen,
   debounce,
   distinct,
+  dragAndDrop,
   filter,
   flatMap,
+  fromCommand,
   fromEvent,
+  fromObsidianEvent,
   fromPromise,
   map,
   merge,
@@ -108,9 +75,12 @@ export {
   completeWhen,
   debounce,
   distinct,
+  dragAndDrop,
   filter,
   flatMap,
+  fromCommand,
   fromEvent,
+  fromObsidianEvent,
   fromPromise,
   map,
   merge,

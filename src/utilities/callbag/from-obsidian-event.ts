@@ -1,5 +1,5 @@
 import type { Events } from 'obsidian'
-import Callbag, { map } from './callbag'
+import Callbag, { map } from '.'
 import { plugin } from 'src/core/main'
 import { Simplify } from 'type-fest'
 

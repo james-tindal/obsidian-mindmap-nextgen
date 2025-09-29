@@ -1,6 +1,5 @@
 import { MarkdownView } from 'obsidian'
-import Callbag, { filter, map, reject, remember } from 'src/utilities/callbag'
-import { fromObsidianEvent } from 'src/utilities/from-obsidian-event'
+import Callbag, { filter, fromObsidianEvent, map, reject, remember } from 'src/utilities/callbag'
 
 
 export const activeMarkdownView$ = Callbag.pipe(
