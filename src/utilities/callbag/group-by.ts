@@ -2,12 +2,13 @@ import create from 'callbag-create'
 import { Source } from 'callbag'
 import Callbag, { Subject, subject } from '.'
 import { Merge } from 'type-fest'
+import replay from 'callbag-replay-all'
 
 
 export type GroupedSource<Key, T> = Source<T> & { key: Key }
 export type GroupedSubject<Key, T> = Merge<Subject<T>, { source: GroupedSource<Key, T> }>
 export const groupBy = <Key, In>(keyFn: (data: In) => Key) => (source: Source<In>): Source<GroupedSource<Key, In>> => 
-  create((next, error, complete) => {
+  replay()(create((next, error, complete) => {
     const groups = new Map<Key, GroupedSubject<Key, In>>()
     return Callbag.subscribe(source, {
       error(reason) {
@@ -32,8 +33,7 @@ export const groupBy = <Key, In>(keyFn: (data: In) => Key) => (source: Source<In
         }
       }
     })
-  }
-)
+  }))
 
 const groupedSubject = <Key, T>(key: Key): GroupedSubject<Key, T> => {
   const sub = subject<T>()
