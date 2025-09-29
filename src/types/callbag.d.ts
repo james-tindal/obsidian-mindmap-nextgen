@@ -92,3 +92,11 @@ declare module 'callbag-drop-repeats' {
 
   export default dropRepeats
 }
+
+declare module 'callbag-replay-all' {
+  import { Source } from 'callbag'
+
+  const replay: (count?: number) => <I>(source: Source<I>) => Source<I>
+
+  export default replay
+}
