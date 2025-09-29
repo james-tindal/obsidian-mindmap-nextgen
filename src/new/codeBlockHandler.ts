@@ -6,7 +6,7 @@ import { nextTick } from 'src/utilities/utilities'
 const _codeBlockCreated = Callbag.subject<CodeBlock>()
 export const codeBlockCreated = _codeBlockCreated.source
 const _codeBlockDeleted = Callbag.subject<CodeBlock>()
-export const codeBlockDeleted = _codeBlockCreated.source
+export const codeBlockDeleted = _codeBlockDeleted.source
 
 const codeBlocks = new Set<CodeBlock>
 Callbag.subscribe(codeBlockCreated, codeBlock =>
