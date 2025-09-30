@@ -1,10 +1,12 @@
-import { Component, Editor, MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, MarkdownView, TFile } from 'obsidian'
-import Callbag from 'src/utilities/callbag'
+import { MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, MarkdownView } from 'obsidian'
+import { plugin } from 'src/core/main'
+import Callbag, { flatMap } from 'src/utilities/callbag'
 import { assert, defineLazyGetters, notNullish } from 'src/utilities/utilities'
 import { Simplify } from 'type-fest'
 
 
-export async function codeBlockHandler(markdown: string, containerEl: HTMLElement, ctx: MarkdownPostProcessorContext) {
+export type CodeBlock = ReturnType<typeof CodeBlock>
+function CodeBlock(markdown: string, containerEl: HTMLElement, ctx: MarkdownPostProcessorContext) {
   const component = new MarkdownRenderChild(containerEl)
   ctx.addChild(component)
   const markdownView = getMarkdownView(component)
@@ -13,25 +15,25 @@ export async function codeBlockHandler(markdown: string, containerEl: HTMLElemen
   const getSectionInfo = () =>
     ctx.getSectionInfo(containerEl) as SectionInfo
 
-  const codeBlock = defineLazyGetters({
+  return defineLazyGetters({
     component, markdown, containerEl, ctx, markdownView, editor, getSectionInfo
   }, {
     file: () => getFileByPath(ctx.sourcePath),
   })
-
-  registerCodeBlock(codeBlock, component)
 }
 
-const _codeBlockCreated = Callbag.subject<CodeBlock>()
-export const codeBlockCreated = _codeBlockCreated.source
-const _codeBlockDeleted = Callbag.subject<CodeBlock>()
-export const codeBlockDeleted = _codeBlockDeleted.source
-
-function registerCodeBlock(codeBlock: CodeBlock, component: Component) {
-  _codeBlockCreated.push(codeBlock)
-  component.register(() =>
-    _codeBlockDeleted.push(codeBlock))
-}
+export const codeBlockCreated = Callbag.share(
+  Callbag.create<CodeBlock>((next, error, complete) => {
+    plugin.registerMarkdownCodeBlockProcessor('markmap', (...args) => next(CodeBlock(...args)))
+    plugin.register(complete)
+  }))
+const codeBlockDeleted = Callbag.pipe(
+  codeBlockCreated,
+  flatMap(codeBlock => Callbag.create<CodeBlock>((next, error, complete) => {
+    codeBlock.component.register(() => next(codeBlock))
+    plugin.register(complete)
+  }))
+)
 
 const codeBlocks = new Set<CodeBlock>
 Callbag.subscribe(codeBlockCreated, codeBlock =>
@@ -44,18 +46,7 @@ export const getCodeBlocksByPath = (filePath: string) =>
     codeBlock.ctx.sourcePath === filePath
   )
 
-type SectionInfo = Simplify<NonNullable<MarkdownSectionInformation>>
-
-export interface CodeBlock {
-  component: MarkdownRenderChild
-  markdown: string
-  containerEl: HTMLElement
-  getSectionInfo(): SectionInfo
-  ctx: MarkdownPostProcessorContext
-  markdownView: MarkdownView
-  editor: Editor
-  file: TFile
-}
+type SectionInfo = Simplify<MarkdownSectionInformation>
 
 function getMarkdownView(component: MarkdownRenderChild) {
   const leaves = app.workspace.getLeavesOfType('markdown')
