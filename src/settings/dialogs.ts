@@ -7,7 +7,7 @@ import { CodeBlockPage, FilePage, GlobalPage } from './components/pages'
 import { plugin } from 'src/core/main'
 import { CodeBlockSettings, FileSettings } from './filesystem'
 import { CodeBlockDoc, FileDoc } from './components/explanations'
-import { createFileSettingsProxy } from './proxy'
+import { createSettingsProxy } from './proxy'
 
 
 export class GlobalSettingsDialog extends PluginSettingTab {
@@ -36,7 +36,7 @@ export class FileSettingsDialog extends Modal {
   constructor(editor: Editor) {
     super(app)
   
-    const fileSettings = createFileSettingsProxy(editor)
+    const fileSettings = createSettingsProxy('file', editor)
 
     this.containerEl.classList.add('mmng-settings-modal')
 
