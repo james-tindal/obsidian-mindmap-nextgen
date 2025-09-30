@@ -15,7 +15,7 @@ export default [
     },
     rules: {
       '@stylistic/semi': ['error', 'never'],
-      '@stylistic/quotes': ['error', 'single'],
+      '@stylistic/quotes': ['error', 'single', { avoidEscape: true }],
       '@stylistic/arrow-parens': ['error', 'as-needed'],
       '@stylistic/linebreak-style': 'error',
       '@stylistic/eol-last': 'error'
