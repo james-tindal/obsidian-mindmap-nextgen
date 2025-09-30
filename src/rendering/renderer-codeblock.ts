@@ -15,8 +15,7 @@ import { CodeBlock } from 'src/new/codeBlockHandler'
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
 export function CodeBlockRenderer(codeBlock: CodeBlock) {
-  const { component, containerEl, markdownView, editor, ctx: { sourcePath }} = codeBlock
-  const file = getFileByPath(sourcePath)
+  const { component, containerEl, markdownView, editor, file } = codeBlock
 
   // createMarkmap should take the full markdown and render
   // transformMarkdown should be merged into this
@@ -209,10 +208,4 @@ function SettingsDialog(codeBlock: CodeBlock, body: string, codeBlockSettings: C
     .setTooltip('Edit block settings')
 
   button.onClick(dialog.open)
-}
-
-function getFileByPath(sourcePath: string) {
-  const file = app.vault.getFileByPath(sourcePath)
-  assert(notNullish, file)
-  return file
 }
