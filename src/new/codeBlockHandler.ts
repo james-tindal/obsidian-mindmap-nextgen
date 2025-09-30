@@ -1,4 +1,4 @@
-import { Editor, MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, MarkdownView, TFile } from 'obsidian'
+import { Component, Editor, MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, MarkdownView, TFile } from 'obsidian'
 import Callbag from 'src/utilities/callbag'
 import { assert, defineLazyGetters, nextTick, notNullish } from 'src/utilities/utilities'
 
@@ -7,6 +7,12 @@ const _codeBlockCreated = Callbag.subject<CodeBlock>()
 export const codeBlockCreated = _codeBlockCreated.source
 const _codeBlockDeleted = Callbag.subject<CodeBlock>()
 export const codeBlockDeleted = _codeBlockDeleted.source
+
+function registerCodeBlock(codeBlock: CodeBlock, component: Component) {
+  _codeBlockCreated.push(codeBlock)
+  component.register(() =>
+    _codeBlockDeleted.push(codeBlock))
+}
 
 const codeBlocks = new Set<CodeBlock>
 Callbag.subscribe(codeBlockCreated, codeBlock =>
@@ -47,9 +53,7 @@ export async function codeBlockHandler(markdown: string, containerEl: HTMLElemen
     file: () => getFileByPath(ctx.sourcePath),
   })
 
-  _codeBlockCreated.push(codeBlock)
-  component.register(() =>
-    _codeBlockDeleted.push(codeBlock))
+  registerCodeBlock(codeBlock, component)
 }
 
 function getMarkdownView(containerEl: HTMLElement) {
