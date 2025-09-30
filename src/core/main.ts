@@ -1,6 +1,5 @@
 import { __entry } from './entry'
 import Callbag from 'src/utilities/callbag'
-import { codeBlockCreated } from 'src/new/codeBlockHandler'
 import { iife } from 'src/utilities/utilities'
 
 
@@ -15,11 +14,10 @@ iife(async () => {
   await settingsLoaded
   const { loadStyleFeatures } = await import('src/rendering/style-features')
   const { GlobalSettingsDialog } = await import('src/settings/dialogs')
-  const { codeBlockHandler } = await import('src/new/codeBlockHandler')
+  const { codeBlockCreated } = await import('src/new/codeBlockHandler')
   const { CodeBlockRenderer } = await import('src/rendering/renderer-codeblock')
   Callbag.subscribe(codeBlockCreated, CodeBlockRenderer)
 
   plugin.addSettingTab(new GlobalSettingsDialog())
-  plugin.registerMarkdownCodeBlockProcessor('markmap', codeBlockHandler)
   loadStyleFeatures()
 })
