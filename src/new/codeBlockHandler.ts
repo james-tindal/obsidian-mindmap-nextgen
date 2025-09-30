@@ -1,4 +1,4 @@
-import { Editor, MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, MarkdownView } from 'obsidian'
+import { Editor, MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, MarkdownView, TFile } from 'obsidian'
 import Callbag from 'src/utilities/callbag'
 import { assert, nextTick, notNullish } from 'src/utilities/utilities'
 
@@ -27,6 +27,7 @@ export interface CodeBlock {
   ctx: MarkdownPostProcessorContext
   markdownView: MarkdownView
   editor: Editor
+  file: TFile
 }
 
 export async function codeBlockHandler(markdown: string, containerEl: HTMLElement, ctx: MarkdownPostProcessorContext) {
@@ -41,7 +42,12 @@ export async function codeBlockHandler(markdown: string, containerEl: HTMLElemen
 
   const codeBlock = {
     component, markdown, containerEl, ctx, markdownView, editor,
-    getSectionInfo: () => ctx.getSectionInfo(containerEl)
+    getSectionInfo: () => ctx.getSectionInfo(containerEl),
+    get file() {
+      const file = getFileByPath(ctx.sourcePath)
+      Object.defineProperty(codeBlock, 'file', { value: file })
+      return file
+    }
   }
 
   _codeBlockCreated.push(codeBlock)
@@ -55,4 +61,10 @@ function getMarkdownView(containerEl: HTMLElement) {
     .find(leaf => leaf.containerEl.contains(containerEl))
   assert(notNullish, markdownViewLeaf, "Couldn't find MarkdownView containing code block")
   return markdownViewLeaf.view as MarkdownView
+}
+
+function getFileByPath(sourcePath: string) {
+  const file = app.vault.getFileByPath(sourcePath)
+  assert(notNullish, file)
+  return file
 }
