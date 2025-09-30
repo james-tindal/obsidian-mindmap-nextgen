@@ -90,7 +90,7 @@ export function assert<In, Out extends In>(
   message?: string
 ): asserts x is Out {
   if (!predicate(x))
-    throw new Error(predicate.message ?? message ?? predicate.toString())
+    throw new Error(message ?? predicate.message ?? predicate.toString())
 }
 
 export const toAssert = <In, Out extends In>(
