@@ -1,16 +1,15 @@
 import { Editor, getFrontMatterInfo } from 'obsidian'
-import yaml from 'yaml'
-import { FileSettings } from './filesystem'
+import * as yaml from 'yaml'
 
-export function createFileSettingsProxy(editor: Editor) {
+import { splitMarkdown } from 'src/rendering/renderer-common'
+
+export function createSettingsProxy<Type extends 'file' | 'codeBlock'>(type: Type, editor: Editor) {
   const markdown = editor.getValue()
-  const { frontmatter } = getFrontMatterInfo(markdown)
-  const parsed = yaml.parse(frontmatter) ?? {}
-  const fileSettings = ('markmap' in parsed ? parsed.markmap : {}) as FileSettings
+  const { settings } = splitMarkdown(type, markdown)
 
   const persist = (() => {
     const markdown = editor.getValue()
-    const { exists, frontmatter, ...info} = getFrontMatterInfo(markdown)
+    const { exists, frontmatter, ...info } = getFrontMatterInfo(markdown)
     const doc = yaml.parseDocument(frontmatter)
     const from = editor.offsetToPos(info.from)
     const to = editor.offsetToPos(info.to)
@@ -30,12 +29,12 @@ export function createFileSettingsProxy(editor: Editor) {
     return { set, delete: delete_ }
   })()
 
-  return new Proxy(fileSettings, { 
-    set<Key extends keyof FileSettings>(_: unknown, key: Key, value: FileSettings[Key]) {
+  return new Proxy(settings, { 
+    set(_, key, value) {
       persist.set(['markmap', key], value)
       return true
     },
-    deleteProperty(_: unknown, key: keyof FileSettings) {
+    deleteProperty(_, key) {
       return persist.delete(['markmap', key])
     },
   })
