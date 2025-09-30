@@ -7,13 +7,12 @@ import { cssClasses } from 'src/constants'
 import { assert, exists } from 'src/utilities/types'
 import { createMarkmap, getOptions, transformMarkdown, splitMarkdown } from 'src/rendering/renderer-common'
 import { renderCodeblocks$ } from 'src/rendering/style-features'
-import Callbag, { fromEvent, take } from 'src/utilities/callbag'
+import Callbag, { fromEvent } from 'src/utilities/callbag'
 import { CodeBlockSettingsDialog } from 'src/settings/dialogs'
 import { isObjectEmpty } from 'src/utilities/utilities'
 import { svgs } from 'src/core/main'
 import { dragAndDrop } from 'src/utilities/drag-and-drop'
 import { CodeBlock } from 'src/new/codeBlockHandler'
-import { activeMarkdownView$ } from 'src/new/active-markdown-view'
 
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
@@ -44,16 +43,10 @@ export function CodeBlockRenderer(codeBlock: CodeBlock) {
   if (markdownView.getMode() === 'source')
     SettingsDialog(codeBlock, body, codeBlockSettings, fileSettings, markdownView.editor)
 
-  const renderered = render()
-
-  Callbag.subscribe(take(1)(activeMarkdownView$), async activeMarkdownView => {
-    if (markdownView !== activeMarkdownView) return
-    await renderered
-    markmap.fit()
-  })
+  render().then(() =>
+    markmap.fit())
 
   Callbag.subscribe(renderCodeblocks$, render)
-  return { render }
 
   function render() {
     const markmapOptions = getOptions(settings.merged)
