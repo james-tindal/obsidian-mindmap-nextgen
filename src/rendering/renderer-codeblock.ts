@@ -199,13 +199,11 @@ function SettingsDialog(codeBlock: CodeBlock, body: string, codeBlockSettings: C
     )
   }
 
-  const dialog = new CodeBlockSettingsDialog(fileSettingsProxy, codeBlockProxy)
-
   const button = new ButtonComponent(codeBlock.containerEl.parentElement!)
     .setClass('edit-block-button')
     .setClass('codeblock-settings-button')
     .setIcon('sliders-horizontal')
     .setTooltip('Edit block settings')
 
-  button.onClick(dialog.open)
+  button.onClick(() => new CodeBlockSettingsDialog(fileSettingsProxy, codeBlockProxy).open())
 }
