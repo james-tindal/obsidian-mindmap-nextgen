@@ -15,7 +15,7 @@ import { CodeBlock } from 'src/new/codeBlockHandler'
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
 export function CodeBlockRenderer(codeBlock: CodeBlock) {
-  const { component, containerEl, ctx: { sourcePath }} = codeBlock
+  const { component, containerEl, markdownView, ctx: { sourcePath }} = codeBlock
   const file = getFileByPath(sourcePath)
 
   // createMarkmap should take the full markdown and render
@@ -28,7 +28,6 @@ export function CodeBlockRenderer(codeBlock: CodeBlock) {
     svgs.delete(svg))
   //
 
-  const markdownView = getMarkdownView(codeBlock)
   const fileText = markdownView.editor.getValue()
   const { settings: fileSettings } = splitMarkdown('file', fileText)
   const { settings: codeBlockSettings, body } = splitMarkdown('codeBlock', codeBlock.markdown)
@@ -217,12 +216,4 @@ function getFileByPath(sourcePath: string) {
   const file = app.vault.getFileByPath(sourcePath)
   assert(notNullish, file)
   return file
-}
-
-function getMarkdownView(codeBlock: CodeBlock) {
-  const markdownViewLeaf =
-    app.workspace.getLeavesOfType('markdown')
-    .find(leaf => leaf.containerEl.contains(codeBlock.containerEl))
-  assert(notNullish, markdownViewLeaf)
-  return markdownViewLeaf.view as MarkdownView
 }
