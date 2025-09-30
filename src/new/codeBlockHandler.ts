@@ -1,4 +1,4 @@
-import { MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, MarkdownView } from 'obsidian'
+import { Editor, MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, MarkdownView } from 'obsidian'
 import Callbag from 'src/utilities/callbag'
 import { assert, nextTick, notNullish } from 'src/utilities/utilities'
 
@@ -26,6 +26,7 @@ export interface CodeBlock {
   getSectionInfo(): MarkdownSectionInformation | null
   ctx: MarkdownPostProcessorContext
   markdownView: MarkdownView
+  editor: Editor
 }
 
 export async function codeBlockHandler(markdown: string, containerEl: HTMLElement, ctx: MarkdownPostProcessorContext) {
@@ -36,9 +37,10 @@ export async function codeBlockHandler(markdown: string, containerEl: HTMLElemen
   await nextTick()
 
   const markdownView = getMarkdownView(containerEl)
+  const editor = markdownView.editor
 
   const codeBlock = {
-    component, markdown, containerEl, ctx, markdownView,
+    component, markdown, containerEl, ctx, markdownView, editor,
     getSectionInfo: () => ctx.getSectionInfo(containerEl)
   }
 

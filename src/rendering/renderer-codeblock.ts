@@ -1,4 +1,4 @@
-import { ButtonComponent, Editor, EditorPosition, MarkdownView } from 'obsidian'
+import { ButtonComponent, Editor, EditorPosition } from 'obsidian'
 import autoBind from 'auto-bind'
 import GrayMatter from 'gray-matter'
 
@@ -15,7 +15,7 @@ import { CodeBlock } from 'src/new/codeBlockHandler'
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
 export function CodeBlockRenderer(codeBlock: CodeBlock) {
-  const { component, containerEl, markdownView, ctx: { sourcePath }} = codeBlock
+  const { component, containerEl, markdownView, editor, ctx: { sourcePath }} = codeBlock
   const file = getFileByPath(sourcePath)
 
   // createMarkmap should take the full markdown and render
@@ -28,16 +28,16 @@ export function CodeBlockRenderer(codeBlock: CodeBlock) {
     svgs.delete(svg))
   //
 
-  const fileText = markdownView.editor.getValue()
+  const fileText = editor.getValue()
   const { settings: fileSettings } = splitMarkdown('file', fileText)
   const { settings: codeBlockSettings, body } = splitMarkdown('codeBlock', codeBlock.markdown)
   const rootNode = transformMarkdown(codeBlock.markdown)
-  const settings = new SettingsManager(markdownView, codeBlock, fileSettings, codeBlockSettings)
+  const settings = new SettingsManager(codeBlock, fileSettings, codeBlockSettings)
 
   SizeManager(containerEl, svg, settings)
 
   if (markdownView.getMode() === 'source')
-    SettingsDialog(codeBlock, body, codeBlockSettings, fileSettings, markdownView.editor)
+    SettingsDialog(codeBlock, body, codeBlockSettings, fileSettings, editor)
 
   render().then(() =>
     markmap.fit())
@@ -67,8 +67,7 @@ class SettingsManager {
   }
 
   constructor(
-    private markdownView: MarkdownView,
-    private __codeBlock: CodeBlock,
+    private codeBlock: CodeBlock,
     fileSettings: FileSettings,
     codeBlockSettings: CodeBlockSettings
   ) {
@@ -111,8 +110,8 @@ class SettingsManager {
   }
 
   private updateFrontmatter(update: (settings: CodeBlockSettings) => void) {
-    const editor = this.markdownView.editor
-    const sectionInfo = this.__codeBlock.getSectionInfo()
+    const editor = this.codeBlock.editor
+    const sectionInfo = this.codeBlock.getSectionInfo()
     assert(notNullish, sectionInfo)
     const lineStart = EditorLine(sectionInfo.lineStart + 1)
     const lineEnd   = EditorLine(sectionInfo.lineEnd)
