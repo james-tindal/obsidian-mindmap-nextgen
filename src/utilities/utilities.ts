@@ -81,3 +81,26 @@ export function Resolve<T>(fn: (resolve: (v: T) => void) => void): T {
   fn(resolve)
   return result
 }
+
+type AssertPredicate<In, Out extends In> = ((x: In) => x is Out) & { message?: string}
+export function assert<In, Out extends In>(
+  predicate: AssertPredicate<In, Out>,
+  x: In,
+  message?: string
+): asserts x is Out {
+  if (!predicate(x))
+    throw new Error(predicate.message ?? message ?? predicate.toString())
+}
+
+export const toAssert = <In, Out extends In>(
+  predicate: AssertPredicate<In, Out>,
+  message?: string
+) => (
+  x: In,
+  message_?: string
+) => assert(predicate, x, message ?? message_)
+
+export const notNullish = Object.assign(
+  <T>(x: T): x is NonNullable<T> => x !== null && x !== undefined,
+  { message: 'Must not be null or undefined' }
+)

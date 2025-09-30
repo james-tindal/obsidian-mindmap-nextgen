@@ -3,7 +3,7 @@ import { MindmapSubject } from './layout-manager'
 import views from './views'
 import { globalSettings } from 'src/settings/filesystem'
 import { constructView } from './view-creator'
-import { assert, notNullish } from 'src/utilities/types'
+import { assert, notNullish } from 'src/utilities/utilities'
 
 
 export const leafManager = {
