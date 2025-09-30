@@ -4,12 +4,11 @@ import GrayMatter from 'gray-matter'
 
 import { CodeBlockSettings, FileSettings, globalSettings, GlobalSettings } from 'src/settings/filesystem'
 import { cssClasses } from 'src/constants'
-import { assert, notNullish } from 'src/utilities/types'
+import { assert, isObjectEmpty, notNullish } from 'src/utilities/utilities'
 import { createMarkmap, getOptions, transformMarkdown, splitMarkdown } from 'src/rendering/renderer-common'
 import { renderCodeblocks$ } from 'src/rendering/style-features'
 import Callbag, { dragAndDrop, fromEvent } from 'src/utilities/callbag'
 import { CodeBlockSettingsDialog } from 'src/settings/dialogs'
-import { isObjectEmpty } from 'src/utilities/utilities'
 import { svgs } from 'src/core/main'
 import { CodeBlock } from 'src/new/codeBlockHandler'
 
