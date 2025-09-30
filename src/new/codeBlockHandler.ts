@@ -3,6 +3,26 @@ import Callbag from 'src/utilities/callbag'
 import { assert, defineLazyGetters, nextTick, notNullish } from 'src/utilities/utilities'
 
 
+export async function codeBlockHandler(markdown: string, containerEl: HTMLElement, ctx: MarkdownPostProcessorContext) {
+  const component = new MarkdownRenderChild(containerEl)
+  ctx.addChild(component)
+
+  // containerEl is appended to the DOM after this function returns
+  await nextTick()
+
+  const markdownView = getMarkdownView(containerEl)
+  const editor = markdownView.editor
+
+  const codeBlock = defineLazyGetters({
+    component, markdown, containerEl, ctx, markdownView, editor,
+    getSectionInfo: () => ctx.getSectionInfo(containerEl),
+  }, {
+    file: () => getFileByPath(ctx.sourcePath),
+  })
+
+  registerCodeBlock(codeBlock, component)
+}
+
 const _codeBlockCreated = Callbag.subject<CodeBlock>()
 export const codeBlockCreated = _codeBlockCreated.source
 const _codeBlockDeleted = Callbag.subject<CodeBlock>()
@@ -34,26 +54,6 @@ export interface CodeBlock {
   markdownView: MarkdownView
   editor: Editor
   file: TFile
-}
-
-export async function codeBlockHandler(markdown: string, containerEl: HTMLElement, ctx: MarkdownPostProcessorContext) {
-  const component = new MarkdownRenderChild(containerEl)
-  ctx.addChild(component)
-
-  // containerEl is appended to the DOM after this function returns
-  await nextTick()
-
-  const markdownView = getMarkdownView(containerEl)
-  const editor = markdownView.editor
-
-  const codeBlock = defineLazyGetters({
-    component, markdown, containerEl, ctx, markdownView, editor,
-    getSectionInfo: () => ctx.getSectionInfo(containerEl),
-  }, {
-    file: () => getFileByPath(ctx.sourcePath),
-  })
-
-  registerCodeBlock(codeBlock, component)
 }
 
 function getMarkdownView(containerEl: HTMLElement) {
