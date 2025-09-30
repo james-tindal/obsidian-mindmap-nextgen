@@ -17,21 +17,20 @@ import { CodeBlock } from 'src/new/codeBlockHandler'
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
 export function CodeBlockRenderer(codeBlock: CodeBlock) {
-  const { component, markdown, containerEl, ctx: { sourcePath }} = codeBlock
-  const file = app.vault.getFileByPath(sourcePath)
-  assert(exists, file)
+  const { component, containerEl, ctx: { sourcePath }} = codeBlock
+  const file = getFileByPath(sourcePath)
 
+  // createMarkmap should take the full markdown and render
+  // transformMarkdown should be merged into this
   const { markmap, svg } = createMarkmap({ parent: containerEl, toolbar: false })
+
+  // Leaving this mess here for now. I'm sure it can be removed soon.
   svgs.set(svg, file)
   component.register(() =>
     svgs.delete(svg))
+  //
 
-  const markdownViewLeaf =
-    app.workspace.getLeavesOfType('markdown')
-    .find(leaf => leaf.containerEl.contains(containerEl))
-  assert(exists, markdownViewLeaf)
-  const markdownView = markdownViewLeaf.view as MarkdownView
-
+  const markdownView = getMarkdownView(codeBlock)
   const fileText = markdownView.editor.getValue()
   const { settings: fileSettings } = splitMarkdown('file', fileText)
   const { settings: codeBlockSettings, body } = splitMarkdown('codeBlock', codeBlock.markdown)
@@ -214,4 +213,18 @@ function SettingsDialog(codeBlock: CodeBlock, body: string, codeBlockSettings: C
     .setTooltip('Edit block settings')
 
   button.onClick(dialog.open)
+}
+
+function getFileByPath(sourcePath: string) {
+  const file = app.vault.getFileByPath(sourcePath)
+  assert(exists, file)
+  return file
+}
+
+function getMarkdownView(codeBlock: CodeBlock) {
+  const markdownViewLeaf =
+    app.workspace.getLeavesOfType('markdown')
+    .find(leaf => leaf.containerEl.contains(codeBlock.containerEl))
+  assert(exists, markdownViewLeaf)
+  return markdownViewLeaf.view as MarkdownView
 }
