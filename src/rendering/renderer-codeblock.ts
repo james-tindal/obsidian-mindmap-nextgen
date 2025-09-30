@@ -1,12 +1,11 @@
-import { ButtonComponent, Editor, EditorPosition, getFrontMatterInfo, MarkdownView } from 'obsidian'
+import { ButtonComponent, Editor, EditorPosition, MarkdownView } from 'obsidian'
 import autoBind from 'auto-bind'
 import GrayMatter from 'gray-matter'
-import yaml from 'yaml'
 
 import { CodeBlockSettings, FileSettings, globalSettings, GlobalSettings } from 'src/settings/filesystem'
 import { cssClasses } from 'src/constants'
 import { assert, exists } from 'src/utilities/types'
-import { createMarkmap, getOptions, parseMarkdown } from 'src/rendering/renderer-common'
+import { createMarkmap, getOptions, transformMarkdown, splitMarkdown } from 'src/rendering/renderer-common'
 import { renderCodeblocks$ } from 'src/rendering/style-features'
 import Callbag, { fromEvent, take } from 'src/utilities/callbag'
 import { CodeBlockSettingsDialog } from 'src/settings/dialogs'
@@ -35,12 +34,9 @@ export function CodeBlockRenderer(codeBlock: CodeBlock) {
   const markdownView = markdownViewLeaf.view as MarkdownView
 
   const fileText = markdownView.editor.getValue()
-  const { frontmatter } = getFrontMatterInfo(fileText)
-  const parsed = yaml.parse(frontmatter) ?? {}
-  const fileSettings = ('markmap' in parsed ? parsed.markmap : {}) as FileSettings
-
-  const { rootNode, settings: codeBlockSettings, body } = parseMarkdown<'codeBlock'>(markdown)
-
+  const { settings: fileSettings } = splitMarkdown('file', fileText)
+  const { settings: codeBlockSettings, body } = splitMarkdown('codeBlock', codeBlock.markdown)
+  const rootNode = transformMarkdown(codeBlock.markdown)
   const settings = new SettingsManager(markdownView, codeBlock, fileSettings, codeBlockSettings)
 
   SizeManager(containerEl, svg, settings)

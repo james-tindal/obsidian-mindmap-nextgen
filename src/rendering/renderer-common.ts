@@ -1,15 +1,16 @@
 import { loadJS, loadCSS, INode } from 'markmap-common'
 import { builtInPlugins, IFeatures, Transformer } from 'markmap-lib'
 import { deriveOptions, globalCSS, IMarkmapOptions, Markmap } from 'markmap-view'
+import { Toolbar } from 'markmap-toolbar'
 import { pick } from 'ramda'
-import GrayMatter from 'gray-matter'
+import * as yaml from 'yaml'
 import 'markmap-toolbar/dist/style.css'
 
 import { CodeBlockSettings, FileSettings } from 'src/settings/filesystem'
 import { parseInternalLinks } from 'src/internal-links/parse-internal-links'
 import { embedPlugin } from 'src/embeds/embeds'
-import { Toolbar } from 'markmap-toolbar'
 import { nextTick } from 'src/utilities/utilities'
+import { getFrontMatterInfo } from 'obsidian'
 
 
 const styleEl = createEl('style', {
@@ -26,18 +27,21 @@ nextTick().then(() => {
 
 export const transformer = new Transformer([ ...builtInPlugins, embedPlugin ])
 
-export function parseMarkdown<Type extends 'file' | 'codeBlock'>(text: string) {
-  ;(GrayMatter as typeof GrayMatter & { clearCache: Function }).clearCache()
-  const gm = GrayMatter(text)
-  const frontmatter = gm.data
-  
-  const { root, features } = transformer.transform(gm.content)
+export function transformMarkdown(markdown: string) {
+  const { root, features } = transformer.transform(markdown)
   loadAssets(features)
   parseInternalLinks(root)
+  return root
+}
 
-  const settings = (frontmatter?.markmap || {}) as Type extends 'file' ? FileSettings : CodeBlockSettings
-
-  return { rootNode: root, settings, body: gm.content }
+export function splitMarkdown<Type extends 'file' | 'codeBlock'>(type: Type, markdown: string) {
+  const { frontmatter, contentStart } = getFrontMatterInfo(markdown)
+  const body = markdown.slice(0, contentStart)
+  const parsed = yaml.parse(frontmatter) ?? {}
+  type Settings =
+    Type extends 'file' ? FileSettings : CodeBlockSettings
+  const settings = ('markmap' in parsed ? parsed.markmap : {}) as Settings
+  return { body, settings }
 }
 
 export function loadAssets(features: IFeatures) {
