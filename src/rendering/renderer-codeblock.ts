@@ -9,8 +9,8 @@ import { createMarkmap, getOptions, transformMarkdown, splitMarkdown } from 'src
 import { renderCodeblocks$ } from 'src/rendering/style-features'
 import Callbag, { dragAndDrop, fromEvent } from 'src/utilities/callbag'
 import { CodeBlockSettingsDialog } from 'src/settings/dialogs'
-import { svgs } from 'src/core/main'
 import { CodeBlock } from 'src/new/codeBlockHandler'
+import { svgs } from 'src/internal-links/handle-internal-links'
 
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
@@ -21,11 +21,7 @@ export function CodeBlockRenderer(codeBlock: CodeBlock) {
   // transformMarkdown should be merged into this
   const { markmap, svg } = createMarkmap({ parent: containerEl, toolbar: false })
 
-  // Leaving this mess here for now. I'm sure it can be removed soon.
-  svgs.set(svg, file)
-  component.register(() =>
-    svgs.delete(svg))
-  //
+  svgs.register(component, svg, file)
 
   const fileText = editor.getValue()
   const { settings: fileSettings } = splitMarkdown('file', fileText)

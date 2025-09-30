@@ -4,7 +4,6 @@ import { iife } from 'src/utilities/utilities'
 
 
 export const plugin = __entry.plugin
-export const svgs = new Map()
 
 iife(async () => {
   import('./events')

@@ -1,7 +1,17 @@
-import { plugin, svgs } from 'src/core/main'
+import { Component, TFile } from 'obsidian'
+import { plugin } from 'src/core/main'
 
 
 const workspace = document.querySelector('.workspace' as 'div')!
+
+export const svgs = new class extends Map<SVGSVGElement, TFile> {
+  register(component: Component, svg: SVGSVGElement, file: TFile) {
+    svgs.set(svg, file)
+    component.register(() =>
+      svgs.delete(svg))
+  }
+  // renderer-tab should call register but it can't find its component
+}
 
 const registerEvent = (type: 'click' | 'mouseover', fn: (args: {
   event: MouseEvent
