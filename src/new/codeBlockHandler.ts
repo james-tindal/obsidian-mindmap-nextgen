@@ -1,6 +1,7 @@
 import { Component, Editor, MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, MarkdownView, TFile } from 'obsidian'
 import Callbag from 'src/utilities/callbag'
 import { assert, defineLazyGetters, notNullish } from 'src/utilities/utilities'
+import { Simplify } from 'type-fest'
 
 
 export async function codeBlockHandler(markdown: string, containerEl: HTMLElement, ctx: MarkdownPostProcessorContext) {
@@ -9,9 +10,11 @@ export async function codeBlockHandler(markdown: string, containerEl: HTMLElemen
   const markdownView = getMarkdownView(component)
   const editor = markdownView.editor
 
+  const getSectionInfo = () =>
+    ctx.getSectionInfo(containerEl) as SectionInfo
+
   const codeBlock = defineLazyGetters({
-    component, markdown, containerEl, ctx, markdownView, editor,
-    getSectionInfo: () => ctx.getSectionInfo(containerEl),
+    component, markdown, containerEl, ctx, markdownView, editor, getSectionInfo
   }, {
     file: () => getFileByPath(ctx.sourcePath),
   })
@@ -41,11 +44,13 @@ export const getCodeBlocksByPath = (filePath: string) =>
     codeBlock.ctx.sourcePath === filePath
   )
 
+type SectionInfo = Simplify<NonNullable<MarkdownSectionInformation>>
+
 export interface CodeBlock {
   component: MarkdownRenderChild
   markdown: string
   containerEl: HTMLElement
-  getSectionInfo(): MarkdownSectionInformation | null
+  getSectionInfo(): SectionInfo
   ctx: MarkdownPostProcessorContext
   markdownView: MarkdownView
   editor: Editor
