@@ -53,12 +53,7 @@ export function CodeBlockRenderer(codeBlock: CodeBlock) {
   })
 
   Callbag.subscribe(renderCodeblocks$, render)
-  return { render, updateFileSettings }
-
-  function updateFileSettings(fileSettings: FileSettings) {
-    settings.file = fileSettings
-    render()
-  }
+  return { render }
 
   function render() {
     const markmapOptions = getOptions(settings.merged)
