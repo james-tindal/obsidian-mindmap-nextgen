@@ -1,6 +1,6 @@
 import { Editor, MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, MarkdownView, TFile } from 'obsidian'
 import Callbag from 'src/utilities/callbag'
-import { assert, nextTick, notNullish } from 'src/utilities/utilities'
+import { assert, defineLazyGetters, nextTick, notNullish } from 'src/utilities/utilities'
 
 
 const _codeBlockCreated = Callbag.subject<CodeBlock>()
@@ -40,15 +40,12 @@ export async function codeBlockHandler(markdown: string, containerEl: HTMLElemen
   const markdownView = getMarkdownView(containerEl)
   const editor = markdownView.editor
 
-  const codeBlock = {
+  const codeBlock = defineLazyGetters({
     component, markdown, containerEl, ctx, markdownView, editor,
     getSectionInfo: () => ctx.getSectionInfo(containerEl),
-    get file() {
-      const file = getFileByPath(ctx.sourcePath)
-      Object.defineProperty(codeBlock, 'file', { value: file })
-      return file
-    }
-  }
+  }, {
+    file: () => getFileByPath(ctx.sourcePath),
+  })
 
   _codeBlockCreated.push(codeBlock)
   component.register(() =>

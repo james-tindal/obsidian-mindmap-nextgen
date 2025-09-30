@@ -1,5 +1,6 @@
 import autoBind from 'auto-bind'
 import { curry } from 'ramda'
+import { Merge } from 'type-fest'
 
 type Path<EventName> = [EventName, number]
 
@@ -104,3 +105,34 @@ export const notNullish = Object.assign(
   <T>(x: T): x is NonNullable<T> => x !== null && x !== undefined,
   { message: 'Must not be null or undefined' }
 )
+
+export const defineLazyGetter = <
+  Obj extends object,
+  Key extends string | number | symbol,
+  Value
+>(
+  obj: Obj,
+  key: Key,
+  getter: () => Value
+): Merge<Obj, { [P in Key]: Value }> =>
+  Object.defineProperty(obj, key, {
+    configurable: true,
+    enumerable: true,
+    get() {
+      const value = getter()
+      Object.defineProperty(obj, key, { value, writable: false, enumerable: true })
+      return value
+    }
+  }) as any
+
+export const defineLazyGetters = <
+  Obj extends object,
+  Getters extends Record<string, () => any>
+>(
+  obj: Obj,
+  getters: Getters
+): Merge<Obj, { [K in keyof Getters]: ReturnType<Getters[K]> }> => {
+  for (const key in getters)
+    defineLazyGetter(obj, key, getters[key])
+  return obj as any
+}
