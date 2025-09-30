@@ -1,6 +1,6 @@
-import { MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation } from 'obsidian'
+import { MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, MarkdownView } from 'obsidian'
 import Callbag from 'src/utilities/callbag'
-import { nextTick } from 'src/utilities/utilities'
+import { assert, nextTick, notNullish } from 'src/utilities/utilities'
 
 
 const _codeBlockCreated = Callbag.subject<CodeBlock>()
@@ -21,26 +21,36 @@ export const getCodeBlocksByPath = (filePath: string) =>
 
 export interface CodeBlock {
   component: MarkdownRenderChild
-  markdown: string,
-  containerEl: HTMLElement,
+  markdown: string
+  containerEl: HTMLElement
   getSectionInfo(): MarkdownSectionInformation | null
   ctx: MarkdownPostProcessorContext
+  markdownView: MarkdownView
 }
 
 export async function codeBlockHandler(markdown: string, containerEl: HTMLElement, ctx: MarkdownPostProcessorContext) {
   const component = new MarkdownRenderChild(containerEl)
   ctx.addChild(component)
 
+  // containerEl is appended to the DOM after this function returns
+  await nextTick()
+
+  const markdownView = getMarkdownView(containerEl)
+
   const codeBlock = {
-    component, markdown, containerEl, ctx,
+    component, markdown, containerEl, ctx, markdownView,
     getSectionInfo: () => ctx.getSectionInfo(containerEl)
   }
-
-  // elements aren't added to the DOM until after this function returns.
-  // this puts "codeBlock created" after "tab opened"
-  await nextTick()
 
   _codeBlockCreated.push(codeBlock)
   component.register(() =>
     _codeBlockDeleted.push(codeBlock))
+}
+
+function getMarkdownView(containerEl: HTMLElement) {
+  const markdownViewLeaf =
+    app.workspace.getLeavesOfType('markdown')
+    .find(leaf => leaf.containerEl.contains(containerEl))
+  assert(notNullish, markdownViewLeaf, "Couldn't find MarkdownView containing code block")
+  return markdownViewLeaf.view as MarkdownView
 }
