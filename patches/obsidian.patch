@@ -1,61 +1,50 @@
 diff --git a/obsidian.d.ts b/obsidian.d.ts
-index 6b78a9fde6e03c18f8cf5f7c8ad8f02e706f30f1..15d884a27b0729cdceac5d79b2890d4800e13cdf 100644
+index caeee06ea2205845837d6155c88672d8ac8ce400..fa294f736ead09e823c6c40810d6b7b2375f43a8 100644
 --- a/obsidian.d.ts
 +++ b/obsidian.d.ts
-@@ -1147,43 +1147,15 @@ export interface Debouncer<T extends unknown[], V> {
+@@ -1676,7 +1676,7 @@ export function displayTooltip(newTargetEl: HTMLElement, content: string | Docum
+  * @public
+  * @since 0.9.7
   */
- export function displayTooltip(newTargetEl: HTMLElement, content: string | DocumentFragment, options?: TooltipOptions): void;
- 
--/**
-- * @public
-- */
 -export class DropdownComponent extends ValueComponent<string> {
--    /**
--     * @public
--     */
--    selectEl: HTMLSelectElement;
--
--    /**
--     * @public
--     */
--    constructor(containerEl: HTMLElement);
--    /**
--     * @public
--     */
--    setDisabled(disabled: boolean): this;
--    /**
--     * @public
--     */
--    addOption(value: string, display: string): this;
--    /**
--     * @public
--     */
--    addOptions(options: Record<string, string>): this;
--    /**
--     * @public
--     */
--    getValue(): string;
--    /**
--     * @public
--     */
--    setValue(value: string): this;
--    /**
--     * @public
--     */
--    onChange(callback: (value: string) => any): this;
 +export class DropdownComponent<T extends string = string> extends ValueComponent<T> {
-+    selectEl: HTMLSelectElement
-+    constructor(containerEl: HTMLElement)
-+    onChange(callback: (value: T) => void): this
-+    getValue(): T
-+    setValue(value: T): this
-+    setDisabled(disabled: boolean): this
-+    addOption(value: T, display: string): this
-+    addOptions(options: Record<T, string>): this
+     /**
+      * @public
+      * @since 0.9.7
+@@ -1696,27 +1696,27 @@ export class DropdownComponent extends ValueComponent<string> {
+      * @public
+      * @since 0.9.7
+      */
+-    addOption(value: string, display: string): this;
++    addOption(value: T, display: string): this;
+     /**
+      * @public
+      * @since 0.9.7
+      */
+-    addOptions(options: Record<string, string>): this;
++    addOptions(options: Record<T, string>): this;
+     /**
+      * @public
+      * @since 0.9.7
+      */
+-    getValue(): string;
++    getValue(): T;
+     /**
+      * @public
+      * @since 0.9.7
+      */
+-    setValue(value: string): this;
++    setValue(value: T): this;
+     /**
+      * @public
+      * @since 0.9.7
+      */
+-    onChange(callback: (value: string) => any): this;
++    onChange(callback: (value: T) => any): this;
  }
  
  /**
-@@ -3758,7 +3730,7 @@ export class Setting {
+@@ -5068,7 +5068,7 @@ export class Setting {
      /**
       * @public
       */
@@ -63,13 +52,13 @@ index 6b78a9fde6e03c18f8cf5f7c8ad8f02e706f30f1..15d884a27b0729cdceac5d79b2890d48
 +    constructor(containerEl: Node);
      /**
       * @public
-      */
-@@ -3815,7 +3787,7 @@ export class Setting {
-     /**
+      * @since 0.12.16
+@@ -5139,7 +5139,7 @@ export class Setting {
       * @public
+      * @ince 0.9.7
       */
 -    addDropdown(cb: (component: DropdownComponent) => any): this;
-+    addDropdown<T extends string>(cb: (component: DropdownComponent<T>) => void): this
++    addDropdown<T extends string>(cb: (component: DropdownComponent<T>) => void): this;
      /**
       * @public
-      */
+      * @ince 0.16.0
