@@ -8,28 +8,28 @@ import views from 'src/views/views'
 
 
 export const embedPlugin: ITransformPlugin = {
-  name: 'obsidian-embed',
+  name: 'mmng-embed',
   transform(hooks) {
     hooks.parser.tap(md => {
-      md.inline.ruler.before('emphasis', 'obsidian_embed', (state, silent) => {
+      md.inline.ruler.before('emphasis', 'mmng_embed', (state, silent) => {
         const { matched, length, linkText } = parseMain(state.src.slice(state.pos))
         if (!matched) return false
         if (silent) return true
 
-        const token = state.push('obsidian_embed', 'obsidian-embed', 0)
+        const token = state.push('mmng_embed', 'mmng-embed', 0)
         token.attrSet('linkText', linkText)
 
         state.pos += length
         return true
       })
 
-      md.renderer.rules.obsidian_embed = (tokens, idx) => {
+      md.renderer.rules.mmng_embed = (tokens, idx) => {
         const token = tokens[idx]
         const attrs = (token.attrs || [])
           .map(([key, value]) => `${key}="${value}"`)
           .join(' ')
         
-        return `<obsidian-embed ${attrs}></obsidian-embed>`
+        return `<mmng-embed ${attrs}></mmng-embed>`
       }
     })
 
@@ -61,7 +61,7 @@ class EmbedElement extends HTMLElement {
 
 	async connectedCallback() {
     const linkText = this.getAttribute('linkText')
-    if (!linkText) throw new Error('obsidian-embed component must have a linkText attribute')
+    if (!linkText) throw new Error('mmng-embed component must have a linkText attribute')
 
     const sourcePath = getSourcePath(this)
 
@@ -104,8 +104,9 @@ class EmbedElement extends HTMLElement {
     embedComponent.loadFile()
 	}
 }
-customElements.define('obsidian-embed', EmbedElement)
-
+const alreadyRegistered = !!customElements.get('mmng-embed')
+if (!alreadyRegistered)
+  customElements.define('mmng-embed', EmbedElement)
 
 function deleteText(parent: ParentNode) {
   for (const node of Array.from(parent.childNodes))
