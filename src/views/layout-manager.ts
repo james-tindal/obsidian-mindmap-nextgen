@@ -96,8 +96,6 @@ async function deserialise() {
   app.workspace.setActiveLeaf(activeLeaf)
 
   LoadingView.closeAll()
-
-  await undefined
 }
 
 type Matcher = {
