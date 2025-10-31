@@ -2,8 +2,8 @@ import { getLanguage } from 'obsidian'
 
 const locale = getLanguage()
 const isBritish = locale === 'en-GB'
-const color = isBritish ? 'color' : 'colour'
-const Color = isBritish ? 'Color' : 'Colour'
+const color = isBritish ? 'colour' : 'color'
+const Color = isBritish ? 'Colour' : 'Color'
 
 export default {
   commands: {
