@@ -5,6 +5,7 @@ import { renderTabs$ } from 'src/rendering/style-features'
 import views from 'src/views/views'
 import { fromCommand, fromObsidianEvent } from 'src/utilities/callbag'
 import MindmapTabView from 'src/views/view'
+import { strings } from 'src/translation'
 
 
 export const start = Callbag.create<void>(
@@ -51,8 +52,8 @@ export const [pin, unpin] =
     ]
   )
 
-export const commandOpenUnpinned = fromCommand('mindmapnextgen:unpinned', 'Open unpinned mindmap')
-export const commandOpenPinned = fromCommand('mindmapnextgen:pinned', 'Open pinned mindmap')
+export const commandOpenUnpinned = fromCommand('mindmapnextgen:unpinned', strings.commands.unpinned)
+export const commandOpenPinned = fromCommand('mindmapnextgen:pinned', strings.commands.pinned)
 
 
 Callbag.subscribe(isDarkMode, isDarkMode => {

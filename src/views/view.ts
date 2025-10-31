@@ -2,6 +2,7 @@ import { ItemView, Menu, WorkspaceLeaf } from 'obsidian'
 
 import { MM_VIEW_TYPE } from 'src/constants'
 import { TabRenderer } from 'src/rendering/renderer-tab'
+import { strings } from 'src/translation'
 import Callbag from 'src/utilities/callbag'
 import { Set } from 'src/utilities/set'
 
@@ -50,22 +51,22 @@ export default class MindmapView extends ItemView {
     menu
       .addItem(item => item
         .setIcon('pin')
-        .setTitle(this.pinned ? 'Unpin' : 'Pin')
+        .setTitle(this.pinned ? strings.menu.pin.unpin : strings.menu.pin.pin)
         .onClick(() => this.togglePinned())
       )
       .addItem(item => item
         .setIcon('image-file')
-        .setTitle('Copy screenshot')
+        .setTitle(strings.menu.copyScreenshot)
         .onClick(takeScreenshot)
       )
       .addItem(item => item
         .setIcon('folder')
-        .setTitle('Collapse all')
+        .setTitle(strings.menu.collapseAll)
         .onClick(collapseAll)
       )
       .addItem(item => item
         .setIcon('view')
-        .setTitle(`${toolbar.hidden ? 'Show' : 'Hide'} toolbar`)
+        .setTitle(`${toolbar.hidden ? strings.menu.toolbar.show : strings.menu.toolbar.hide} ${strings.menu.toolbar.toolbar}`)
         .onClick(toolbar.toggle)
       )
 

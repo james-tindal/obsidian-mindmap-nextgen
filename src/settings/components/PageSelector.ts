@@ -2,6 +2,7 @@ import { ButtonComponent, Setting } from 'obsidian'
 import { Component, div, fragment } from './various'
 import { Resolve } from 'src/utilities/utilities'
 import { fromEntries } from 'src/utilities/entries'
+import { strings } from 'src/translation'
 
 type Level = 'global' | 'file' | 'codeBlock'
 export const PageSelector = (initialPage: Level, pages: Record<Level, () => Component>) => (parent: Node) => {
@@ -12,7 +13,7 @@ export const PageSelector = (initialPage: Level, pages: Record<Level, () => Comp
     (['global', 'file', 'codeBlock'] as const)
     .map(level => [level,
       Resolve<ButtonComponent>(resolve => selector.addButton(resolve))
-        .setButtonText(level)
+        .setButtonText(strings.settings.level[level])
         .onClick(() => showPage(level))
     ])
   ) as Record<Level, ButtonComponent>

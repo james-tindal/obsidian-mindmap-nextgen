@@ -2,30 +2,31 @@ import { Setting } from 'obsidian'
 import { CodeBlockSettings, Coloring, FileSettings, globalSettings, GlobalSettings, ScreenshotBgStyle } from 'src/settings/filesystem'
 import { Heading, HtmlComponent, fragment } from './various'
 import { SettingComponent, dropdown, numberText, text } from './SettingComponent'
+import { strings } from 'src/translation'
 
 
 
 // -- SectionGeneral -- //
 
 const SplitDirection = SettingComponent({
-  name: 'Split direction',
-  description: 'Direction to split the window when opening a mindmap',
+  name: strings.settings.settings.splitDirection.name,
+  description: strings.settings.settings.splitDirection.description,
   key: 'splitDirection',
   control: dropdown(
-    ['horizontal', 'Horizontal'],
-    ['vertical', 'Vertical'])
+    ['horizontal', strings.settings.settings.splitDirection.horizontal],
+    ['vertical', strings.settings.settings.splitDirection.vertical])
 })
 
 const HighlightInlineMindmap = SettingComponent({
-  name: 'Highlight inline mindmap',
-  description: 'Use a contrasting background color for inline mindmaps',
+  name: strings.settings.settings.highlight.name,
+  description: strings.settings.settings.highlight.description,
   key: 'highlight',
   control: 'toggle'
 })
 
 const TitleAsRootNode = SettingComponent({
-  name: 'Use title as root node',
-  description: 'When on, the root node of the mindmap will be the title of the document',
+  name: strings.settings.settings.titleAsRootNode.name,
+  description: strings.settings.settings.titleAsRootNode.description,
   key: 'titleAsRootNode',
   control: 'toggle'
 })
@@ -34,66 +35,62 @@ const TitleAsRootNode = SettingComponent({
 
 // -- SectionColoring -- //
 
-const SectionColoringHeading = Heading('Coloring')
+const SectionColoringHeading = Heading(strings.settings.sectionHeadings.coloring)
 
 const ColoringApproach = SettingComponent({
-  name: 'Coloring approach',
+  name: strings.settings.settings.coloring.name,
   key: 'coloring',
   control: dropdown(
-    ['depth', 'Depth-based coloring'],
-    ['branch', 'Branch-based coloring'],
-    ['single', 'Single color'])
+    ['depth', strings.settings.settings.coloring.depth],
+    ['branch', strings.settings.settings.coloring.branch],
+    ['single', strings.settings.settings.coloring.single])
 })
 
 const Description = (approach: Coloring) => 
   HtmlComponent(new Setting(createFragment())
     .setClass('mmng-coloring-approach-description')
-    .setDesc({
-      branch: 'In branch mode, colors are chosen at random',
-      depth: 'In depth mode, branches are colored based on their depth in the mindmap',
-      single: 'In single color mode, all branches are the same color'
-    }[approach])
+    .setDesc(strings.settings.settings.coloring.description[approach])
     .settingEl)
 
 const Color1 = SettingComponent({
-  name: 'Depth 1 color',
-  description: 'Color for the first level of the mindmap',
+  name: strings.settings.settings.depth1Color.name,
+  description: strings.settings.settings.depth1Color.description,
   key: 'depth1Color',
   control: 'colorPicker'
 })
 
 const Color2 = SettingComponent({
-  name: 'Depth 2 color',
-  description: 'Color for the second level of the mindmap',
+  name: strings.settings.settings.depth2Color.name,
+  description: strings.settings.settings.depth2Color.description,
   key: 'depth2Color',
   control: 'colorPicker'
 })
 
 const Color3 = SettingComponent({
-  name: 'Depth 3 color',
-  description: 'Color for the third level of the mindmap',
+  name: strings.settings.settings.depth3Color.name,
+  description: strings.settings.settings.depth3Color.description,
   key: 'depth3Color',
   control: 'colorPicker'
 })
 
 const ColorDefault = SettingComponent({
-  name: 'Default color',
-  description: 'Color for fourth level and beyond',
+  name: strings.settings.settings.defaultColor.name,
+  description: strings.settings.settings.defaultColor.description,
   key: 'defaultColor',
   control: 'colorPicker'
 })
 
 const ColorSingle = SettingComponent({
-  name: 'Color',
+  name: strings.settings.settings.defaultColor.singleName,
   key: 'defaultColor',
   control: 'colorPicker'
 })
 
 const ColorFreezeLevel = SettingComponent({
-  name: 'Color freeze level',
-  description: 'All child branches will use the color of their ancestor node beyond the freeze level',
+  name: strings.settings.settings.colorFreezeLevel.name,
+  description: strings.settings.settings.colorFreezeLevel.description,
   key: 'colorFreezeLevel',
-  control: numberText('Example: 3')
+  control: numberText(strings.settings.settings.colorFreezeLevel.placeholder)
 })
 
 
@@ -176,28 +173,31 @@ const SectionColoringHeritable = (inherit: GlobalSettings, partial: Partial<Glob
 
 // -- SectionThickness -- //
 
-const SectionThicknessHeading = Heading('Line thickness', 'Measured in pixels')
+const SectionThicknessHeading = Heading(
+  strings.settings.sectionHeadings.thickness.heading,
+  strings.settings.sectionHeadings.thickness.subHeading,
+)
 
 const Thickness1 = SettingComponent({
-  name: 'Depth 1',
+  name: strings.settings.settings.depth1Thickness,
   key: 'depth1Thickness',
   control: 'text'
 })
 
 const Thickness2 = SettingComponent({
-  name: 'Depth 2',
+  name: strings.settings.settings.depth2Thickness,
   key: 'depth2Thickness',
   control: 'text'
 })
 
 const Thickness3 = SettingComponent({
-  name: 'Depth 3',
+  name: strings.settings.settings.depth3Thickness,
   key: 'depth3Thickness',
   control: 'text'
 })
 
 const ThicknessDefault = SettingComponent({
-  name: 'Default',
+  name: strings.settings.settings.defaultThickness,
   key: 'defaultThickness',
   control: 'text'
 })
@@ -206,12 +206,15 @@ const ThicknessDefault = SettingComponent({
 
 // -- SectionScreenshots -- //
 
-const SectionScreenshotsHeading = Heading('Screenshots', 'Choose how you want your screenshots to look')
+const SectionScreenshotsHeading = Heading(
+  strings.settings.sectionHeadings.screenshots.heading,
+  strings.settings.sectionHeadings.screenshots.subHeading,
+)
 
 const ScreenshotTextColor = (settings: Pick<GlobalSettings, 'screenshotTextColor' | 'screenshotTextColorEnabled'>) =>
   HtmlComponent(new Setting(createFragment())
-    .setName('Screenshot text color')
-    .setDesc('Text color for the screenshot. Toggle the switch on and off to disable/enable this color on the screenshot')
+    .setName(strings.settings.settings.screenshotTextColor.name)
+    .setDesc(strings.settings.settings.screenshotTextColor.description)
     .addColorPicker(colPicker => colPicker
       .setValue(settings.screenshotTextColor)
       .onChange(value =>
@@ -225,13 +228,13 @@ const ScreenshotTextColor = (settings: Pick<GlobalSettings, 'screenshotTextColor
 
 const ScreenshotBackgroundStyle = (settings: Pick<GlobalSettings, 'screenshotBgStyle' | 'screenshotBgColor'>) =>
   HtmlComponent(new Setting(createFragment())
-    .setName('Screenshot background style')
-    .setDesc('Select the background style for the screenshot, when using "Color" the color picker value will be used')
+    .setName(strings.settings.settings.screenshotBgStyle.name)
+    .setDesc(strings.settings.settings.screenshotBgStyle.description)
     .addDropdown<ScreenshotBgStyle>(dropdown => dropdown
       .addOptions({
-        [ScreenshotBgStyle.Transparent]: 'Transparent',
-        [ScreenshotBgStyle.Color]: 'Color',
-        [ScreenshotBgStyle.Theme]: 'Theme',
+        [ScreenshotBgStyle.Transparent]: strings.settings.settings.screenshotBgStyle.transparent,
+        [ScreenshotBgStyle.Color]: strings.settings.settings.screenshotBgStyle.color,
+        [ScreenshotBgStyle.Theme]: strings.settings.settings.screenshotBgStyle.theme,
       })
       .setValue(settings.screenshotBgStyle)
       .onChange(value =>
@@ -245,63 +248,65 @@ const ScreenshotBackgroundStyle = (settings: Pick<GlobalSettings, 'screenshotBgS
 
 // -- SectionMarkmap -- //
 
-const SectionMarkmapHeading = Heading('Markmap settings', 'Settings for adjusting how Markmap draws the mindmaps')
+const SectionMarkmapHeading = Heading(
+  strings.settings.sectionHeadings.markmap.heading,
+  strings.settings.sectionHeadings.markmap.subHeading,
+)
 
 const NodeMinHeight = SettingComponent({
-  name: 'Node Min Height',
-  description: 'Minimum height for the mindmap nodes',
+  name: strings.settings.settings.nodeMinHeight.name,
+  description: strings.settings.settings.nodeMinHeight.description,
   key: 'nodeMinHeight',
-  control: numberText('Example: 16')
+  control: numberText(strings.settings.settings.nodeMinHeight.placeholder),
 })
 
 const NodeTextLineHeight = SettingComponent({
-  name: 'Node Text Line Height',
-  description: 'Line height for content in mindmap nodes',
+  name: strings.settings.settings.lineHeight.name,
+  description: strings.settings.settings.lineHeight.description,
   key: 'lineHeight',
-  control: text('Example: 1em')
+  control: numberText(strings.settings.settings.lineHeight.placeholder),
 })
 
 const VerticalSpacing = SettingComponent({
-  name: 'Vertical Spacing',
-  description: 'Vertical spacing of the mindmap nodes',
+  name: strings.settings.settings.spacingVertical.name,
+  description: strings.settings.settings.spacingVertical.description,
   key: 'spacingVertical',
-  control: numberText('Example: 5')
+  control: numberText(strings.settings.settings.spacingVertical.placeholder),
 })
 
 const HorizontalSpacing = SettingComponent({
-  name: 'Horizontal Spacing',
-  description: 'Horizontal spacing of the mindmap nodes',
+  name: strings.settings.settings.spacingHorizontal.name,
+  description: strings.settings.settings.spacingHorizontal.description,
   key: 'spacingHorizontal',
-  control: numberText('Example: 80')
+  control: numberText(strings.settings.settings.spacingHorizontal.placeholder),
 })
 
 const HorizontalPadding = SettingComponent({
-  name: 'Horizontal padding',
-  description: 'Leading space before the content of mindmap nodes',
+  name: strings.settings.settings.paddingX.name,
+  description: strings.settings.settings.paddingX.description,
   key: 'paddingX',
-  control: numberText('Example: 8')
+  control: numberText(strings.settings.settings.paddingX.placeholder),
 })
 
 const InitialExpandLevel = SettingComponent({
-  name: 'Initial expand level',
-  description: 'Sets the initial depth of the mindmap. 0 means all nodes are collapsed, '
-             + '1 means only the root node is expanded, etc. To expand all nodes, set this to -1',
+  name: strings.settings.settings.initialExpandLevel.name,
+  description: strings.settings.settings.initialExpandLevel.description,
   key: 'initialExpandLevel',
-  control: numberText('Example: 2')
+  control: numberText(strings.settings.settings.initialExpandLevel.placeholder),
 })
 
 const AnimationDuration = SettingComponent({
-  name: 'Animation duration',
-  description: 'The animation duration when folding/unfolding a node',
+  name: strings.settings.settings.animationDuration.name,
+  description: strings.settings.settings.animationDuration.description,
   key: 'animationDuration',
-  control: numberText('Example: 500')
+  control: numberText(strings.settings.settings.animationDuration.placeholder),
 })
 
 const MaxWidth = SettingComponent({
-  name: 'Max width',
-  description: 'The max width of each node. 0 for no limit',
+  name: strings.settings.settings.maxWidth.name,
+  description: strings.settings.settings.maxWidth.description,
   key: 'maxWidth',
-  control: numberText('Example: 130')
+  control: numberText(strings.settings.settings.maxWidth.placeholder),
 })
 
 
