@@ -1,8 +1,8 @@
 diff --git a/obsidian.d.ts b/obsidian.d.ts
-index caeee06ea2205845837d6155c88672d8ac8ce400..fa294f736ead09e823c6c40810d6b7b2375f43a8 100644
+index 73bb2491f416649b1772cbd04b68ed9433707dab..9877b563ccd49b4b74e76adce3758011d9895664 100644
 --- a/obsidian.d.ts
 +++ b/obsidian.d.ts
-@@ -1676,7 +1676,7 @@ export function displayTooltip(newTargetEl: HTMLElement, content: string | Docum
+@@ -1702,7 +1702,7 @@ export function displayTooltip(newTargetEl: HTMLElement, content: string | Docum
   * @public
   * @since 0.9.7
   */
@@ -11,7 +11,7 @@ index caeee06ea2205845837d6155c88672d8ac8ce400..fa294f736ead09e823c6c40810d6b7b2
      /**
       * @public
       * @since 0.9.7
-@@ -1696,27 +1696,27 @@ export class DropdownComponent extends ValueComponent<string> {
+@@ -1722,27 +1722,27 @@ export class DropdownComponent extends ValueComponent<string> {
       * @public
       * @since 0.9.7
       */
@@ -44,7 +44,7 @@ index caeee06ea2205845837d6155c88672d8ac8ce400..fa294f736ead09e823c6c40810d6b7b2
  }
  
  /**
-@@ -5068,7 +5068,7 @@ export class Setting {
+@@ -5182,7 +5182,7 @@ export class Setting {
      /**
       * @public
       */
@@ -53,7 +53,7 @@ index caeee06ea2205845837d6155c88672d8ac8ce400..fa294f736ead09e823c6c40810d6b7b2
      /**
       * @public
       * @since 0.12.16
-@@ -5139,7 +5139,7 @@ export class Setting {
+@@ -5253,7 +5253,7 @@ export class Setting {
       * @public
       * @ince 0.9.7
       */
