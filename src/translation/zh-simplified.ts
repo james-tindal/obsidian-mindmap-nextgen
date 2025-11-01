@@ -1,156 +1,163 @@
+// import { getLanguage } from 'obsidian'
+// const locale = getLanguage()
+// locale string value is based on: https://github.com/obsidianmd/obsidian-translations?tab=readme-ov-file#existing-languages
+// 'zh' is simplified Chinese, 'zh-TW' is traditional Chinese
+// const isSimplifiedChinese = locale === 'zh'
+// const isTraditionalChinese = locale.endsWith('TW')
+
 export default {
   commands: {
-    unpinned: 'Open unpinned mindmap',
-    pinned: 'Open pinned mindmap',
+    unpinned: '打开‘非固定模式’思维导图',
+    pinned: '打开‘固定模式’思维导图',
   },
   menu: {
-    copyScreenshot: 'Copy screenshot',
-    collapseAll: 'Collapse all',
+    copyScreenshot: '复制截图',
+    collapseAll: '折叠所有',
     toolbar: {
-      toolbar: 'toolbar',
-      show: 'Show',
-      hide: 'Hide',
+      toolbar: '工具栏',
+      show: '显示',
+      hide: '隐藏',
     },
     pin: {
-      pin: 'Pin',
-      unpin: 'Unpin',
+      pin: '固定',
+      unpin: '取消固定',
     }
   },
-  fileSettingsButton: 'Edit mindmap settings',
+  fileSettingsButton: '编辑思维导图',
   settings: {
     explanations: {
       file: [
-        'To adjust settings for an individual file, click the',
-        'button in the top-right corner of a Markdown or Mindmap tab.',
+        '要调整单个文件的设置，请点击',
+        '按钮(位于Markdown或Mindmap标签右上角)',
       ],
       codeBlock: [
-        'To modify settings for each code block, hover over it and click the',
-        'button that appears in the top-right corner.',
+        '要修改每个代码块的设置，请将鼠标悬停在上面并点击',
+        '右上角的按钮',
       ],
     },
     level: {
-      global: 'global',
-      file: 'file',
-      codeBlock: 'codeBlock',
+      global: '全局',
+      file: '文件',
+      codeBlock: '代码块',
     },
     sectionHeadings: {
-      coloring: 'Coloring',
+      coloring: '配色',
       thickness: {
-        heading: 'Thickness',
-        subHeading: 'Measured in pixels'
+        heading: '字体粗细',
+        subHeading: '单位（像素）'
       },
       screenshots: {
-        heading: 'Screenshots',
-        subHeading: 'Choose how you want your screenshots to look',
+        heading: '截图',
+        subHeading: '选择你想要的截图样式',
       },
       markmap: {
-        heading: 'Markmap settings',
-        subHeading: 'Settings for adjusting how Markmap draws the mindmaps',
+        heading: 'Markmap 设置',
+        subHeading: '调整Markup绘制思维导图的细节',
       },
     },
     settings: {
       splitDirection: {
-        name: 'Split direction',
-        description: 'Direction to split the window when opening a mindmap',
-        horizontal: 'Horizontal',
-        vertical: 'Vertical',
+        name: '分割方向',
+        description: '打开思维导图时分割窗口的方向',
+        horizontal: '水平',
+        vertical: '垂直',
       },
       highlight: {
-        name: 'Highlight inline mindmap',
-        description: 'Use a contrasting background color for inline mindmaps',
+        name: '高亮内联思维导图',
+        description: '使用高对比背景颜色用于内联思维导图',
       },
       titleAsRootNode: {
-        name: 'Use title as root node',
-        description: 'When on, the root node of the mindmap will be the title of the document',
+        name: '使用标题作为根节点',
+        description: '启用后，思维导图的根节点将使用文档的标题',
       },
       coloring: {
-        name: 'Coloring approach',
-        depth: 'Depth-based coloring',
-        branch: 'Branch-based coloring',
-        single: 'Single color',
+        name: '配色方案',
+        depth: '基于深度的配色',
+        branch: '基于分支的配色',
+        single: '单色配色',
         description: {
-          branch: 'In branch mode, colors are chosen at random',
-          depth: 'In depth mode, branches are colored based on their depth in the mindmap',
-          single: 'In single color mode, all branches are the same color'
+          branch: '在分支配色模式下，颜色是随机选择的',
+          depth: '在基于深度的配色模式下，分支根据其在思维导图中的深度着色',
+          single: '在单色配色模式下，所有分支都是相同的颜色'
         },
       },
       depth1Color: {
-        name: 'Depth 1 color',
-        description: 'Color for the first level of the mindmap',
+        name: '深度1颜色',
+        description: '思维导图第一层级的颜色',
       },
       depth2Color: {
-        name: 'Depth 2 color',
-        description: 'Color for the second level of the mindmap',
+        name: '深度2颜色',
+        description: '思维导图第二层级的颜色',
       },
       depth3Color: {
-        name: 'Depth 3 color',
-        description: 'Color for the third level of the mindmap',
+        name: '深度3颜色',
+        description: '思维导图第三层级的颜色',
       },
       defaultColor: {
-        singleName: 'Color',
-        name: 'Default color',
-        description: 'Color for fourth level and beyond',
+        singleName: '颜色',
+        name: '默认颜色',
+        description: '思维导图第四层级及以上的颜色',
       },
       colorFreezeLevel: {
-        name: 'Color freeze level',
-        description: 'All child branches will use the color of their ancestor node beyond the freeze level',
-        placeholder: 'Example: 3'
+        name: '颜色冻结层级',
+        description: '超过冻结层级的子分支将使用其上级节点的颜色',
+        placeholder: '示例: 3'
       },
-      depth1Thickness: 'Depth 1',
-      depth2Thickness: 'Depth 2',
-      depth3Thickness: 'Depth 3',
-      defaultThickness: 'Default',
+      depth1Thickness: '深度1',
+      depth2Thickness: '深度2',
+      depth3Thickness: '深度3',
+      defaultThickness: '默认',
       screenshotTextColor: {
-        name: 'Screenshot text color',
-        description: 'Text color for the screenshot. Toggle the switch on and off to disable/enable this color on the screenshot',
+        name: '截图文本颜色',
+        description: '截图文本的颜色。切换开关在截图上禁用/启用该颜色',
       },
       screenshotBgStyle: {
-        name: 'Screenshot background style',
-        description: 'Select the background style for the screenshot, when using "Color" the color picker value will be used',
-        transparent: 'Transparent',
-        color: 'Color',
-        theme: 'Theme',
+        name: '截图背景样式',
+        description: '选择截图的背景样式, 当使用特定颜色时, 将使用选定的颜色',
+        transparent: '透明',
+        color: '颜色',
+        theme: '主题',
       },
       nodeMinHeight: {
-        name: 'Node Min Height',
-        description: 'Minimum height for the mindmap nodes',
-        placeholder: 'Example: 16',
+        name: '节点最小高度',
+        description: '思维导图节点的最小高度',
+        placeholder: '示例: 16',
       },
       lineHeight: {
-        name: 'Node Text Line Height',
-        description: 'Line height for content in mindmap nodes',
-        placeholder: 'Example: 1em',
+        name: '节点文本行高',
+        description: '思维导图节点文本的行高',
+        placeholder: '示例: 1em',
       },
       spacingVertical: {
-        name: 'Vertical Spacing',
-        description: 'Vertical spacing of the mindmap nodes',
-        placeholder: 'Example: 5',
+        name: '垂直间距',
+        description: '思维导图节点之间的垂直间距',
+        placeholder: '示例: 5',
       },
       spacingHorizontal: {
-        name: 'Horizontal Spacing',
-        description: 'Horizontal spacing of the mindmap nodes',
-        placeholder: 'Example: 80',
+        name: '水平间距',
+        description: '思维导图节点之间的水平间距',
+        placeholder: '示例: 80',
       },
       paddingX: {
-        name: 'Horizontal padding',
-        description: 'Leading space before the content of mindmap nodes',
-        placeholder: 'Example: 8',
+        name: '水平内边距',
+        description: '思维导图节点内容前的间距',
+        placeholder: '示例: 8',
       },
       initialExpandLevel: {
-        name: 'Initial expand level',
-        description: 'Sets the initial depth of the mindmap. 0 means all nodes are collapsed, '
-                   + '1 means only the root node is expanded, etc. To expand all nodes, set this to -1',
-        placeholder: 'Example: 2',
+        name: '初始展开层级',
+        description: '设置思维导图的初始展开层级。0表示所有节点折叠, '
+                   + '1表示只有根节点展开, 以此类推。要展开所有节点，设置为-1',
+        placeholder: '示例: 2',
       },
       animationDuration: {
-        name: 'Animation duration',
-        description: 'The animation duration when folding/unfolding a node',
-        placeholder: 'Example: 500',
+        name: '动画时长',
+        description: '折叠/展开一个节点时的动画时长',
+        placeholder: '示例: 500',
       },
       maxWidth: {
-        name: 'Max width',
-        description: 'The max width of each node. 0 for no limit',
-        placeholder: 'Example: 130',
+        name: '最大宽度',
+        description: '每个节点的最大宽度。0表示无限制',
+        placeholder: '示例: 130',
       },
     },
   },
