@@ -1,10 +1,3 @@
-// import { getLanguage } from 'obsidian'
-// const locale = getLanguage()
-// locale string value is based on: https://github.com/obsidianmd/obsidian-translations?tab=readme-ov-file#existing-languages
-// 'zh' is simplified Chinese, 'zh-TW' is traditional Chinese
-// const isSimplifiedChinese = locale === 'zh'
-// const isTraditionalChinese = locale.endsWith('TW')
-
 export default {
   commands: {
     unpinned: '打开‘非固定模式’思维导图',
