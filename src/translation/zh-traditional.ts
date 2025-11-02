@@ -16,8 +16,8 @@ export default {
       unpin: '取消固定',
     }
   },
-  fileSettingsButton: '編輯思維導圖',
-  blockSettingsButton: 'Edit block settings',
+  fileSettingsButton: '文件級別設置',
+  blockSettingsButton: '代碼框級別設置',
   settings: {
     explanations: {
       file: [

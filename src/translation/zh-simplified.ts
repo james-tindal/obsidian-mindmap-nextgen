@@ -16,8 +16,8 @@ export default {
       unpin: '取消固定',
     }
   },
-  fileSettingsButton: '编辑思维导图',
-  blockSettingsButton: 'Edit block settings',
+  fileSettingsButton: '文件级别设置',
+  blockSettingsButton: '代码框级别设置',
   settings: {
     explanations: {
       file: [
