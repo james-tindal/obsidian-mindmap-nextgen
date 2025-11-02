@@ -11,6 +11,7 @@ import Callbag, { dragAndDrop, fromEvent } from 'src/utilities/callbag'
 import { CodeBlockSettingsDialog } from 'src/settings/dialogs'
 import { CodeBlock } from 'src/new/codeBlockHandler'
 import { svgs } from 'src/internal-links/handle-internal-links'
+import { strings } from 'src/translation'
 
 
 export type CodeBlockRenderer = ReturnType<typeof CodeBlockRenderer>
@@ -199,7 +200,7 @@ function SettingsDialog(codeBlock: CodeBlock, body: string, codeBlockSettings: C
     .setClass('edit-block-button')
     .setClass('codeblock-settings-button')
     .setIcon('sliders-horizontal')
-    .setTooltip('Edit block settings')
+    .setTooltip(strings.blockSettingsButton)
 
   button.onClick(() => new CodeBlockSettingsDialog(fileSettingsProxy, codeBlockProxy).open())
 }

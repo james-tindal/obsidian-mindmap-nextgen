@@ -17,6 +17,7 @@ export default {
     }
   },
   fileSettingsButton: '编辑思维导图',
+  blockSettingsButton: 'Edit block settings',
   settings: {
     explanations: {
       file: [
