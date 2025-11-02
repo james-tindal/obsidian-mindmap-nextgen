@@ -52,7 +52,7 @@ export default {
       },
       markmap: {
         heading: 'Markmap 设置',
-        subHeading: '调整Markup绘制思维导图的细节',
+        subHeading: '调整Markmap绘制思维导图的细节',
       },
     },
     settings: {
