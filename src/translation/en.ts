@@ -24,6 +24,7 @@ export default {
     }
   },
   fileSettingsButton: 'Edit mindmap settings',
+  blockSettingsButton: 'Edit block settings',
   settings: {
     explanations: {
       file: [

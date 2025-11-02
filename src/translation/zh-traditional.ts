@@ -17,6 +17,7 @@ export default {
     }
   },
   fileSettingsButton: '編輯思維導圖',
+  blockSettingsButton: 'Edit block settings',
   settings: {
     explanations: {
       file: [
