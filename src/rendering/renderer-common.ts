@@ -8,6 +8,7 @@ import 'markmap-toolbar/dist/style.css'
 
 import { CodeBlockSettings, FileSettings } from 'src/settings/filesystem'
 import { parseInternalLinks } from 'src/internal-links/parse-internal-links'
+import { parseNodeParams } from 'src/node-params/parse-node-params'
 import { embedPlugin } from 'src/embeds/embeds'
 import { nextTick } from 'src/utilities/utilities'
 import { getFrontMatterInfo } from 'obsidian'
@@ -31,6 +32,7 @@ export function transformMarkdown(markdown: string) {
   const { root, features } = transformer.transform(markdown)
   loadAssets(features)
   parseInternalLinks(root)
+  parseNodeParams(root)
   return root
 }
 
@@ -52,12 +54,16 @@ export function loadAssets(features: IFeatures) {
     !s.data?.href.contains('@highlightjs') ))
 }
 
+function withNodeColor(fn: (node: INode) => string) {
+  return (node: INode) => (node.payload?.nodeColor as string | undefined) ?? fn(node)
+}
+
 export function getOptions(settings: CodeBlockSettings): Partial<IMarkmapOptions> {
   const { color: branchColoring } = deriveOptions(pick(['color', 'colorFreezeLevel'], settings))
   const colorFn = {
-    branch: branchColoring,
-    depth: depthColoring(settings),
-    single: () => settings.defaultColor
+    branch: branchColoring ? withNodeColor(branchColoring) : undefined,
+    depth: withNodeColor(depthColoring(settings)),
+    single: withNodeColor(() => settings.defaultColor)
   }[settings.coloring]
 
   return {
@@ -77,7 +83,7 @@ export function getOptions(settings: CodeBlockSettings): Partial<IMarkmapOptions
 }
 
 export function depthColoring(settings: CodeBlockSettings) {
-  return ({ state: { depth }}: INode) => {
+  return ({ state: { depth } }: INode) => {
     if (settings.color?.length)
       return settings.color[depth % settings.color.length]
 
