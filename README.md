@@ -18,6 +18,7 @@ Obsidian plugin to view your notes as mindmaps using [Markmap](https://markmap.j
   + [Checkboxes](#checkboxes)
   + [LaTeX](#latex)
   + [Syntax Highlighting](#syntax-highlighting)
+  + [Per-node styling and folding](#per-node-styling-and-folding)
 + [Frontmatter](#frontmatter)
 + [Settings](#settings)
   + [Coloring approaches](#coloring-approaches)
@@ -111,6 +112,31 @@ Put the css file in your [Snippets](https://help.obsidian.md/Extending+Obsidian/
 
 tokyo-dark is a nice pair of themes for light and dark mode.
 Mindmap Nextgen is not yet able to switch between light and dark mode syntax highlighting automatically
+
+
+### Per-node styling and folding
+
+You can style individual nodes and control their folding using inline HTML comments with CSS-style declarations:
+
+```markdown
+# Project <!-- nodeColor: #663366 -->
+## Risks <!-- bgColor: red; color: white; fold: this -->
+- Item one
+- Item two
+## Goals <!-- nodeColor: #2e86de; fold: tree -->
+### Short term
+### Long term
+```
+
+**Supported parameters:**
+
+| Parameter | Effect | Propagates to children |
+|-----------|--------|----------------------|
+| `nodeColor` | Branch line/circle color | ✅ Yes |
+| `bgColor` | Node label background | ❌ No |
+| `color` | Node label text color | ❌ No |
+| `fold: this` | Collapse this node by default | ❌ No |
+| `fold: tree` | Collapse this node and all descendants | ❌ No |
 
 
 ## Frontmatter
