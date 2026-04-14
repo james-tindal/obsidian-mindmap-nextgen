@@ -52,7 +52,7 @@ if (!Promise.withResolvers)
     return { promise, resolve, reject } as any
   }
 
-export const nextTick = () => new Promise<void>(setImmediate)
+export const nextTick = () => Promise.resolve()
 
 export function* genLog<T>(message: string, generator: Generator<T>) {
   let count = 0

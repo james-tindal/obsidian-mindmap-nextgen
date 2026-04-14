@@ -21,7 +21,8 @@
   },
   "include": [
     "**/*.ts",
-    "src/types"
+    "src/types",
+    "webpack.config.mts"
   ],
   "exclude": [
     "node_modules/"
