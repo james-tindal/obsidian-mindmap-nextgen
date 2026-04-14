@@ -8,7 +8,7 @@ import 'markmap-toolbar/dist/style.css'
 
 import { CodeBlockSettings, FileSettings } from 'src/settings/filesystem'
 import { parseInternalLinks } from 'src/internal-links/parse-internal-links'
-import { parseNodeParams } from 'src/node-params/parse-node-params'
+import { nodeParams } from 'src/node-params/parse-node-params'
 import { embedPlugin } from 'src/embeds/embeds'
 import { nextTick } from 'src/utilities/utilities'
 import { getFrontMatterInfo } from 'obsidian'
@@ -32,7 +32,7 @@ export function transformMarkdown(markdown: string) {
   const { root, features } = transformer.transform(markdown)
   loadAssets(features)
   parseInternalLinks(root)
-  parseNodeParams(root)
+  nodeParams(root)
   return root
 }
 
