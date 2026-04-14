@@ -8,7 +8,7 @@ import 'markmap-toolbar/dist/style.css'
 
 import { CodeBlockSettings, FileSettings } from 'src/settings/filesystem'
 import { parseInternalLinks } from 'src/internal-links/parse-internal-links'
-import { nodeParams } from 'src/node-params/parse-node-params'
+import { nodeParams } from 'src/node-params/node-params'
 import { embedPlugin } from 'src/embeds/embeds'
 import { nextTick } from 'src/utilities/utilities'
 import { getFrontMatterInfo } from 'obsidian'
