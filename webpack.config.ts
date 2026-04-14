@@ -9,7 +9,7 @@ const config: CallableWebpackConfiguration = (env, argv) => ({
   mode: getMode(argv.mode),
   entry: './src/core/entry.ts',
   output: {
-    path: resolve(import.meta.dirname, argv.mode === 'production' ? '.' : testPluginRoute),
+    path: resolve(__dirname, argv.mode === 'production' ? '.' : testPluginRoute),
     filename: 'main.js',
     libraryTarget: 'commonjs',
   },
