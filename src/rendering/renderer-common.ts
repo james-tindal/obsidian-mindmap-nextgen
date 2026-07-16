@@ -106,7 +106,7 @@ export function createMarkmap({ parent, toolbar }: { parent: ParentNode, toolbar
   // Slow down Ctrl+scroll zoom speed
   markmap.zoom.wheelDelta(event => {
     const baseDelta = -event.deltaY * (event.deltaMode ? 120 : 1) / 500
-    return event.ctrlKey ? baseDelta * 0.3 : baseDelta
+    return (event.ctrlKey || event.metaKey) ? baseDelta * 0.3 : baseDelta
   })
 
   parent.append(svg)
