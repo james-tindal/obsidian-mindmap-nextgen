@@ -153,6 +153,10 @@ export default {
         description: '每个节点的最大宽度。0表示无限制',
         placeholder: '示例: 130',
       },
+      scrollForPan: {
+        name: '滚轮滑动页面',
+        description: '使用鼠标滚轮滚动页面，而不是缩放思维导图',
+      },
     },
   },
 }

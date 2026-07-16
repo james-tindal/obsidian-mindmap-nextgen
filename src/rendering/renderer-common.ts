@@ -70,6 +70,7 @@ export function getOptions(settings: CodeBlockSettings): Partial<IMarkmapOptions
     autoFit: false,
     fitRatio: 1,
     duration: settings.animationDuration,
+    scrollForPan: settings.scrollForPan,
     ...pick([
       'initialExpandLevel',
       'maxWidth',
@@ -101,6 +102,13 @@ export function createMarkmap(options: { parent: ParentNode, toolbar: true }): {
 export function createMarkmap({ parent, toolbar }: { parent: ParentNode, toolbar: boolean }): any {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
   const markmap = Markmap.create(svg, { embedGlobalCSS: false })
+
+  // Slow down Ctrl+scroll zoom speed
+  markmap.zoom.wheelDelta(event => {
+    const baseDelta = -event.deltaY * (event.deltaMode ? 120 : 1) / 500
+    return (event.ctrlKey || event.metaKey) ? baseDelta * 0.3 : baseDelta
+  })
+
   parent.append(svg)
 
   if (toolbar) {

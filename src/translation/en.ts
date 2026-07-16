@@ -160,6 +160,10 @@ export default {
         description: 'The max width of each node. 0 for no limit',
         placeholder: 'Example: 130',
       },
+      scrollForPan: {
+        name: 'Scroll for pan',
+        description: 'Use mouse wheel to scroll the page instead of zooming the mindmap',
+      },
     },
   },
 }

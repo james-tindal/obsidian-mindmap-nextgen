@@ -46,7 +46,7 @@ export function CodeBlockRenderer(codeBlock: CodeBlock) {
 
     const { classList } = containerEl.parentElement!
     settings.merged.highlight
-      ? classList.add   (cssClasses.highlight)
+      ? classList.add(cssClasses.highlight)
       : classList.remove(cssClasses.highlight)
 
     return promise
@@ -110,7 +110,7 @@ class SettingsManager {
     const sectionInfo = this.codeBlock.getSectionInfo()
     assert(notNullish, sectionInfo)
     const lineStart = EditorLine(sectionInfo.lineStart + 1)
-    const lineEnd   = EditorLine(sectionInfo.lineEnd)
+    const lineEnd = EditorLine(sectionInfo.lineEnd)
 
     const text = editor.getRange(lineStart, lineEnd)
 
@@ -183,7 +183,7 @@ function SettingsDialog(codeBlock: CodeBlock, body: string, codeBlockSettings: C
     const sectionInfo = codeBlock.getSectionInfo()
     assert(notNullish, sectionInfo)
     const lineStart = EditorLine(sectionInfo.lineStart + 1)
-    const lineEnd   = EditorLine(sectionInfo.lineEnd)
+    const lineEnd = EditorLine(sectionInfo.lineEnd)
 
     const text = editor.getRange(lineStart, lineEnd)
 
