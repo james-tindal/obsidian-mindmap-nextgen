@@ -70,6 +70,7 @@ export function getOptions(settings: CodeBlockSettings): Partial<IMarkmapOptions
     autoFit: false,
     fitRatio: 1,
     duration: settings.animationDuration,
+    scrollForPan: true,
     ...pick([
       'initialExpandLevel',
       'maxWidth',
