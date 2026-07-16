@@ -46,7 +46,7 @@ const ColoringApproach = SettingComponent({
     ['single', strings.settings.settings.coloring.single])
 })
 
-const Description = (approach: Coloring) => 
+const Description = (approach: Coloring) =>
   HtmlComponent(new Setting(createFragment())
     .setClass('mmng-coloring-approach-description')
     .setDesc(strings.settings.settings.coloring.description[approach])
@@ -111,7 +111,7 @@ const SectionColoringGlobal = () => {
     Description('single'),
     ColorSingle.global(),
   ]
-  const all = [ ...branch, ...depth, ...single ]
+  const all = [...branch, ...depth, ...single]
 
   function setApproach(coloring: Coloring) {
     all.forEach(x => x.node.hidden = true)
@@ -149,11 +149,11 @@ const SectionColoringHeritable = (inherit: GlobalSettings, partial: Partial<Glob
     Description('single'),
     ColorSingle.heritable(inherit, partial),
   ]
-  const all = [ ...branch, ...depth, ...single ]
+  const all = [...branch, ...depth, ...single]
 
   function setApproach(coloring: Coloring) {
     all.forEach(x => x.node.hidden = true)
-    ~{branch, depth, single}[coloring].forEach(x => {
+    ~{ branch, depth, single }[coloring].forEach(x => {
       x.node.hidden = false
       if ('update' in x) (x.update as Function)()
     })
@@ -218,11 +218,11 @@ const ScreenshotTextColor = (settings: Pick<GlobalSettings, 'screenshotTextColor
     .addColorPicker(colPicker => colPicker
       .setValue(settings.screenshotTextColor)
       .onChange(value =>
-        settings.screenshotTextColor = value ))
+        settings.screenshotTextColor = value))
     .addToggle(toggle => toggle
       .setValue(settings.screenshotTextColorEnabled)
       .onChange(value =>
-        settings.screenshotTextColorEnabled = value ))
+        settings.screenshotTextColorEnabled = value))
     .settingEl
   )
 
@@ -238,11 +238,11 @@ const ScreenshotBackgroundStyle = (settings: Pick<GlobalSettings, 'screenshotBgS
       })
       .setValue(settings.screenshotBgStyle)
       .onChange(value =>
-        settings.screenshotBgStyle = value ))
+        settings.screenshotBgStyle = value))
     .addColorPicker(colPicker => colPicker
       .setValue(settings.screenshotBgColor)
       .onChange(value =>
-        settings.screenshotBgColor = value ))
+        settings.screenshotBgColor = value))
     .settingEl
   )
 
@@ -309,6 +309,13 @@ const MaxWidth = SettingComponent({
   control: numberText(strings.settings.settings.maxWidth.placeholder),
 })
 
+const ScrollForPan = SettingComponent({
+  name: strings.settings.settings.scrollForPan.name,
+  description: strings.settings.settings.scrollForPan.description,
+  key: 'scrollForPan',
+  control: 'toggle'
+})
+
 
 
 // -- Complete Pages -- //
@@ -342,6 +349,7 @@ const GlobalPage = () => fragment([
     InitialExpandLevel.global(),
     AnimationDuration.global(),
     MaxWidth.global(),
+    ScrollForPan.global(),
   ])
 ])
 
@@ -369,10 +377,11 @@ const FilePage = (file: Partial<FileSettings>) => () =>
       InitialExpandLevel.heritable(globalSettings, file),
       AnimationDuration.heritable(globalSettings, file),
       MaxWidth.heritable(globalSettings, file),
+      ScrollForPan.heritable(globalSettings, file),
     ])
   ])
 
-const CodeBlockPage = (inherit: GlobalSettings, codeBlock: Partial<CodeBlockSettings>) => () => 
+const CodeBlockPage = (inherit: GlobalSettings, codeBlock: Partial<CodeBlockSettings>) => () =>
   fragment([
     fragment([
       HighlightInlineMindmap.heritable(inherit, codeBlock)
@@ -395,6 +404,7 @@ const CodeBlockPage = (inherit: GlobalSettings, codeBlock: Partial<CodeBlockSett
       InitialExpandLevel.heritable(inherit, codeBlock),
       AnimationDuration.heritable(inherit, codeBlock),
       MaxWidth.heritable(inherit, codeBlock),
+      ScrollForPan.heritable(inherit, codeBlock),
     ])
   ])
 

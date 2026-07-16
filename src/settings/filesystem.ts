@@ -40,6 +40,7 @@ export const defaultSettings: v2['settings'] = {
   screenshotTextColor: '#fdf6e3',
   screenshotTextColorEnabled: false,
   titleAsRootNode: true,
+  scrollForPan: true,
 }
 
 type SettingsV2 = {
@@ -70,6 +71,7 @@ type SettingsV2 = {
 
   coloring: Coloring
   titleAsRootNode: boolean
+  scrollForPan: boolean
 }
 
 export type v2 = {
