@@ -1,4 +1,4 @@
-import { ButtonComponent, Editor, EditorPosition } from 'obsidian'
+import { Editor, EditorPosition, setIcon, setTooltip } from 'obsidian'
 import autoBind from 'auto-bind'
 import GrayMatter from 'gray-matter'
 
@@ -196,11 +196,17 @@ function SettingsDialog(codeBlock: CodeBlock, body: string, codeBlockSettings: C
     )
   }
 
-  const button = new ButtonComponent(codeBlock.containerEl.parentElement!)
-    .setClass('edit-block-button')
-    .setClass('codeblock-settings-button')
-    .setIcon('sliders-horizontal')
-    .setTooltip(strings.blockSettingsButton)
+  queueMicrotask(() => {
+    const embedActions = codeBlock.containerEl.parentElement!
+      .querySelector<HTMLElement>(':scope > .embed-actions')
+    assert(notNullish, embedActions)
 
-  button.onClick(() => new CodeBlockSettingsDialog(fileSettingsProxy, codeBlockProxy).open())
+    const action = createDiv('embed-action edit-block-button')
+    setIcon(action, 'sliders-horizontal')
+    setTooltip(action, strings.blockSettingsButton)
+    action.addEventListener('click', () =>
+      new CodeBlockSettingsDialog(fileSettingsProxy, codeBlockProxy).open())
+
+    embedActions.prepend(action)
+  })
 }

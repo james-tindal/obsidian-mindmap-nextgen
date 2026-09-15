@@ -85,24 +85,6 @@
 /* keep resize handle inside block in reading mode */
 .block-language-markmap { position: relative }
 
-
-
-/* reset button style: begin */
-.markdown-source-view.mod-cm6 .edit-block-button.codeblock-settings-button {
-    --reset-button-style: true;
-    box-shadow: none;
-    background-color: inherit;
-    height: inherit;
-}
-/* reset button style: end */
-
-.markdown-source-view.mod-cm6 .edit-block-button.codeblock-settings-button {
-    --icon-width: 18px;
-    --padding-width: calc(var(--size-2-3) * 2);
-    --margin-width: var(--size-2-2);
-    right: calc(var(--icon-width) + var(--padding-width) + var(--margin-width));
-}
-
 .mmng-settings-modal .modal {
     padding: 0
 }
