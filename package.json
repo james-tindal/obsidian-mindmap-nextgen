@@ -11,6 +11,7 @@
   "dependencies": {
     "@codemirror/state": "^6.7.5",
     "@codemirror/view": "^6.43.12",
+    "@obsidian-typings/obsidian-public-latest": "^6.36.0",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@types/d3": "^7.4.3",
     "@types/d3-zoom": "^3.0.8",

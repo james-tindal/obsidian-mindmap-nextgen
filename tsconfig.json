@@ -15,6 +15,10 @@
       "es5",
       "es2020"
     ],
+    "types": [
+      "@obsidian-typings/obsidian-public-latest",
+      "node"
+    ],
     "paths": {
       "src/*": ["./src/*"]
     },

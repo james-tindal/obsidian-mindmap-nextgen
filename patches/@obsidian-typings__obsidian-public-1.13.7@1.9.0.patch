@@ -1,0 +1,66 @@
+diff --git a/dist/esm/types.d.mts b/dist/esm/types.d.mts
+index 1609d7a2e0069d46d8e6300fede8fc4937c3cf71..8eaa27f9f9b582cf5c81044407726f611fabb22e 100644
+--- a/dist/esm/types.d.mts
++++ b/dist/esm/types.d.mts
+@@ -16146,7 +16146,7 @@ declare module "obsidian" {
+ 	 *
+ 	 * @since 0.9.7
+ 	 */
+-	interface DropdownComponent extends ValueComponent<string> {
++	interface DropdownComponent<T extends string = string> extends ValueComponent<T> {
+ 		/**
+ 		 * Hidden select element used to measure the natural width of the dropdown.
+ 		 *
+@@ -16180,7 +16180,7 @@ declare module "obsidian" {
+ 		 * @official
+ 		 * @since 0.9.7
+ 		 */
+-		addOption(value: string, display: string): this;
++		addOption(value: T, display: string): this;
+ 		/**
+ 		 * Add multiple options to the dropdown.
+ 		 *
+@@ -16193,14 +16193,14 @@ declare module "obsidian" {
+ 		 * @official
+ 		 * @since 0.9.7
+ 		 */
+-		addOptions(options: Record<string, string>): this;
++		addOptions(options: Record<T, string>): this;
+ 		/**
+ 		 * The function that's called after changing the value of the component.
+ 		 *
+ 		 * @remark Using `DropdownComponent.onChange(callback)` assigns the callback to this method.
+ 		 * @unofficial
+ 		 */
+-		changeCallback?(value: string): void;
++		changeCallback?(value: T): void;
+ 		/**
+ 		 * Constructor.
+ 		 *
+@@ -16219,7 +16219,7 @@ declare module "obsidian" {
+ 		 * @official
+ 		 * @since 0.9.7
+ 		 */
+-		getValue(): string;
++		getValue(): T;
+ 		/**
+ 		 * Set the callback function to be called when the dropdown value changes.
+ 		 *
+@@ -16232,7 +16232,7 @@ declare module "obsidian" {
+ 		 * @official
+ 		 * @since 0.9.7
+ 		 */
+-		onChange(callback: (value: string) => unknown): this;
++		onChange(callback: (value: T) => unknown): this;
+ 		/**
+ 		 * Resizes the dropdown to fit the width of its selected option.
+ 		 *
+@@ -16264,7 +16264,7 @@ declare module "obsidian" {
+ 		 * @official
+ 		 * @since 0.9.7
+ 		 */
+-		setValue(value: string): this;
++		setValue(value: T): this;
+ 	}
+ }
+ declare module "obsidian" {
