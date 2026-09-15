@@ -1,5 +1,6 @@
+import type { EmbedContext } from '@obsidian-typings/obsidian-public-latest'
 import { ITransformPlugin } from 'markmap-lib'
-import { EmbedInfo, MarkdownRenderer, parseLinktext, TFile } from 'obsidian'
+import { MarkdownRenderer, parseLinktext, TFile } from 'obsidian'
 
 import { plugin } from 'src/core/main'
 import { getActiveFile } from 'src/views/get-active-file'
@@ -90,7 +91,7 @@ class EmbedElement extends HTMLElement {
       embedContainer.append(title)
     }
 
-    const embedInfo: EmbedInfo = {
+    const embedInfo: EmbedContext = {
       app,
       containerEl: embedContainer as HTMLDivElement,
       depth: 1,

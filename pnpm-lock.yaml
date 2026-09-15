@@ -8,6 +8,7 @@ overrides:
   callbag: ^1.5.1
 
 patchedDependencies:
+  '@obsidian-typings/obsidian-public-1.13.7@1.9.0': 5db45357142f41ae9a1e4b59178cb2e69134369b3714cf91f9dfaa81c747cb76
   '@types/d3-zoom@3.0.8': 5eaf626badb1eecbce1fc43499e29ff25547a863750c1e316f18030ed9239196
   obsidian: c9ef5e49a59e7b62eb075a80ac2971639b47fe3f7ef8ef170f28b41b37817fa2
 
@@ -21,6 +22,9 @@ importers:
       '@codemirror/view':
         specifier: ^6.43.12
         version: 6.43.12
+      '@obsidian-typings/obsidian-public-latest':
+        specifier: ^6.36.0
+        version: 6.36.0(@types/node@22.20.3)
       '@stylistic/eslint-plugin':
         specifier: ^5.10.0
         version: 5.10.0(eslint@10.10.0(supports-color@8.1.1))
@@ -614,6 +618,14 @@ packages:
 
   '@marijn/find-cluster-break@1.0.2':
     resolution: {integrity: sha512-l0h88YhZFyKdXIFNfSWpyjStDjGHwZ/U7iobcK1cQQD8sejsONdQtTVU+1wVN1PBw40PiiHB1vA5S7VTfQiP9g==}
+
+  '@obsidian-typings/obsidian-public-1.13.7@1.9.0':
+    resolution: {integrity: sha512-q/Y45Sfy52Vivz/fWrNxvHMe8FaLmG8xu0pNKejkU0k7V/p4xV90y/VBPya13tyFIhNDxhZHgSRmV+3f12wI2g==}
+    peerDependencies:
+      '@types/node': '>=16.0.0'
+
+  '@obsidian-typings/obsidian-public-latest@6.36.0':
+    resolution: {integrity: sha512-Zs8D0AJpjDUAsXl+ZMMUSne1PdGmNo0JVy2X+2lY26Yt0izk+mYrJrSD3ZsEQlmfyGM2oa+rlsUt7GG6kAuXQA==}
 
   '@rollup/rollup-android-arm-eabi@4.52.5':
     resolution: {integrity: sha512-8c1vW4ocv3UOMp9K+gToY5zL2XiiVw3k7f1ksf4yO1FlDFQ1C2u72iACFnSOceJFsWskc2WZNqeRhFRPzv+wtQ==}
@@ -2756,6 +2768,16 @@ snapshots:
   '@keyv/serialize@1.1.1': {}
 
   '@marijn/find-cluster-break@1.0.2': {}
+
+  '@obsidian-typings/obsidian-public-1.13.7@1.9.0(patch_hash=5db45357142f41ae9a1e4b59178cb2e69134369b3714cf91f9dfaa81c747cb76)(@types/node@22.20.3)':
+    dependencies:
+      '@types/node': 22.20.3
+
+  '@obsidian-typings/obsidian-public-latest@6.36.0(@types/node@22.20.3)':
+    dependencies:
+      '@obsidian-typings/obsidian-public-1.13.7': 1.9.0(patch_hash=5db45357142f41ae9a1e4b59178cb2e69134369b3714cf91f9dfaa81c747cb76)(@types/node@22.20.3)
+    transitivePeerDependencies:
+      - '@types/node'
 
   '@rollup/rollup-android-arm-eabi@4.52.5':
     optional: true

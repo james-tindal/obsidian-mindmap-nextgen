@@ -108,13 +108,9 @@ async function match(
   actual: WorkspaceSplit | WorkspaceTabs,
   matcher: Matcher
 ) {
-  const type = {
-    serialised: Array.isArray(serialised?.[0]) ? 'split' : 'tabs',
-    actual: actual.type
-  }
+  const match = Array.isArray(serialised?.[0]) ? 'split' : 'tabs'
 
-  if (type.serialised !== type.actual) return
-  const match = type.serialised
+  if (match !== actual.type) return
   await matcher[match]()
 }
 
