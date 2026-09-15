@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "noEmit": true,
     "strict": true,
     "inlineSourceMap": true,
@@ -8,16 +7,17 @@
     "module": "ESNext",
     "target": "es2018",
     "allowJs": true,
-    "moduleResolution": "node",
     "importHelpers": true,
     "esModuleInterop": true,
-    "downlevelIteration": true,
     "skipLibCheck": true,
     "lib": [
       "dom",
       "es5",
       "es2020"
     ],
+    "paths": {
+      "src/*": ["./src/*"]
+    },
   },
   "include": [
     "**/*.ts",

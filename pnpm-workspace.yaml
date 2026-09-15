@@ -1,0 +1,7 @@
+patchedDependencies:
+  obsidian: patches/obsidian.patch
+
+overrides:
+  callbag: ^1.5.1
+
+strictDepBuilds: false
