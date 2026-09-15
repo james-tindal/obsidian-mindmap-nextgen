@@ -1,11 +1,10 @@
 import CopyPlugin from 'copy-webpack-plugin'
 import { resolve } from 'path'
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
-import webpack from 'webpack'
+import webpack, { type ConfigurationFactory } from 'webpack'
 import ForkTsCheckerPlugin from 'fork-ts-checker-webpack-plugin'
-import { type CallableWebpackConfiguration } from 'webpack-cli'
 
-const config: CallableWebpackConfiguration = (env, argv) => ({
+const config: ConfigurationFactory = (env, argv) => ({
   mode: getMode(argv.mode),
   entry: './src/core/entry.ts',
   output: {

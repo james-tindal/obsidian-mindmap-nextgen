@@ -2,7 +2,7 @@ diff --git a/obsidian.d.ts b/obsidian.d.ts
 index 73bb2491f416649b1772cbd04b68ed9433707dab..9877b563ccd49b4b74e76adce3758011d9895664 100644
 --- a/obsidian.d.ts
 +++ b/obsidian.d.ts
-@@ -1702,7 +1702,7 @@ export function displayTooltip(newTargetEl: HTMLElement, content: string | Docum
+@@ -2296,7 +2296,7 @@ export class DisplayValueComponent {
   * @public
   * @since 0.9.7
   */
@@ -11,7 +11,7 @@ index 73bb2491f416649b1772cbd04b68ed9433707dab..9877b563ccd49b4b74e76adce3758011
      /**
       * @public
       * @since 0.9.7
-@@ -1722,27 +1722,27 @@ export class DropdownComponent extends ValueComponent<string> {
+@@ -2317,27 +2317,27 @@ export class DropdownComponent extends ValueComponent<string> {
       * @public
       * @since 0.9.7
       */
@@ -44,16 +44,16 @@ index 73bb2491f416649b1772cbd04b68ed9433707dab..9877b563ccd49b4b74e76adce3758011
  }
  
  /**
-@@ -5182,7 +5182,7 @@ export class Setting {
+@@ -5732,7 +5732,7 @@ export class Setting {
      /**
       * @public
       */
 -    constructor(containerEl: HTMLElement);
 +    constructor(containerEl: Node);
      /**
-      * @public
-      * @since 0.12.16
-@@ -5253,7 +5253,7 @@ export class Setting {
+      * Show a persistent validation error message below the setting. Pass an
+      * empty string or `null` to clear it. Adds the `is-invalid` class to the
+@@ -5829,7 +5829,7 @@ export class Setting {
       * @public
       * @ince 0.9.7
       */
