@@ -100,8 +100,12 @@ export function createMarkmap(options: { parent: ParentNode, toolbar: false }): 
 export function createMarkmap(options: { parent: ParentNode, toolbar: true }): { svg: SVGSVGElement, markmap: Markmap, toolbar: HTMLDivElement }
 export function createMarkmap({ parent, toolbar }: { parent: ParentNode, toolbar: boolean }): any {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-  const markmap = Markmap.create(svg, { embedGlobalCSS: false })
   parent.append(svg)
+  const markmap = Markmap.create(svg, { embedGlobalCSS: false })
+  markmap.zoom.extent(() => {
+    const { width, height } = svg.getBoundingClientRect()
+    return [[0, 0], [width, height]]
+  })
 
   if (toolbar) {
     const toolbar = Toolbar.create(markmap)
