@@ -125,13 +125,10 @@
 }
 
 .mmng-main {
+    padding-top: 1em;
     padding-left: var(--size-4-12);
     padding-right: var(--size-4-12);
     padding-bottom: var(--size-4-16);
-}
-
-.mmng-main .setting-item:first-child {
-    padding-top: 0.75em
 }
 
 .setting-item.mmng-faded {
