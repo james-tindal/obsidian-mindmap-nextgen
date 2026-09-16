@@ -49,9 +49,8 @@ export function splitMarkdown<Type extends 'file' | 'codeBlock'>(type: Type, mar
 export function loadAssets(features: IFeatures) {
   const { styles, scripts } = transformer.getUsedAssets(features)
   if (scripts) loadJS(scripts)
-  if (styles) loadCSS(styles.filter(s =>
-    // @ts-expect-error
-    !s.data?.href.contains('@highlightjs') ))
+  if (styles) loadCSS(styles.filter(({ data }) =>
+    typeof data === 'string' || !data?.href.includes('@highlightjs') ))
 }
 
 function withNodeColor(fn: (node: INode) => string) {
