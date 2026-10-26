@@ -1,5 +1,6 @@
 import { Component, Editor, EditorPosition, setIcon, setTooltip, TFile } from 'obsidian'
 import type { Markmap } from 'markmap-view'
+import type { ZoomTransform } from 'd3-zoom'
 import autoBind from 'auto-bind'
 import GrayMatter from 'gray-matter'
 
@@ -73,18 +74,26 @@ function getFileSettingsFromCache(file: TFile | undefined) {
 // fit() measures the live container; embeds and canvas cards may not be laid
 // out yet at first render, so re-fit (debounced) until the size settles.
 function refitOnResize(markmap: Markmap, svg: SVGSVGElement, component: Component) {
-  const fit = () => {
-    // Canvas cards live under a transformed ancestor, so the rendered rect
-    // reflects canvas zoom instead of the box size; fit by layout size so the
-    // mindmap fills its box and scales with the canvas like an image.
-    if (!svg.clientWidth || !svg.clientHeight) return
-    const originalGetRect = svg.getBoundingClientRect
-    svg.getBoundingClientRect = () => {
-      const rect = originalGetRect.call(svg)
-      return new DOMRect(rect.x, rect.y, svg.clientWidth, svg.clientHeight)
-    }
-    try { markmap.fit() }
-    finally { svg.getBoundingClientRect = originalGetRect }
+  function fit() {
+    const { clientWidth: width, clientHeight: height } = svg
+    if (!width || !height) return
+    const { x1, y1, x2, y2 } = markmap.state.rect
+    const { fitRatio, maxInitialScale } = markmap.options
+    const contentWidth = x2 - x1
+    const contentHeight = y2 - y1
+    const scale = Math.min(
+      width / contentWidth * fitRatio,
+      height / contentHeight * fitRatio,
+      maxInitialScale
+    )
+    const current = markmap.svg.property('__zoom') as ZoomTransform
+    const x = (width - contentWidth * scale) / 2 - x1 * scale
+    const y = (height - contentHeight * scale) / 2 - y1 * scale
+    const transform = current.translate(
+      (x - current.x) / current.k,
+      (y - current.y) / current.k
+    ).scale(scale / current.k)
+    markmap.transition(markmap.svg).call(markmap.zoom.transform, transform)
   }
 
   let lastWidth = -1
