@@ -1,26 +1,29 @@
 import { IMarkmapOptions } from 'markmap-view'
-import { TFile } from 'obsidian'
+import { Component, TFile } from 'obsidian'
 import { IPureNode } from 'markmap-common'
 
 import { FileSettings, globalSettings } from 'src/settings/filesystem'
 import { ScreenshotColors, takeScreenshot } from 'src/rendering/screenshot'
 import { createMarkmap, getOptions, transformMarkdown, splitMarkdown } from './renderer-common'
 import { MindmapTab } from 'src/utilities/types'
-import { svgs } from 'src/internal-links/handle-internal-links'
+import { registerInternalLinks } from 'src/internal-links/handle-internal-links'
 
 
 export type TabRenderer = ReturnType<typeof TabRenderer>
-export function TabRenderer(containerEl: MindmapTab.View['containerEl']) {
+export function TabRenderer(containerEl: MindmapTab.View['containerEl'], component: Component) {
   const contentEl = containerEl.children[1]
   const { svg, markmap, toolbar } = createMarkmap({ parent: contentEl, toolbar: true })
 
   const state: {
+    file?: TFile
     hasRendered: boolean
     screenshotColors?: ScreenshotColors
     markmapOptions?: Partial<IMarkmapOptions>
   } = {
     hasRendered: false
   }
+
+  registerInternalLinks(component, svg, () => state.file)
 
   return { collapseAll, firstRender, render,
     takeScreenshot: () => takeScreenshot(markmap, state.screenshotColors!),
@@ -49,7 +52,7 @@ export function TabRenderer(containerEl: MindmapTab.View['containerEl']) {
   }
 
   async function render(file: TFile, content?: string) {
-    svgs.set(svg, file)
+    state.file = file
 
     if (!state.hasRendered) return
 

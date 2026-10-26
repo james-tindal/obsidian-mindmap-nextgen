@@ -12,7 +12,7 @@ import { renderCodeblocks$ } from 'src/rendering/style-features'
 import Callbag, { dragAndDrop, fromEvent } from 'src/utilities/callbag'
 import { CodeBlockSettingsDialog } from 'src/settings/dialogs'
 import { CodeBlock } from 'src/new/codeBlockHandler'
-import { svgs } from 'src/internal-links/handle-internal-links'
+import { registerInternalLinks } from 'src/internal-links/handle-internal-links'
 import { strings } from 'src/translation'
 
 
@@ -24,8 +24,7 @@ export function CodeBlockRenderer(codeBlock: CodeBlock) {
   // transformMarkdown should be merged into this
   const { markmap, svg } = createMarkmap({ parent: containerEl, toolbar: false })
 
-  if (file)
-    svgs.register(component, svg, file)
+  registerInternalLinks(component, svg, () => file)
 
   const fileSettings: FileSettings = editor
     ? splitMarkdown('file', editor.getValue()).settings

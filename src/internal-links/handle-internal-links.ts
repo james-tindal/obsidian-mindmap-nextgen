@@ -2,56 +2,42 @@ import { Component, TFile } from 'obsidian'
 import { plugin } from 'src/core/main'
 
 
-const workspace = document.querySelector('.workspace' as 'div')!
-
-export const svgs = new class extends Map<SVGSVGElement, TFile> {
-  register(component: Component, svg: SVGSVGElement, file: TFile) {
-    svgs.set(svg, file)
-    component.register(() =>
-      svgs.delete(svg))
-  }
-  // renderer-tab should call register but it can't find its component
-}
-
-const registerEvent = (type: 'click' | 'mouseover', fn: (args: {
-  event: MouseEvent
-  target: HTMLAnchorElement
-  parentMindmap: SVGSVGElement
-  href: string
-}) => void) =>
-  plugin.registerDomEvent(workspace, type, event => {
-    const { target } = event
-    const isAnchor = target instanceof HTMLAnchorElement
-      if (!isAnchor) return
-    const parentMindmap = target.closest('svg.markmap' as 'svg')
-      if (!parentMindmap) return
-    const href = target.getAttribute('href')
-      if (!href) return
-    const hasProtocol = /^[^#:]*:.*#/.test(href)  // https://regex101.com/r/RLG0a5/1
-      if (hasProtocol) return
-
-    fn({ event, target, parentMindmap, href })
+export function registerInternalLinks(component: Component, svg: SVGSVGElement, getFile: () => TFile | undefined) {
+  svg.addEventListener('click', handleEvent)
+  svg.addEventListener('mouseover', handleEvent)
+  component.register(() => {
+    svg.removeEventListener('click', handleEvent)
+    svg.removeEventListener('mouseover', handleEvent)
   })
 
-registerEvent('click', ({ event, parentMindmap, href }) => {
-  event.preventDefault()
+  function handleEvent(event: MouseEvent) {
+    const { target } = event
+    if (!(target instanceof HTMLAnchorElement)) return
+    if (target.closest('svg.markmap') !== svg) return
+    const href = target.getAttribute('href')
+    if (!href) return
+    const hasProtocol = /^[^#:]*:.*#/.test(href)  // https://regex101.com/r/RLG0a5/1
+    if (hasProtocol) return
 
-  const file = svgs.get(parentMindmap)
-  if (!file) return
-  app.workspace.openLinkText(href, file.path)
-})
+    if (event.type === 'click') {
+      event.preventDefault()
+      const file = getFile()
+      if (!file) return
+      app.workspace.openLinkText(href, file.path)
+    } else {
+      app.workspace.trigger('hover-link', {
+        event,
+        source: 'mindmap-nextgen',
+        hoverParent: svg,
+        targetEl: target,
+        linktext: href
+      })
+    }
+  }
+}
 
 plugin.registerHoverLinkSource('mindmap-nextgen', {
   display: 'Mindmap Nextgen',
   defaultMod: true
 })
 
-registerEvent('mouseover', ({ event, target, parentMindmap, href }) => {
-  app.workspace.trigger('hover-link', {
-    event,
-    source: 'mindmap-nextgen',
-    hoverParent: parentMindmap,
-    targetEl: target,
-    linktext: href
-  })
-})
