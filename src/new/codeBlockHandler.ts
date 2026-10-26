@@ -1,7 +1,7 @@
-import { MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, MarkdownView } from 'obsidian'
+import { MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, MarkdownView, parseLinktext, TFile } from 'obsidian'
 import { plugin } from 'src/core/main'
 import Callbag, { flatMap } from 'src/utilities/callbag'
-import { assert, defineLazyGetters, notNullish } from 'src/utilities/utilities'
+import { defineLazyGetters } from 'src/utilities/utilities'
 import { Simplify } from 'type-fest'
 
 
@@ -10,7 +10,7 @@ function CodeBlock(markdown: string, containerEl: HTMLElement, ctx: MarkdownPost
   const component = new MarkdownRenderChild(containerEl)
   ctx.addChild(component)
   const markdownView = getMarkdownView(component)
-  const editor = markdownView.editor
+  const editor = markdownView?.editor
 
   const getSectionInfo = () =>
     ctx.getSectionInfo(containerEl) as SectionInfo
@@ -18,7 +18,7 @@ function CodeBlock(markdown: string, containerEl: HTMLElement, ctx: MarkdownPost
   return defineLazyGetters({
     component, markdown, containerEl, ctx, markdownView, editor, getSectionInfo
   }, {
-    file: () => getFileByPath(ctx.sourcePath),
+    file: () => resolveFile(ctx, containerEl),
   })
 }
 
@@ -57,12 +57,22 @@ function getMarkdownView(component: MarkdownRenderChild) {
     if (!('_children' in subView && Array.isArray(subView._children))) return
     return subView._children.contains(component)
   })
-  assert(notNullish, leaf, "Couldn't find MarkdownView containing code block")
-  return leaf.view as MarkdownView
+  return leaf?.view as MarkdownView | undefined
 }
 
-function getFileByPath(sourcePath: string) {
-  const file = app.vault.getFileByPath(sourcePath)
-  assert(notNullish, file)
-  return file
+// Code blocks inside embeds / canvas cards are not hosted by a MarkdownView,
+// and their ctx.sourcePath may be empty or point at a non-markdown file, so
+// resolve the source file with a DOM fallback on the enclosing embed's src.
+function resolveFile(ctx: MarkdownPostProcessorContext, containerEl: HTMLElement) {
+  const sourceFile = ctx.sourcePath ? app.vault.getFileByPath(ctx.sourcePath) : undefined
+  if (sourceFile?.extension === 'md') return sourceFile
+
+  const embedSrc = containerEl.closest('.markdown-embed')?.getAttribute('src')
+  if (embedSrc) {
+    const { path } = parseLinktext(embedSrc)
+    const dest = app.metadataCache.getFirstLinkpathDest(path, ctx.sourcePath || '')
+    if (dest?.extension === 'md') return dest
+  }
+
+  return undefined
 }

@@ -36,8 +36,9 @@ const registerEvent = (type: 'click' | 'mouseover', fn: (args: {
 registerEvent('click', ({ event, parentMindmap, href }) => {
   event.preventDefault()
 
-  const { path } = svgs.get(parentMindmap)!
-  app.workspace.openLinkText(href, path)
+  const file = svgs.get(parentMindmap)
+  if (!file) return
+  app.workspace.openLinkText(href, file.path)
 })
 
 plugin.registerHoverLinkSource('mindmap-nextgen', {
