@@ -26,7 +26,7 @@ export default class MindmapView extends ItemView {
     this.displayText = displayText
     this.pinned = pinned
 
-    this.renderer = TabRenderer(this.containerEl)
+    this.renderer = TabRenderer(this.containerEl, this)
     this.render = this.renderer.render
     this.firstRender = this.renderer.firstRender
   }
