@@ -1,4 +1,5 @@
-import { Editor, EditorPosition, setIcon, setTooltip } from 'obsidian'
+import { Component, Editor, EditorPosition, setIcon, setTooltip, TFile } from 'obsidian'
+import type { Markmap } from 'markmap-view'
 import autoBind from 'auto-bind'
 import GrayMatter from 'gray-matter'
 
@@ -22,21 +23,31 @@ export function CodeBlockRenderer(codeBlock: CodeBlock) {
   // transformMarkdown should be merged into this
   const { markmap, svg } = createMarkmap({ parent: containerEl, toolbar: false })
 
-  svgs.register(component, svg, file)
+  if (file)
+    svgs.register(component, svg, file)
 
-  const fileText = editor.getValue()
-  const { settings: fileSettings } = splitMarkdown('file', fileText)
+  const fileSettings: FileSettings = editor
+    ? splitMarkdown('file', editor.getValue()).settings
+    : getFileSettingsFromCache(file)
   const { settings: codeBlockSettings, body } = splitMarkdown('codeBlock', codeBlock.markdown)
   const rootNode = transformMarkdown(codeBlock.markdown)
   const settings = new SettingsManager(codeBlock, fileSettings, codeBlockSettings)
 
-  SizeManager(containerEl, svg, settings)
+  SizeManager(containerEl, svg, settings, { editable: editor !== undefined })
 
-  if (markdownView.getMode() === 'source')
+  if (markdownView?.getMode() === 'source' && editor)
     SettingsDialog(codeBlock, body, codeBlockSettings, fileSettings, editor)
 
-  render().then(() =>
-    markmap.fit())
+  render().then(() => {
+    // Blocks without an editor (embeds, canvas cards) can render before their
+    // container has its final size, which makes fit() compute a wrong scale.
+    if (editor) {
+      try { markmap.fit() }
+      catch {}
+    } else {
+      refitOnResize(markmap, svg, component)
+    }
+  })
 
   Callbag.subscribe(renderCodeblocks$, render)
 
@@ -51,6 +62,49 @@ export function CodeBlockRenderer(codeBlock: CodeBlock) {
 
     return promise
   }
+}
+
+// Read file-level markmap settings without an editor (embeds / canvas cards)
+function getFileSettingsFromCache(file: TFile | undefined) {
+  if (!file) return {} as FileSettings
+  return (app.metadataCache.getFileCache(file)?.frontmatter?.markmap ?? {}) as FileSettings
+}
+
+// fit() measures the live container; embeds and canvas cards may not be laid
+// out yet at first render, so re-fit (debounced) until the size settles.
+function refitOnResize(markmap: Markmap, svg: SVGSVGElement, component: Component) {
+  const fit = () => {
+    // Canvas cards live under a transformed ancestor, so the rendered rect
+    // reflects canvas zoom instead of the box size; fit by layout size so the
+    // mindmap fills its box and scales with the canvas like an image.
+    if (!svg.clientWidth || !svg.clientHeight) return
+    const originalGetRect = svg.getBoundingClientRect
+    svg.getBoundingClientRect = () => {
+      const rect = originalGetRect.call(svg)
+      return new DOMRect(rect.x, rect.y, svg.clientWidth, svg.clientHeight)
+    }
+    try { markmap.fit() }
+    finally { svg.getBoundingClientRect = originalGetRect }
+  }
+
+  let lastWidth = -1
+  let lastHeight = -1
+  let timer: ReturnType<typeof setTimeout> | undefined
+
+  const observer = new ResizeObserver(() => {
+    const { width, height } = svg.getBoundingClientRect()
+    if (width === lastWidth && height === lastHeight) return
+    lastWidth = width
+    lastHeight = height
+    if (timer) clearTimeout(timer)
+    timer = setTimeout(fit, 200)
+  })
+
+  observer.observe(svg)
+  component.register(() => {
+    observer.disconnect()
+    if (timer) clearTimeout(timer)
+  })
 }
 
 class SettingsManager {
@@ -109,6 +163,7 @@ class SettingsManager {
     const editor = this.codeBlock.editor
     const sectionInfo = this.codeBlock.getSectionInfo()
     assert(notNullish, sectionInfo)
+    assert(notNullish, editor)
     const lineStart = EditorLine(sectionInfo.lineStart + 1)
     const lineEnd   = EditorLine(sectionInfo.lineEnd)
 
@@ -128,8 +183,10 @@ class SettingsManager {
 
 const EditorLine = (line: number): EditorPosition => ({ line, ch: 0 })
 
-function SizeManager(containerEl: CodeBlock['containerEl'], svg: SVGSVGElement, settings: SettingsManager) {
+function SizeManager(containerEl: CodeBlock['containerEl'], svg: SVGSVGElement, settings: SettingsManager, { editable }: { editable: boolean }) {
   svg.style.height = settings.height + 'px'
+
+  if (!editable) return
 
   const resizeHandle = document.createElement('hr')
   containerEl.prepend(resizeHandle)
