@@ -2,6 +2,7 @@
   "name": "obsidian-mindmap-nextgen",
   "version": "1.16.0",
   "description": "An Obsidian plugin for displaying markdown notes as mindmaps using Markmap",
+  "license": "0BSD",
   "scripts": {
     "dev": "webpack --mode development --watch",
     "build": "webpack --mode production",
