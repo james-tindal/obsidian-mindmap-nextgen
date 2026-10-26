@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "webpack --mode development --watch",
     "build": "webpack --mode production",
-    "test": "vitest"
+    "test": "vitest",
+    "test:integration": "npm run build && vitest run --config vitest.integration.config.ts"
   },
   "type": "module",
   "dependencies": {
@@ -58,6 +59,7 @@
     "markmap-toolbar": "^0.18.12",
     "markmap-view": "^0.18.12",
     "obsidian": "1.13.1",
+    "obsidian-integration-testing": "^17.5.1",
     "ramda": "^0.32.0",
     "style-loader": "^4.0.0",
     "tsconfig-paths-webpack-plugin": "^4.2.0",
