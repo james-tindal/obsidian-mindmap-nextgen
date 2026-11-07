@@ -31,6 +31,13 @@ const TitleAsRootNode = SettingComponent({
   control: 'toggle'
 })
 
+const RememberFolding = SettingComponent({
+  name: strings.settings.settings.rememberFolding.name,
+  description: strings.settings.settings.rememberFolding.description,
+  key: 'rememberFolding',
+  control: 'toggle'
+})
+
 
 
 // -- SectionColoring -- //
@@ -318,6 +325,7 @@ const GlobalPage = () => fragment([
     SplitDirection.global(),
     HighlightInlineMindmap.global(),
     TitleAsRootNode.global(),
+    RememberFolding.global(),
   ]),
   SectionColoringGlobal(),
   fragment([

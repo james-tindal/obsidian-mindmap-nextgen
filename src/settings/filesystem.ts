@@ -2,6 +2,11 @@ import type { SplitDirection } from 'obsidian'
 import { LocalEvents } from 'src/utilities/utilities'
 import { Layout } from 'src/views/layout-manager'
 import { plugin } from 'src/core/main'
+import { Notice } from 'obsidian'
+import { captureFolding, FoldingState, moveFoldingStates, parseFoldingStates } from 'src/rendering/folding'
+import type { IPureNode } from 'markmap-common'
+import { dataWriter } from './data-writer'
+import { strings } from 'src/translation'
 
 
 export type Coloring = 'depth' | 'branch' | 'single'
@@ -40,6 +45,7 @@ export const defaultSettings: v2['settings'] = {
   screenshotTextColor: '#fdf6e3',
   screenshotTextColorEnabled: false,
   titleAsRootNode: true,
+  rememberFolding: false,
 }
 
 type SettingsV2 = {
@@ -70,18 +76,21 @@ type SettingsV2 = {
 
   coloring: Coloring
   titleAsRootNode: boolean
+  rememberFolding: boolean
 }
 
 export type v2 = {
   version: '2.0'
   settings: SettingsV2,
   layout: Layout
+  foldingStates: Record<string, FoldingState>
 }
 
 const useDefaultsForMissingKeys =
 (data: any): v2 => ({
   version: '2.0',
   layout: data?.layout || [],
+  foldingStates: parseFoldingStates(data?.foldingStates),
   settings: {
     ...defaultSettings,
     ...data?.settings
@@ -90,6 +99,7 @@ const useDefaultsForMissingKeys =
 
 type OmitFromFileSettings =
 | 'splitDirection'
+| 'rememberFolding'
 | 'screenshotTextColor'
 | 'screenshotTextColorEnabled'
 | 'screenshotBgStyle'
@@ -110,18 +120,27 @@ export let layout: {
   save(layout: Layout): void
   load(): Layout
 }
+export let foldingStates: {
+  load(path: string): FoldingState | undefined
+  save(path: string, root: IPureNode): void
+  reset(path: string): void
+}
 
 plugin.loadData()
 .then(useDefaultsForMissingKeys)
 .then(fsd => {
-  plugin.saveData(fsd)
+  const save = dataWriter<v2>(data => plugin.saveData(data), error => {
+    console.error('Mindmap NextGen: could not save plugin data', error)
+    new Notice(strings.saveError)
+  })
+  save(fsd)
 
   globalSettings = new Proxy<GlobalSettings>(fsd.settings, {
     get: (_, key: keyof GlobalSettings) => fsd.settings[key],
     set<K extends keyof GlobalSettings>(_: any, key: K, value: GlobalSettings[K]) {
       fsd.settings[key] = value
       events.emit(key, value)
-      plugin.saveData(fsd)
+      save(fsd)
       return true
     }
   })
@@ -129,10 +148,28 @@ plugin.loadData()
   layout = {
     save(layout: Layout) {
       fsd.layout = layout
-      plugin.saveData(fsd)
+      save(fsd)
     },
     load: () => fsd.layout
   }
+
+  foldingStates = {
+    load: path => Object.prototype.hasOwnProperty.call(fsd.foldingStates, path) ? fsd.foldingStates[path] : undefined,
+    save(path, root) {
+      fsd.foldingStates[path] = captureFolding(root)
+      save(fsd)
+    },
+    reset(path) {
+      delete fsd.foldingStates[path]
+      save(fsd)
+    }
+  }
+  plugin.registerEvent(app.vault.on('rename', (file, oldPath) => {
+    if (moveFoldingStates(fsd.foldingStates, oldPath, file.path)) save(fsd)
+  }))
+  plugin.registerEvent(app.vault.on('delete', file => {
+    if (moveFoldingStates(fsd.foldingStates, file.path)) save(fsd)
+  }))
 
   resolve(globalSettings)
 })

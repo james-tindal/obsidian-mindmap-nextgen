@@ -6,6 +6,7 @@ export default {
   menu: {
     copyScreenshot: '複製截圖',
     collapseAll: '摺疊所有',
+    resetFolding: '重設已儲存的摺疊狀態',
     toolbar: {
       toolbar: '工具欄',
       show: '顯示',
@@ -18,6 +19,7 @@ export default {
   },
   fileSettingsButton: '文件級別設置',
   blockSettingsButton: '代碼框級別設置',
+  saveError: 'Mindmap NextGen 無法儲存設定或摺疊狀態，請查看主控台了解詳情。',
   settings: {
     explanations: {
       file: [
@@ -63,6 +65,10 @@ export default {
       titleAsRootNode: {
         name: '使用標題作為根節點',
         description: '啟用後，思維導圖的根節點將使用文檔的標題',
+      },
+      rememberFolding: {
+        name: '記住節點摺疊狀態',
+        description: '按筆記記住導圖分頁中的分支展開和摺疊狀態，編輯或重新開啟後還原。狀態儲存在外掛資料中，不修改筆記。預設關閉。',
       },
       coloring: {
         name: '配色方案',

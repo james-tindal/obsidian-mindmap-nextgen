@@ -13,6 +13,7 @@ export default {
   menu: {
     copyScreenshot: 'Copy screenshot',
     collapseAll: 'Collapse all',
+    resetFolding: 'Reset saved folding state',
     toolbar: {
       toolbar: 'toolbar',
       show: 'Show',
@@ -25,6 +26,7 @@ export default {
   },
   fileSettingsButton: 'Edit mindmap settings',
   blockSettingsButton: 'Edit block settings',
+  saveError: 'Mindmap NextGen could not save settings or folding states. See the console for details.',
   settings: {
     explanations: {
       file: [
@@ -70,6 +72,10 @@ export default {
       titleAsRootNode: {
         name: 'Use title as root node',
         description: 'When on, the root node of the mindmap will be the title of the document',
+      },
+      rememberFolding: {
+        name: 'Remember node folding',
+        description: 'Remember expanded and collapsed branches for each note in mindmap tabs, across edits and reopening. Stored in plugin data; does not change notes. Disabled by default.',
       },
       coloring: {
         name: `${Color}ing approach`,
