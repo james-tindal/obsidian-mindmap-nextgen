@@ -1,8 +1,9 @@
-import { IMarkmapOptions } from 'markmap-view'
-import { Component, TFile } from 'obsidian'
-import { IPureNode } from 'markmap-common'
+import type { IMarkmapOptions } from 'markmap-view'
+import type { Component, TFile } from 'obsidian'
+import type { IPureNode } from 'markmap-common'
 
-import { FileSettings, globalSettings } from 'src/settings/filesystem'
+import { FileSettings, foldingStates, globalSettings } from 'src/settings/filesystem'
+import { restoreFolding } from './folding'
 import { ScreenshotColors, takeScreenshot } from 'src/rendering/screenshot'
 import { createMarkmap, getOptions, transformMarkdown, splitMarkdown } from './renderer-common'
 import { MindmapTab } from 'src/utilities/types'
@@ -25,7 +26,27 @@ export function TabRenderer(containerEl: MindmapTab.View['containerEl'], compone
 
   registerInternalLinks(component, svg, () => state.file)
 
-  return { collapseAll, firstRender, render,
+  let revision = 0
+  let disposed = false
+  let markdownContent: string | undefined
+  const toggleNode = markmap.toggleNode.bind(markmap)
+  markmap.toggleNode = (node, recursive) => {
+    const result = toggleNode(node, recursive)
+    rememberFolding()
+    return result
+  }
+  component.register(() => {
+    disposed = true
+    revision++
+    markmap.toggleNode = toggleNode
+  })
+
+  function rememberFolding() {
+    if (!disposed && globalSettings.rememberFolding && state.file && markmap.state.data)
+      foldingStates.save(state.file.path, markmap.state.data)
+  }
+
+  return { collapseAll, firstRender, render, resetFolding,
     takeScreenshot: () => takeScreenshot(markmap, state.screenshotColors!),
     toolbar: {
       get hidden() { return toolbar.hidden },
@@ -37,11 +58,19 @@ export function TabRenderer(containerEl: MindmapTab.View['containerEl'], compone
   }
 
   // This relies on firstRender having already happened, so state.markmapOptions is set.
-  function collapseAll() {
-    markmap.setData(markmap.state.data, {
+  async function collapseAll() {
+    const rendering = markmap.setData(markmap.state.data, {
       ...state.markmapOptions,
       initialExpandLevel: 0,
     })
+    rememberFolding()
+    await rendering
+  }
+
+  async function resetFolding() {
+    if (!state.file) return
+    foldingStates.reset(state.file.path)
+    await render(state.file, markdownContent)
   }
 
   async function firstRender(file: TFile) {
@@ -52,11 +81,14 @@ export function TabRenderer(containerEl: MindmapTab.View['containerEl'], compone
   }
 
   async function render(file: TFile, content?: string) {
-    state.file = file
-
-    if (!state.hasRendered) return
+    const currentRevision = ++revision
+    if (!state.hasRendered || disposed) return
 
     const markdown = content ?? await app.vault.cachedRead(file)
+    // A slower disk read must not replace a newer editor update or another note.
+    if (disposed || currentRevision !== revision) return
+    state.file = file
+    markdownContent = markdown
     
     const rootNode = transformMarkdown(markdown)
     const { settings: fileSettings } = splitMarkdown('file', markdown)
@@ -67,6 +99,12 @@ export function TabRenderer(containerEl: MindmapTab.View['containerEl'], compone
       addTitleToRootNode(rootNode, file.basename)
 
     state.markmapOptions = markmapOptions
+
+    if (globalSettings.rememberFolding) {
+      restoreFolding(rootNode, settings.initialExpandLevel, foldingStates.load(file.path))
+      await markmap.setData(rootNode, { ...markmapOptions, initialExpandLevel: -1 })
+      return
+    }
 
     await markmap.setData(rootNode, markmapOptions)
   }

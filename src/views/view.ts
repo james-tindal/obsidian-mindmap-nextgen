@@ -5,6 +5,7 @@ import { TabRenderer } from 'src/rendering/renderer-tab'
 import { strings } from 'src/translation'
 import Callbag from 'src/utilities/callbag'
 import { Set } from 'src/utilities/set'
+import { globalSettings } from 'src/settings/filesystem'
 
 
 export default class MindmapView extends ItemView {
@@ -69,6 +70,12 @@ export default class MindmapView extends ItemView {
         .setTitle(`${toolbar.hidden ? strings.menu.toolbar.show : strings.menu.toolbar.hide} ${strings.menu.toolbar.toolbar}`)
         .onClick(toolbar.toggle)
       )
+
+    if (globalSettings.rememberFolding) menu.addItem(item => item
+      .setIcon('rotate-ccw')
+      .setTitle(strings.menu.resetFolding)
+      .onClick(this.renderer.resetFolding)
+    )
 
     super.onPaneMenu(menu, source)
   }

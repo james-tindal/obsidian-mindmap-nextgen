@@ -6,6 +6,7 @@ export default {
   menu: {
     copyScreenshot: '复制截图',
     collapseAll: '折叠所有',
+    resetFolding: '重置已保存的折叠状态',
     toolbar: {
       toolbar: '工具栏',
       show: '显示',
@@ -18,6 +19,7 @@ export default {
   },
   fileSettingsButton: '文件级别设置',
   blockSettingsButton: '代码框级别设置',
+  saveError: 'Mindmap NextGen 无法保存设置或折叠状态，请查看控制台了解详情。',
   settings: {
     explanations: {
       file: [
@@ -63,6 +65,10 @@ export default {
       titleAsRootNode: {
         name: '使用标题作为根节点',
         description: '启用后，思维导图的根节点将使用文档的标题',
+      },
+      rememberFolding: {
+        name: '记住节点折叠状态',
+        description: '按笔记记住导图标签页中的分支展开和折叠状态，编辑或重新打开后恢复。状态保存在插件数据中，不修改笔记。默认关闭。',
       },
       coloring: {
         name: '配色方案',

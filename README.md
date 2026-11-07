@@ -13,6 +13,7 @@ Obsidian plugin to view your notes as mindmaps using [Markmap](https://markmap.j
   + [Pin/Unpin](#pinunpin)
   + [Copy screenshot](#copy-screenshot)
   + [Collapse all](#collapse-all)
+  + [Reset saved folding state](#reset-saved-folding-state)
   + [Toggle toolbar](#toggle-toolbar)
 + [Other features](#other-features)
   + [Checkboxes](#checkboxes)
@@ -25,6 +26,7 @@ Obsidian plugin to view your notes as mindmaps using [Markmap](https://markmap.j
   + [Line thickness](#line-thickness)
   + [Highlight inline markmaps](#highlight-inline-markmaps)
   + [Use title as root node](#use-title-as-root-node)
+  + [Remember node folding](#remember-node-folding)
   + [Markmap settings](#markmap-settings)
 + [Installing](#installing)
 + [Contributing](#contributing)
@@ -67,6 +69,11 @@ Background and text color are configurable in settings or the document's frontma
 ### Collapse all
 
 Closes all mindmap nodes, leaving just the root visible
+
+### Reset saved folding state
+
+Reset this note to its initial expand level and folding comments.
+Available when **Remember node folding** is on.
 
 ### Toggle toolbar
 
@@ -187,6 +194,17 @@ Add a background to inline markmaps to make them stand out from the rest of the 
 Frontmatter setting: `titleAsRootNode`
 
 Generate mindmaps with the title at the bottom level, so you can avoid repeating the title.
+
+### Remember node folding
+
+Turn this on to keep branches open or closed when you edit a note or reopen its mindmap.
+Each note is remembered separately. Off by default.
+
+Your choices are saved in the plugin settings, without changing your notes.
+This only works in mindmap tabs. Zoom and position are not saved.
+
+If you rename a branch or move it under another branch, you may need to fold it again.
+Adding or removing identical branches may also reset their folding.
 
 
 ### Screenshot settings
